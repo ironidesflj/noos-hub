@@ -5,6 +5,7 @@ Thumbs.db
 .idea/
 .vscode/
 
-# QA local
-*.png
-!assets/*.svg
+# QA local — screenshots tirados na raiz do repo.
+# ⚠ Só a raiz: as og-images de assets/ PRECISAM subir no push
+# (referenciadas pelas metas og:image das páginas).
+/*.png

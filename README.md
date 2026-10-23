@@ -47,7 +47,7 @@ noos-hub/
 │   ├── favicon.svg         compacto + prefers-color-scheme (referenciado como /assets/favicon.svg)
 │   ├── og-image-pt.png     imagem de compartilhamento 1200×630 (PT)
 │   └── og-image-en.png     imagem de compartilhamento 1200×630 (EN)
-├── css/noos.css            estilos (componentes do manual, breakpoints idênticos)
+├── css/noos.css            estilos (componentes do manual; breakpoints 980/640 + 768 funcional p/ o cabeçalho móvel)
 ├── js/campo-noosferico.js  ⚠ Fig. 01 — NÃO EDITAR
 ├── js/noos.js              tema + idioma persistente + ano
 ├── .github/workflows/ci.yml  CI: gate de placeholders + integridade PT/EN
@@ -82,6 +82,17 @@ Claro/escuro com a mesma chave do manual (`localStorage: noos-theme`,
 `data-theme="dark"`). Ao trocar, o Campo Noosférico é re-colorido via
 `window.__noosField.refresh()` — mesmo comportamento do manual.
 
+## Cabeçalho em telas pequenas (≤768px)
+
+Decisão funcional do hub (o manual não define padrão de navegação móvel):
+
+- **Navegação inteira visível em duas linhas** — logo + idioma + tema na
+  primeira, as 5 seções na segunda. Sem barra de rolagem horizontal:
+  link escondido atrás de rolagem é link que não existe para o usuário.
+- **Cabeçalho solto (não-sticky)** — rola junto com a página. Nenhum
+  conteúdo fica “cortado” por cima dele, em nenhuma posição de leitura.
+- Acima de 768px o cabeçalho volta a ser sticky (comporta tudo em 1 linha).
+
 ## ✅ Dados do mantenedor — preenchidos (out/2026)
 
 Todos os placeholders `EDITAR`/`EDIT` foram preenchidos e os comentários
@@ -105,6 +116,23 @@ Licença de código **decidida: MIT** (justificativa e nota de marca em
 > Features → Discussions** (um clique) para o link responder em vez de 404.
 > O rodapé do site avisa “chegando com a Fase 2”, mas o quadro em si é
 > gratuito e pode abrir antes.
+
+## Apps da família — links (out/2026)
+
+Nomes dos cartões = links para os próprios apps (nova aba; `target="_blank"`
++ `rel="noopener"`). Fio visível em repouso sob o nome: toque não tem
+hover — link escondido atrás de affordance é link que não existe para o
+usuário (mesma lição do cabeçalho móvel).
+
+| App | URL pública | Onde (PT e EN) |
+|---|---|---|
+| Synapse | `https://ctfl-app.vercel.app/` | seção 02 — nome do cartão |
+| Ranvier | `https://ranvier-seven.vercel.app/#/` | seção 02 — nome do cartão |
+
+Ambos com selo `live` (ponto colorido da cor do app + texto em destaque):
+Synapse “em constante atualização”/“constantly improving”; Ranvier “em
+produção”/“in production”. Myelin/Theta/Engram seguem sem link até existirem
+os apps — nunca placeholder (regra do CI).
 
 ## CI — o gate de placeholders
 
@@ -138,8 +166,9 @@ sempre atualizado** (deploy automático a cada push).
 
 ## Backlog conhecido (não bloqueia o ir ao ar)
 
-- **Link no cartão Ranvier** (seção 02 Família): adicionar quando o app
-  tiver URL pública — decisão do mantenedor: fica para depois.
 - Self-host das fontes (hoje: Google Fonts via CDN), CSS de impressão,
   CSP mais estrita, segundo espelho no Cloudflare Pages (P2/F3 — ver
   relatório *Revisão do Time — Estado Atual*, Tabelas 8–9).
+
+> ⚠ Regra do `.gitignore`: apenas PNGs da **raiz** são ignorados (screenshots
+> de QA local). As og-images em `assets/` devem sempre subir no push.
