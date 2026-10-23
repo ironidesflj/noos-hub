@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-labelledby="noos-title noos-desc">
+  <title id="noos-title">Símbolo Noos</title>
+  <desc id="noos-desc">Esfera aberta de grandes círculos, com um nó-luz na abertura.</desc>
+  <path d="M80.66 21.15 A44 44 0 1 0 98.85 39.34" fill="none" stroke="#0e1b1c" stroke-width="2.4"/>
+  <g fill="none" stroke="#0e1b1c" stroke-width="1.1" opacity=".5">
+    <ellipse cx="60" cy="60" rx="44" ry="17.04"/>
+    <ellipse cx="60" cy="60" rx="44" ry="16.88" transform="rotate(98.5 60 60)"/>
+    <ellipse cx="60" cy="60" rx="44" ry="27.36" transform="rotate(129.8 60 60)"/>
+    <ellipse cx="60" cy="60" rx="44" ry="25.9" transform="rotate(49.8 60 60)"/>
+  </g>
+  <g fill="#0e1b1c">
+    <circle cx="16" cy="60" r="2.2"/>
+    <circle cx="60" cy="77" r="1.5"/>
+    <circle cx="104" cy="60" r="2.2"/>
+    <circle cx="60" cy="43" r="1.4"/>
+    <circle cx="42.3" cy="40.4" r="1.7"/>
+    <circle cx="77.8" cy="68.8" r="1.7"/>
+    <circle cx="64.1" cy="27.9" r="1.4"/>
+    <circle cx="28.9" cy="72" r="1.5"/>
+    <circle cx="95.96" cy="25.27" r="3.2" fill="#32a188"/>
+    <circle cx="97.47" cy="18.39" r="1.5" opacity=".55"/>
+    <circle cx="98.8" cy="10.36" r="1" opacity=".35"/>
+  </g>
+</svg>

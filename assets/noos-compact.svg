@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-labelledby="noos-title noos-desc">
+  <title id="noos-title">Símbolo Noos — compacto</title>
+  <desc id="noos-desc">Versão para favicon e tamanhos pequenos: anel com quatro nós e o nó-luz à direita.</desc>
+  <circle cx="60" cy="60" r="42" fill="none" stroke="#0e1b1c" stroke-width="16"/>
+  <g fill="#0e1b1c">
+    <circle cx="60" cy="18" r="9"/>
+    <circle cx="18" cy="60" r="9"/>
+    <circle cx="60" cy="102" r="9"/>
+    <circle cx="102" cy="60" r="11" fill="#32a188"/>
+  </g>
+</svg>

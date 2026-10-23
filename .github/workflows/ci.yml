@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  gate-placeholders:
+    name: Gate de placeholders
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Regra do projeto: nenhuma página pode ir ao ar com dados do
+      # mantenedor em aberto (Revisão do Time — Estado Atual, P0).
+      # Enquanto este job estiver vermelho, o site NÃO está pronto.
+      - name: Nenhuma página com EDITAR/EDIT vivo
+        run: |
+          if grep -rnE 'EDITAR|EDIT' index.html 404.html pt/index.html en/index.html; then
+            echo "::error::Ainda há placeholders EDITAR/EDIT nas páginas. Preencha os dados do mantenedor (README, seção «Preencher antes do ir ao ar»), remova os comentários <!-- EDITAR/EDIT ... --> e faça push de novo."
+            exit 1
+          fi
+          echo "OK — nenhum placeholder vivo."
+
+  integridade:
+    name: Integridade e paridade PT/EN
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Paridade de âncoras e seções (PT ↔ EN)
+        run: |
+          diff <(grep -oE 'id="[a-zA-Z-]+"' pt/index.html | sort) \
+               <(grep -oE 'id="[a-zA-Z-]+"' en/index.html | sort)
+
+      - name: Paridade de metas sociais (PT ↔ EN)
+        run: |
+          pt=$(grep -c 'property="og:' pt/index.html)
+          en=$(grep -c 'property="og:' en/index.html)
+          if [ "$pt" -ne "$en" ]; then
+            echo "::error::PT tem $pt metas og:, EN tem $en — as duas línguas são cidadãs de primeira classe."
+            exit 1
+          fi
+
+      - name: Referências locais existem
+        run: |
+          python3 - <<'PY'
+          import re, pathlib, sys
+          root = pathlib.Path('.')
+          bad = []
+          pages = ['index.html', '404.html', 'pt/index.html', 'en/index.html']
+          for page in pages:
+              html = (root / page).read_text(encoding='utf-8')
+              for m in re.finditer(r'(?:href|src)="(/[^"#]*)(?:[#?].*)?"', html):
+                  ref = m.group(1)
+                  cand = root / (ref.lstrip('/') + 'index.html') if ref.endswith('/') else root / ref.lstrip('/')
+                  if not cand.exists():
+                      bad.append(f'{page} -> {ref}')
+          if bad:
+              for b in bad:
+                  print(f'::error::referência quebrada: {b}')
+              sys.exit(1)
+          print('OK — todas as referências locais existem.')
+          PY
+
+      - name: Sitemap cobre PT e EN
+        run: |
+          grep -q 'https://noos.study/pt/' sitemap.xml
+          grep -q 'https://noos.study/en/' sitemap.xml

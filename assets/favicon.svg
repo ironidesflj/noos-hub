@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Símbolo compacto Noos (Manual de Identidade v1.0) + tokens — sem redesenho -->
+  <style>
+    .ink{stroke:#0e1b1c}
+    .dot{fill:#0e1b1c}
+    .hot{fill:#32a188}
+    @media (prefers-color-scheme:dark){
+      .ink{stroke:#e4e9e8}
+      .dot{fill:#e4e9e8}
+      .hot{fill:#8fd6c5}
+    }
+  </style>
+  <circle class="ink" cx="60" cy="60" r="42" fill="none" stroke="#0e1b1c" stroke-width="16"/>
+  <g>
+    <circle class="dot" cx="60" cy="18" r="9" fill="#0e1b1c"/>
+    <circle class="dot" cx="18" cy="60" r="9" fill="#0e1b1c"/>
+    <circle class="dot" cx="60" cy="102" r="9" fill="#0e1b1c"/>
+    <circle class="hot" cx="102" cy="60" r="11" fill="#32a188"/>
+  </g>
+</svg>

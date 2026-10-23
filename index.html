@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Noos — A esfera do conhecimento coletivo</title>
+<meta name="description" content="Noos é a marca-mãe de um ecossistema de estudo para certificações de tecnologia. Não é um produto: é a esfera que conecta, endossa e mantém tudo aberto." />
+<meta name="theme-color" content="#f7fbf9" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Noos" />
+<meta property="og:title" content="Noos — A esfera do conhecimento coletivo" />
+<meta property="og:description" content="Manifesto, família de apps, Contribua, Feedback e Contato. Estude sem conta; contribua com conhecimento, código ou sustento." />
+<meta property="og:url" content="https://noos.study/" />
+<meta property="og:image" content="https://noos.study/assets/og-image-pt.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Noos — a esfera do conhecimento coletivo, com a Fig. 01 Campo Noosférico." />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="canonical" href="https://noos.study/" />
+<link rel="alternate" hreflang="pt" href="https://noos.study/pt/" />
+<link rel="alternate" hreflang="en" href="https://noos.study/en/" />
+<link rel="alternate" hreflang="x-default" href="https://noos.study/" />
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Instrument+Sans:ital,wght@0,400..600;1,400&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..500;1,6..72,200..400&amp;display=swap" rel="stylesheet">
+<script>
+/* Política de idioma (Carta do Projeto, cap. 7):
+   o idioma do dispositivo manda; o inglês é o fallback universal;
+   a troca manual é sempre visível e persiste (localStorage 'noos-lang'). */
+(function(){
+  var target='en';
+  try{
+    var saved=localStorage.getItem('noos-lang');
+    if(saved==='pt'||saved==='en'){target=saved;}
+    else{
+      var nav=(navigator.languages&&navigator.languages[0])||navigator.language||'en';
+      target=String(nav).toLowerCase().indexOf('pt')===0?'pt':'en';
+    }
+  }catch(e){}
+  location.replace(target+'/');
+})();
+</script>
+<script>
+(function(){try{var t=localStorage.getItem('noos-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+</script>
+<link rel="stylesheet" href="/css/noos.css" />
+</head>
+<body>
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+<symbol id="noos-mark" viewBox="0 0 120 120">
+  <path d="M80.66 21.15 A44 44 0 1 0 98.85 39.34" fill="none" stroke="currentColor" stroke-width="2.4"/>
+  <g fill="none" stroke="currentColor" stroke-width="1.1" opacity=".5">
+    <ellipse cx="60" cy="60" rx="44" ry="17.04"/>
+    <ellipse cx="60" cy="60" rx="44" ry="16.88" transform="rotate(98.5 60 60)"/>
+    <ellipse cx="60" cy="60" rx="44" ry="27.36" transform="rotate(129.8 60 60)"/>
+    <ellipse cx="60" cy="60" rx="44" ry="25.9" transform="rotate(49.8 60 60)"/>
+  </g>
+  <g fill="currentColor">
+    <circle cx="16" cy="60" r="2.2"/>
+    <circle cx="60" cy="77" r="1.5"/>
+    <circle cx="104" cy="60" r="2.2"/>
+    <circle cx="60" cy="43" r="1.4"/>
+    <circle cx="42.3" cy="40.4" r="1.7"/>
+    <circle cx="77.8" cy="68.8" r="1.7"/>
+    <circle cx="64.1" cy="27.9" r="1.4"/>
+    <circle cx="28.9" cy="72" r="1.5"/>
+    <circle cx="95.96" cy="25.27" r="3.2" style="fill:var(--mark-hot, var(--accent-bright))"/>
+    <circle cx="97.47" cy="18.39" r="1.5" opacity=".55"/>
+    <circle cx="98.8" cy="10.36" r="1" opacity=".35"/>
+  </g>
+</symbol>
+<symbol id="noos-compact" viewBox="0 0 120 120">
+  <circle cx="60" cy="60" r="42" fill="none" stroke="currentColor" stroke-width="16"/>
+  <g fill="currentColor">
+    <circle cx="60" cy="18" r="9"/>
+    <circle cx="18" cy="60" r="9"/>
+    <circle cx="60" cy="102" r="9"/>
+    <circle cx="102" cy="60" r="11" style="fill:var(--mark-hot, var(--accent-bright))"/>
+  </g>
+</symbol>
+</defs>
+</svg>
+
+<main id="conteudo" class="gate">
+  <div class="gate-box">
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    <div class="gate-mark">
+      <svg class="mark" viewBox="0 0 120 120" aria-label="Símbolo Noos" role="img"><use href="#noos-mark"/></svg>
+      <span class="wm">Noos</span>
+    </div>
+    <h1>Escolha o idioma — choose your language.</h1>
+    <p>A esfera do conhecimento coletivo. O hub do ecossistema Noos: manifesto, família de apps, Contribua, Feedback e Contato.</p>
+    <div class="gate-actions">
+      <a class="btn primary" data-lang="pt" href="/pt/">Português</a>
+      <a class="btn secondary" data-lang="en" href="/en/">English</a>
+    </div>
+    <span class="mono">noos.study</span>
+  </div>
+</main>
+
+<script src="/js/noos.js"></script>
+</body>
+</html>

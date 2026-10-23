@@ -1,0 +1,35 @@
+:root {
+  --bg: #f7fbf9;
+  --surface: #ffffff;
+  --surface-2: #eef4f1;
+  --fg: #0e1b1c;
+  --muted: #525d5e;
+  --border: #d9e0de;
+  --border-strong: #7f8b89;
+  --accent: #066755;
+  --accent-bright: #32a188;
+  --signal: #d69643;
+  --synapse: #7a55b2;
+  --ranvier: #246cad;
+  --myelin: #b5812f;
+  --theta: #b4508c;
+  --engram: #267b4c;
+  --font-display: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Instrument Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #0a0f10;
+  --surface: #121919;
+  --surface-2: #182020;
+  --fg: #e4e9e8;
+  --muted: #929a99;
+  --border: #2c3535;
+  --border-strong: #5f6b69;
+  --accent: #69c1ae;
+  --accent-bright: #8fd6c5;
+  --signal: #e0a95c;
+  color-scheme: dark;
+}
