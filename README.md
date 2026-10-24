@@ -50,13 +50,38 @@ noos-hub/
 ├── css/noos.css            estilos (componentes do manual; breakpoints 980/640 + 768 funcional p/ o cabeçalho móvel)
 ├── js/campo-noosferico.js  ⚠ Fig. 01 — NÃO EDITAR
 ├── js/noos.js              tema + idioma persistente + ano
-├── .github/workflows/ci.yml  CI: gate de placeholders + integridade PT/EN
+├── .github/workflows/ci.yml  CI: gate de placeholders + integridade PT/EN + sdd-lint
+├── constitution.md         SDD — regras permanentes da marca-mãe (assimetria, ingestão, registro)
+├── current-state.md        SDD — estado verificado, versões e limitações
+├── plan.md                 SDD — autorizado, pendente, adiado, fora de escopo
+├── spec-rodape-versao.md   SDD — spec da mudança "rodapé com versão" (v7)
+├── noos.registry.json      registro da família — fonte única de prefixos, status e versão do sistema
 ├── vercel.json             cleanUrls, trailingSlash, headers de segurança
 ├── robots.txt · sitemap.xml
 ├── LICENSE.md              CC BY-SA 4.0 (conteúdo) + MIT (código) — ver arquivo
 ├── README.md               este arquivo
 └── DEPLOY.md               noos.study + Vercel (backup sempre atualizado)
 ```
+
+## SDD — o hub também tem especificação
+
+O hub segue o modelo SDD do mantenedor (desenvolvimento orientado por
+especificação: **problema, decisão, limites e evidência no Git** — não em
+conversa, não em quadro que ninguém abre):
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `constitution.md` | Regras permanentes — a assimetria da marca-mãe (o que o hub nunca faz) e a ingestão de manifestos |
+| `current-state.md` | Estado verificado, versões, commits e limitações |
+| `plan.md` | Autorizado, pendente, adiado e fora de escopo (pistas: hub · biblioteca · apps) |
+| `spec-*.md` | Problema e contrato de cada mudança, com aceitação |
+| `noos.registry.json` | **O registro da família** — fonte única de prefixos, status e versão do sistema; o job `sdd-lint` do CI valida e mantém o site em sincronia |
+
+O **contrato técnico compartilhado** (formato de ID, `manifest.jsonl`,
+deep-link canônico) mora no repositório do **Axon** (`@noos/axon`,
+spec-first v0.1.0) — este README aponta; não duplica. O Axon entra como
+**versão fixada** quando o hub tiver build de aplicação (Fase 2); na Fase 1
+o hub é estático e consome o contrato como referência.
 
 ## Regras da identidade aplicadas (Manual §11 — “Antes de publicar”)
 
@@ -130,13 +155,42 @@ usuário (mesma lição do cabeçalho móvel).
 | Ranvier | `https://ranvier-seven.vercel.app/#/` | seção 02 — nome do cartão |
 
 Ambos com selo `live` (ponto colorido da cor do app + texto em destaque):
-Synapse “em constante atualização”/“constantly improving”; Ranvier “em
-produção”/“in production”. Myelin/Theta/Engram seguem sem link até existirem
-os apps — nunca placeholder (regra do CI).
+Synapse “em constante atualização”/“constantly improving” — o texto do
+cartão acompanha o app real no ar (“Mais de mil questões em revisão
+contínua”); Ranvier “em produção”/“in production”.
+
+Domínios definidos pelo **Guia de aplicação nos apps** (design · v1.0 ·
+out/2026) — refletidos na seção 02 desde a v6:
+
+| App | Domínio | Status no hub |
+|---|---|---|
+| Synapse | QA · ISTQB | em constante atualização |
+| Ranvier | Cloud | em produção |
+| Myelin | Segurança | no horizonte |
+| Theta | Agile | no horizonte |
+| Engram | Dados · AI | no horizonte |
+
+O nó-luz no símbolo e o ponto `live` dos cartões seguem `--accent-bright`
+e a cor do app — dado do registro, não decoração de interface.
+
+## Versões
+
+| Pacote | O que traz | Estado |
+|---|---|---|
+| **v7 (atual)** | SDD no repo (constitution/current-state/plan/spec) · `noos.registry.json` como fonte única · rodapé com versão do sistema e build (sistema **v1.1.1**) · job `sdd-lint` no CI | pronto p/ push — **acumula a v6** |
+| v6 | Domínios da família pelo Guia de aplicação (Myelin Segurança, Theta Agile, Engram Dados · AI) · Synapse "mais de mil questões em revisão contínua" · vocabulário "no horizonte" | incluída na v7 |
+| v5 | Cartões dos apps viram links (Synapse/Ranvier) · selo live no Synapse · linha Fig. 01 do rodapé removida | incluída |
+| v4 | Cabeçalho móvel 2 linhas + não-sticky · esfera sem corte · status do Synapse | incluída |
+| v3 | Dados do mantenedor preenchidos · CI verde no primeiro push | incluída |
+
+> **A v7 inclui tudo da v6** (que ainda não foi empurrada): um único
+> `git push` aplica v6+v7 juntos. O rodapé passa a exibir `Sistema Noos
+> v1.1.1 · build out/2026` — a versão vem do `noos.registry.json` e o
+> `sdd-lint` do CI impede que os dois divirjam.
 
 ## CI — o gate de placeholders
 
-O GitHub Actions (`.github/workflows/ci.yml`) roda a cada push com dois jobs:
+O GitHub Actions (`.github/workflows/ci.yml`) roda a cada push com três jobs:
 
 - **Gate de placeholders** — falha se algum `EDITAR`/`EDIT` voltar a aparecer
   em qualquer página (o gate protege o estado preenchido; se você adicionar

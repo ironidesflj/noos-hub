@@ -70,3 +70,40 @@ jobs:
         run: |
           grep -q 'https://noos.study/pt/' sitemap.xml
           grep -q 'https://noos.study/en/' sitemap.xml
+
+  sdd-lint:
+    name: SDD — arquivos canônicos e registro
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Regra do projeto: o SDD mora no repositório (problema, decisão,
+      # limites e evidência no Git — não em conversa). Este job guarda a
+      # existência dos arquivos canônicos e a sincronia do registro.
+      - name: Arquivos canônicos do SDD presentes
+        run: |
+          for f in constitution.md current-state.md plan.md noos.registry.json; do
+            test -f "$f" || { echo "::error::$f ausente — o SDD mora no repositório (ver README)."; exit 1; }
+          done
+          grep -q "noos.registry.json" README.md || { echo "::error::README não aponta o registro (noos.registry.json)."; exit 1; }
+
+      - name: Registro válido e em sincronia com o site
+        run: |
+          python3 - <<'PY'
+          import json
+          reg = json.load(open('noos.registry.json', encoding='utf-8'))
+          ns = reg['namespaces']
+          canon = {'em produção', 'em breve', 'no horizonte', 'descontinuado'}
+          prefixes = [n['prefix'] for n in ns]
+          assert len(prefixes) == len(set(prefixes)) == 5, 'esperava 5 prefixos únicos'
+          for n in ns:
+              assert n['status'] in canon, f"status não canônico: {n['app']} = {n['status']}"
+          assert reg['library']['name'] == '@noos/axon', 'registro deve apontar @noos/axon'
+          version = reg['version']
+          for lang in ('pt', 'en'):
+              html = open(f'{lang}/index.html', encoding='utf-8').read()
+              for n in ns:
+                  assert n['app'] in html, f"{n['app']} ausente em {lang}/index.html"
+              assert f'v{version}' in html, f"rodapé {lang} sem a versão v{version} do registro"
+          print(f'OK — registro v{version} válido e em sincronia com PT e EN.')
+          PY

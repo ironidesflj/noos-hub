@@ -1,5 +1,12 @@
 # Deploy — noos.study (primário) + Vercel (backup sempre atualizado)
 
+> **Versão deste pacote: v7** — ela **acumula tudo da v6** (que nunca foi
+> empurrada). Um único `git push` coloca v6+v7 no ar juntos. O rodapé passa
+> a mostrar `Sistema Noos v1.1.1 · build out/2026` e o CI ganha o job
+> `sdd-lint` (arquivos SDD + registro `noos.registry.json` em sincronia).
+> Se o repo já recebeu versões anteriores, suba por cima (`--force` se
+> necessário — ver seção 1).
+
 Arquitetura pedida pelo mantenedor: o hub responde em **noos.study** como
 endereço primário, e uma **cópia na Vercel** funciona como backup — sempre
 atualizada a cada push. O repositório é estático (sem build), então as duas

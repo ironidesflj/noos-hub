@@ -1,0 +1,28 @@
+{
+  "system": "noos",
+  "version": "1.1.1",
+  "updated": "2026-10",
+  "namespaces": [
+    { "prefix": "SYN", "app": "Synapse", "domain": "ISTQB", "status": "em produção", "color": "#7a55b2" },
+    { "prefix": "RAN", "app": "Ranvier", "domain": "Cloud", "status": "em produção", "color": "#246cad", "alias": "GLI-" },
+    { "prefix": "MYE", "app": "Myelin", "domain": "Segurança", "status": "no horizonte", "color": "#b5812f" },
+    { "prefix": "THA", "app": "Theta", "domain": "Agile", "status": "no horizonte", "color": "#b4508c" },
+    { "prefix": "ENG", "app": "Engram", "domain": "Dados · AI", "status": "no horizonte", "color": "#267b4c" }
+  ],
+  "library": {
+    "name": "@noos/axon",
+    "mode": "pacote",
+    "version": "0.1.0",
+    "phase": "spec-first"
+  },
+  "rules": {
+    "recycle": false,
+    "alias": "eterno",
+    "invalidLine": "rejeitar_com_log",
+    "hubHostsPractice": false
+  },
+  "notes": {
+    "status-axis": "O status descreve o app público: 'em produção' = app no ar; 'em breve' = nome validado e marca limpa, sem data; 'no horizonte' = validar no lançamento; 'descontinuado' = epitáfio.",
+    "registry-source": "Fonte única do registro da família. O CI valida este arquivo e a presença dos 5 apps nas páginas PT e EN. Contrato técnico completo (IDs, manifest.jsonl, deep-link) mora no repositório do Axon (constitution.md)."
+  }
+}
