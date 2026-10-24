@@ -7,8 +7,8 @@
 - **Domínios funcionando:** `www.noos.study` (primário na Vercel),
   `noos.study` (308 → www, path preservado), `noos-hub.vercel.app` (backup
   canônico). DNS GoDaddy → Vercel operacional desde 23/10.
-- **Deploy no ar: versão do repo anterior à v6** (v6 ainda não sofreu push —
-  este pacote v7 **acumula v6+v7**; um push aplica tudo).
+- **Deploy no ar: pacote v7**, publicado no commit `01a5927` e servido pela
+  Vercel em produção. O pacote v7 acumulou as alterações da v6+v7.
 
 ## Estado do pacote (v7, este)
 
