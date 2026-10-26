@@ -50,6 +50,13 @@ Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
   localmente: build zero-manifestos idêntico byte a byte, QA do fixture 20/20,
   função de rota 8/8.
 
+## Feito (v10.1 — out/2026)
+
+- ✅ **Fix de routing da rota `/q/{ID}`** — rewrites por `:id` de segmento
+  único, com e sem barra final, e `handle: filesystem` para preservar as
+  páginas canônicas estáticas. O fixture de QA fica fora do deploy via
+  `.vercelignore`.
+
 ## Pendente (Fase 2 — engenharia do hub)
 
 - **Ingestão de manifestos no build** — consumir os `manifest.jsonl`

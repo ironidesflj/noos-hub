@@ -1,6 +1,6 @@
 # current-state — hub Noos (noos.study)
 
-Última verificação: out/2026 · pacote v10 · sistema v1.2.0
+Última verificação: out/2026 · pacote v10.1 · sistema v1.2.0
 
 ## No ar (verificado)
 
@@ -16,7 +16,11 @@
   manifestos as páginas são idênticas às da v9 — mudança visível: rodapé e
   registro em v1.2.0.
 
-## Estado do pacote (v10, este)
+## Estado do pacote (v10.1, este)
+
+- **v10.1 (out/2026):** routing de `/q/{ID}` corrigido com rewrites `:id`
+  (com e sem barra final) e `handle: filesystem`; fixture local excluído
+  do deploy por `.vercelignore`.
 
 - **v10 (out/2026):** rota `/q/{ID}` implementada (`spec-pagina-de-questao.md`
   v1): o build gera páginas, mapa de aliases e sitemap a partir de

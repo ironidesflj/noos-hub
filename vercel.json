@@ -5,9 +5,13 @@
   "buildCommand": "node build/gera-questoes.mjs",
   "outputDirectory": ".",
   "rewrites": [
-    { "source": "/q/:rest*", "destination": "/api/q?p=/q/:rest*" },
-    { "source": "/pt/q/:rest*", "destination": "/api/q?p=/pt/q/:rest*" },
-    { "source": "/en/q/:rest*", "destination": "/api/q?p=/en/q/:rest*" }
+    { "handle": "filesystem" },
+    { "source": "/q/:id", "destination": "/api/q?p=/q/:id" },
+    { "source": "/pt/q/:id", "destination": "/api/q?p=/pt/q/:id" },
+    { "source": "/en/q/:id", "destination": "/api/q?p=/en/q/:id" },
+    { "source": "/q/:id/", "destination": "/api/q?p=/q/:id/" },
+    { "source": "/pt/q/:id/", "destination": "/api/q?p=/pt/q/:id/" },
+    { "source": "/en/q/:id/", "destination": "/api/q?p=/en/q/:id/" }
   ],
   "headers": [
     {

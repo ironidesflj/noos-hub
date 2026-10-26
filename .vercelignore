@@ -1,0 +1,2 @@
+# Fixture de QA local; não deve ser servido no deploy.
+build/fixtures

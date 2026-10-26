@@ -1,6 +1,6 @@
 # spec-pagina-de-questao
 
-Especificação do hub (noos.study) · estado: **proposta v1** — Fase 2, item 1 do `plan.md`. Desenho fechado; implementação em lote próprio, após OK do mantenedor.
+Especificação do hub (noos.study) · estado: **implementada na v10** — rota, build e função no ar (routing de aliases corrigido na v10.1); conteúdo aguarda o primeiro manifesto (F2 item 2 para o transporte).
 
 ## Problema
 
