@@ -6,6 +6,14 @@ Thumbs.db
 .vscode/
 *.bak
 
+# v10 — saídas do build das páginas /q/{ID}
+/pt/q/
+/en/q/
+/api/q-data.mjs
+/sitemap.xml
+.qa-dist/
+node_modules/
+
 # QA local — screenshots tirados na raiz do repo.
 # ⚠ Só a raiz: as og-images de assets/ PRECISAM subir no push
 # (referenciadas pelas metas og:image das páginas).

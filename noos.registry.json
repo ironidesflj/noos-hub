@@ -1,28 +1,28 @@
 {
-  "system": "noos",
-  "version": "1.1.1",
-  "updated": "2026-10",
-  "namespaces": [
-    { "prefix": "SYN", "app": "Synapse", "domain": "ISTQB", "status": "em produção", "color": "#7a55b2" },
-    { "prefix": "RAN", "app": "Ranvier", "domain": "Cloud", "status": "em produção", "color": "#246cad", "alias": "GLI-" },
-    { "prefix": "MYE", "app": "Myelin", "domain": "Segurança", "status": "no horizonte", "color": "#b5812f" },
-    { "prefix": "THA", "app": "Theta", "domain": "Agile", "status": "no horizonte", "color": "#b4508c" },
-    { "prefix": "ENG", "app": "Engram", "domain": "Dados · AI", "status": "no horizonte", "color": "#267b4c" }
-  ],
-  "library": {
-    "name": "@ironidesflj/axon",
-    "mode": "pacote",
-    "version": "0.2.2",
-    "phase": "publicada"
-  },
-  "rules": {
-    "recycle": false,
-    "alias": "eterno",
-    "invalidLine": "rejeitar_com_log",
-    "hubHostsPractice": false
-  },
-  "notes": {
-    "status-axis": "O status descreve o app público: 'em produção' = app no ar; 'em breve' = nome validado e marca limpa, sem data; 'no horizonte' = validar no lançamento; 'descontinuado' = epitáfio.",
-    "registry-source": "Fonte única do registro da família. O CI valida este arquivo e a presença dos 5 apps nas páginas PT e EN. Contrato técnico completo (IDs, manifest.jsonl, deep-link) mora no repositório do Axon (constitution.md)."
-  }
+"system": "noos",
+"version": "1.2.0",
+"updated": "2026-10",
+"namespaces": [
+{ "prefix": "SYN", "app": "Synapse", "domain": "ISTQB", "status": "em produção", "color": "#7a55b2", "url": "https://ctfl-app.vercel.app/" },
+{ "prefix": "RAN", "app": "Ranvier", "domain": "Cloud", "status": "em produção", "color": "#246cad", "url": "https://ranvier-seven.vercel.app/#/", "alias": "GLI-" },
+{ "prefix": "MYE", "app": "Myelin", "domain": "Segurança", "status": "no horizonte", "color": "#b5812f" },
+{ "prefix": "THA", "app": "Theta", "domain": "Agile", "status": "no horizonte", "color": "#b4508c" },
+{ "prefix": "ENG", "app": "Engram", "domain": "Dados · AI", "status": "no horizonte", "color": "#267b4c" }
+],
+"library": {
+"name": "@ironidesflj/axon",
+"mode": "pacote",
+"version": "0.2.2",
+"phase": "publicada"
+},
+"rules": {
+"recycle": false,
+"alias": "eterno",
+"invalidLine": "rejeitar_com_log",
+"hubHostsPractice": false
+},
+"notes": {
+"status-axis": "O status descreve o app público: 'em produção' = app no ar; 'em breve' = nome validado e marca limpa, sem data; 'no horizonte' = validar no lançamento; 'descontinuado' = epitáfio.",
+"registry-source": "Fonte única do registro da família. O CI valida este arquivo e a presença dos 5 apps nas páginas PT e EN. Contrato técnico completo (IDs, manifest.jsonl, deep-link) mora no repositório do Axon (constitution.md). O campo opcional 'url' por namespace alimenta o link de volta ao app nas páginas /q/{ID} (spec-pagina-de-questao.md)."
+}
 }

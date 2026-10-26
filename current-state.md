@@ -1,6 +1,6 @@
 # current-state — hub Noos (noos.study)
 
-Última verificação: out/2026 · pacote v9 · sistema v1.1.1
+Última verificação: out/2026 · pacote v10 · sistema v1.2.0
 
 ## No ar (verificado)
 
@@ -10,12 +10,19 @@
   desde 23/10.
 - **Bordas verificadas (v8):** 320, 640 (200% zoom de 1280) e 1920 px,
   PT e EN — zero overflow horizontal, zero elementos fora da viewport.
-- **Deploy no ar: pacote v9**, sobre o v8 (`d57feea` — registry 0.2.2 +
-  bordas 320/640/1920 verificadas) e o v7 (`01a5927`, `3b44aba`, `e0867e6`,
-  com o registry alinhado em `639c4fb`). Da v7 para cá nenhuma página muda —
-  v8 e v9 são registro e documentação.
+- **Deploy no ar: pacote v10**, sobre o v9 (`a5001e1` — spec da página de
+  questão) e o v8 (`d57feea` — registry 0.2.2 + bordas 320/640/1920
+  verificadas). Primeira versão com build step e função de rota; com zero
+  manifestos as páginas são idênticas às da v9 — mudança visível: rodapé e
+  registro em v1.2.0.
 
-## Estado do pacote (v9, este)
+## Estado do pacote (v10, este)
+
+- **v10 (out/2026):** rota `/q/{ID}` implementada (`spec-pagina-de-questao.md`
+  v1): o build gera páginas, mapa de aliases e sitemap a partir de
+  `manifestos/*.jsonl`; sistema sobe para v1.2.0 (campo `url` opcional por
+  namespace). Conteúdo aguarda o primeiro manifesto — com zero manifestos o
+  site fica idêntico ao da v9, exceto registro/rodapé em v1.2.0.
 
 - **v9 (out/2026):** spec da página `/q/{ID}` escrita como proposta v1
   (`spec-pagina-de-questao.md`, F2 item 1) — rota, alias 301, geração no
@@ -51,10 +58,10 @@
 
 ## Limitações conhecidas (verdade atual, sem maquiagem)
 
-- **A rota `/q/{ID}` ainda não existe** — deep-links de questão são entrega
-  da Fase 2 (spec escrita — proposta v1 em `spec-pagina-de-questao.md`;
-  implementação em lote próprio); nenhum manifesto foi ingerido ainda
-  (ninguém publica `manifest.jsonl` até agora).
+- **A rota `/q/{ID}` existe, mas nenhuma questão está publicada** — página
+  canônica, redirect de alias (301) e forma sem idioma (308) no ar; o
+  conteúdo acende com o primeiro `manifestos/{PREFIXO}.jsonl` (nenhum app
+  publica `manifest.jsonl` até agora — Ranvier segue na fatia 1).
 - **Discussões (GitHub Discussions) são o quadro da Fase 2** — o link existe,
   o quadro depende de o mantenedor ativar a feature no repo.
 - **Canonical:** `noos.study` é o domínio primário; `www.noos.study` redireciona

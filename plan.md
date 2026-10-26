@@ -39,12 +39,19 @@ Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
   volta ao app (§1), zero manifestos = site inalterado. Primeiro item de
   engenharia da Fase 2 desenhado; implementação em lote próprio após OK.
 
+## Feito (v10 — out/2026)
+
+- ✅ **Página `/q/{ID}` implementada (rota no ar)** — `spec-pagina-de-questao.md`
+  v1: geração estática no build com o parser do Axon (devDependency com pin
+  exato — zero Axon no output servido), alias 301 e forma sem idioma 308 via
+  função burra (`api/q.js`), sitemap gerado, sistema v1.2.0 com campo `url`
+  opcional por namespace no registro. Zero manifestos = site inalterado — as
+  páginas acendem com o primeiro `manifestos/{PREFIXO}.jsonl`. Lote validado
+  localmente: build zero-manifestos idêntico byte a byte, QA do fixture 20/20,
+  função de rota 8/8.
+
 ## Pendente (Fase 2 — engenharia do hub)
 
-- **Página `/q/{ID}`** — renderização estática da questão a partir do
-  snapshot do manifesto, com proveniência e link para o app (**spec escrita —
-  proposta v1** em `spec-pagina-de-questao.md`; implementação em lote próprio
-  após OK do mantenedor).
 - **Ingestão de manifestos no build** — consumir os `manifest.jsonl`
   publicados pelos apps conforme o contrato do Axon (linha inválida → log;
   último build bom segue servindo).
