@@ -9,7 +9,7 @@ Thumbs.db
 # v10 — saídas do build das páginas /q/{ID}
 /pt/q/
 /en/q/
-/api/q-data.mjs
+/q/
 /sitemap.xml
 .qa-dist/
 node_modules/

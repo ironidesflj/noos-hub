@@ -1,6 +1,6 @@
 # current-state — hub Noos (noos.study)
 
-Última verificação: out/2026 · pacote v10.1 · sistema v1.2.0
+Última verificação: out/2026 · pacote v10.2 · sistema v1.2.0
 
 ## No ar (verificado)
 
@@ -10,17 +10,19 @@
   desde 23/10.
 - **Bordas verificadas (v8):** 320, 640 (200% zoom de 1280) e 1920 px,
   PT e EN — zero overflow horizontal, zero elementos fora da viewport.
-- **Deploy no ar: pacote v10**, sobre o v9 (`a5001e1` — spec da página de
-  questão) e o v8 (`d57feea` — registry 0.2.2 + bordas 320/640/1920
-  verificadas). Primeira versão com build step e função de rota; com zero
-  manifestos as páginas são idênticas às da v9 — mudança visível: rodapé e
-  registro em v1.2.0.
+- **Deploy v10.2:** roteamento estático para questões e aliases, sem função
+  ou rewrites. Com zero manifestos, o conteúdo permanece igual ao da v9,
+  exceto registro e rodapé em v1.2.0.
 
-## Estado do pacote (v10.1, este)
+## Estado do pacote (v10.2, este)
 
-- **v10.1 (out/2026):** routing de `/q/{ID}` corrigido com rewrites `:id`
-  (com e sem barra final) e `handle: filesystem`; fixture local excluído
-  do deploy por `.vercelignore`.
+- **v10.2 (out/2026):** o build gera páginas canônicas e páginas de
+  redirecionamento para aliases e URLs sem idioma. Desconhecidas recebem
+  404 estático; redirects usam 200, refresh e canonical.
+
+- **v10.1 (out/2026):** tentativa de routing por rewrites `:id`; o campo
+  `handle: filesystem` foi rejeitado pela Vercel e removido. Fixture local
+  excluído do deploy por `.vercelignore`.
 
 - **v10 (out/2026):** rota `/q/{ID}` implementada (`spec-pagina-de-questao.md`
   v1): o build gera páginas, mapa de aliases e sitemap a partir de
@@ -62,8 +64,8 @@
 
 ## Limitações conhecidas (verdade atual, sem maquiagem)
 
-- **A rota `/q/{ID}` existe, mas nenhuma questão está publicada** — página
-  canônica, redirect de alias (301) e forma sem idioma (308) no ar; o
+- **A rota `/q/{ID}` existe, mas nenhuma questão está publicada** — páginas
+  canônicas e de redirecionamento são geradas no build; o
   conteúdo acende com o primeiro `manifestos/{PREFIXO}.jsonl` (nenhum app
   publica `manifest.jsonl` até agora — Ranvier segue na fatia 1).
 - **Discussões (GitHub Discussions) são o quadro da Fase 2** — o link existe,

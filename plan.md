@@ -57,6 +57,13 @@ Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
   páginas canônicas estáticas. O fixture de QA fica fora do deploy via
   `.vercelignore`.
 
+## Feito (v10.2 — out/2026)
+
+- ✅ **Roteamento `/q/{ID}` 100% estático** — o build gera páginas canônicas
+  e páginas de redirecionamento para aliases e URLs sem idioma (200 com
+  refresh e canonical). Função e rewrites removidos; desconhecidas recebem
+  o 404 estático. Sistema permanece v1.2.0.
+
 ## Pendente (Fase 2 — engenharia do hub)
 
 - **Ingestão de manifestos no build** — consumir os `manifest.jsonl`

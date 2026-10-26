@@ -1,20 +1,30 @@
 #!/usr/bin/env node
 // build/gera-questoes.mjs — gerador das páginas /q/{ID} do hub Noos.
-// spec-pagina-de-questao.md (proposta v1, implementada na v10).
+// spec-pagina-de-questao.md (proposta v1, implementada na v10; roteamento
+// revisado na v10.2 — plano C: 100% estático, zero função, zero rewrites).
 //
 // Lê `noos.registry.json` + `manifestos/*.jsonl`, valida com o parser do
 // pacote `@ironidesflj/axon` (devDependency de build, pin exato — ZERO Axon
 // no output servido) e emite:
 //
 //   pt/q/{ID}/index.html + en/q/{ID}/index.html   páginas da questão (pares)
-//   api/q-data.mjs                                 mapa de aliases + corpo do 404
+//   pt/q/{alias}/index.html + en/q/{alias}/…      páginas de redirect (alias)
+//   q/{ID}/index.html + q/{alias}/index.html       redirect sem idioma → PT
 //   sitemap.xml                                    base + uma entrada por questão
+//
+// Por que páginas de redirect (v10.2): a plataforma rejeitou
+// `handle: filesystem` no build, e sem ele os rewrites aplicam ANTES do
+// filesystem — sombreariam as páginas canônicas. Alias e forma sem idioma
+// viram, portanto, arquivos estáticos: 200 + meta refresh 0s + canonical
+// para a canônica + location.replace. A ID legada continua honrada: resolve
+// sempre, na mesma língua, alias em salto único (o destino já é a canônica).
+// Desconhecidas caem no not-found estático (o 404.html do output).
 //
 // Regras da constitution embutidas: linha inválida é rejeitada com log e o
 // build segue (§ sempre 2); checksum divergente rejeita a linha; alias
 // duplicada rejeita o record; ID duplicada entre arquivos é rejeitada.
-// Zero manifestos = zero páginas, mapa vazio, sitemap igual à base — o site
-// fica byte a byte igual (a mãe funciona com zero apps no ar, § nunca 5).
+// Zero manifestos = zero páginas, sitemap igual à base — o site fica byte a
+// byte igual (a mãe funciona com zero apps no ar, § nunca 5).
 //
 // Modo `--qa`: lê `build/fixtures/` em vez de `manifestos/`, escreve em
 // `.qa-dist/` e roda as asserções de aceitação da spec. Sai com 0 (PASS)
@@ -72,7 +82,7 @@ const manifestFiles = existsSync(SRC_DIR)
   : [];
 
 const accepted = []; // { record, prefix, lineNumber, ns }
-const aliasMap = {}; // alias -> canônica
+const aliasMap = {}; // alias -> canônica (validação de unicidade; não vira output)
 const seenIds = new Map(); // id -> arquivo:linha (dedup global entre arquivos)
 
 for (const file of manifestFiles) {
@@ -209,23 +219,57 @@ for (const q of accepted) {
   }
 }
 
-// ---------- api/q-data.mjs (mapa de aliases + corpo do 404)
+// ---------- páginas de redirect (plano C — alias e forma sem idioma)
+//
+// Sem rewrites e sem função: TODO o roteamento da /q/{ID} é arquivo
+// estático. A alias resolve em salto único — o destino já é a canônica na
+// mesma língua; a forma sem idioma aponta direto para /pt/q/{resolvida}/.
 
-const notFoundHtml = await readFile(path.join(ROOT, '404.html'), 'utf8');
-const qDataPath = path.join(OUT_DIR, 'api', 'q-data.mjs');
-await mkdir(path.dirname(qDataPath), { recursive: true });
-await writeFile(
-  qDataPath,
-  `// GERADO PELO BUILD (\`node build/gera-questoes.mjs\`) — NÃO EDITAR NEM COMMITAR.
-// spec-pagina-de-questao.md: a função api/q.js é burra por desenho — forma +
-// mapa; zero Axon em runtime (quem valida conteúdo é este build).
-export const aliasMap = ${JSON.stringify(aliasMap, null, 2)};
-export const canonicalIds = ${JSON.stringify(accepted.map((q) => q.record.id), null, 2)};
-export const notFoundBody = ${JSON.stringify(notFoundHtml)};
-`,
-);
+const tplRdPt = await readFile(path.join(ROOT, 'build', 'templates', 'redirect-pt.html'), 'utf8');
+const tplRdEn = await readFile(path.join(ROOT, 'build', 'templates', 'redirect-en.html'), 'utf8');
 
-// ---------- sitemap.xml (base + uma entrada por questão)
+// path normalizado (com barras) -> destino relativo; colisão = build falha
+const redirects = new Map();
+const addRedirect = (from, dest) => {
+  const norm = `/${from.replace(/^\/+|\/+$/g, '')}/`;
+  const existing = redirects.get(norm);
+  if (existing !== undefined && existing !== dest) {
+    console.error(
+      `[gera-questoes] FALHA: colisão de redirect em ${norm} — "${dest}" vs "${existing}" (alias igual a canônica de outra questão, ou alias reivindicada duas vezes)`,
+    );
+    process.exit(1);
+  }
+  redirects.set(norm, dest);
+};
+
+for (const q of accepted) {
+  const id = q.record.id;
+  addRedirect(`q/${id}`, `/pt/q/${id}/`); // sem idioma → PT
+  for (const a of q.record.aliases) {
+    addRedirect(`pt/q/${a}`, `/pt/q/${id}/`); // alias na mesma língua
+    addRedirect(`en/q/${a}`, `/en/q/${id}/`);
+    addRedirect(`q/${a}`, `/pt/q/${id}/`); // sem idioma + alias = salto único
+  }
+}
+
+let redirectsWritten = 0;
+for (const [fromPath, destPath] of redirects) {
+  const isEn = fromPath.startsWith('/en/');
+  const fromId = fromPath.split('/').filter(Boolean).pop();
+  const dir = path.join(OUT_DIR, fromPath);
+  await mkdir(dir, { recursive: true });
+  await writeFile(
+    path.join(dir, 'index.html'),
+    fill(isEn ? tplRdEn : tplRdPt, {
+      FROM_ID: escapeHtml(fromId),
+      DESTINY_PATH: escapeHtml(destPath),
+      CANONICAL_URL: `https://noos.study${destPath}`,
+    }),
+  );
+  redirectsWritten++;
+}
+
+// ---------- sitemap.xml (base + uma entrada por questão — só canônicas)
 
 const sitemapBase = await readFile(path.join(ROOT, 'build', 'templates', 'sitemap-base.xml'), 'utf8');
 const entries = accepted
@@ -247,7 +291,7 @@ await writeFile(
 );
 
 log(
-  `saídas: ${pagesWritten} página(s) de questão, api/q-data.mjs (${Object.keys(aliasMap).length} alias, ${accepted.length} canônica(s)), sitemap.xml (${entries ? 'base + questões' : 'igual à base'})`,
+  `saídas: ${pagesWritten} página(s) de questão, ${redirectsWritten} página(s) de redirect (aliases + forma sem idioma), sitemap.xml (${entries ? 'base + questões' : 'igual à base'})`,
 );
 
 // ---------- modo --qa: asserções da aceitação (spec-pagina-de-questao.md)
@@ -292,23 +336,51 @@ if (QA) {
   expect(enHtml.includes(`Noos system v${registry.version}`), 'rodapé EN = versão do registry');
   expect(enHtml.includes('This question is in pt-BR.'), 'nota de idioma da questão na página EN');
 
-  // q-data
-  expect(aliasMap['GLI-AZ900-00012'] === 'RAN-AZ900-00042', 'mapa de aliases: GLI → RAN');
+  // páginas de redirect (plano C — alias e forma sem idioma)
+  const rdPt = path.join(OUT_DIR, 'pt', 'q', 'GLI-AZ900-00012', 'index.html');
+  const rdEn = path.join(OUT_DIR, 'en', 'q', 'GLI-AZ900-00012', 'index.html');
+  const rdNoLang = path.join(OUT_DIR, 'q', 'RAN-AZ900-00042', 'index.html');
+  const rdNoLangAlias = path.join(OUT_DIR, 'q', 'GLI-AZ900-00012', 'index.html');
+  expect(existsSync(rdPt) && existsSync(rdEn), 'páginas de redirect da alias PT/EN geradas');
+  const rdPtHtml = existsSync(rdPt) ? await readFile(rdPt, 'utf8') : '';
   expect(
-    JSON.stringify(Object.keys(aliasMap)) === JSON.stringify(['GLI-AZ900-00012']),
-    'mapa sem alias órfã',
+    rdPtHtml.includes('content="0; url=/pt/q/RAN-AZ900-00042/"'),
+    'alias PT redireciona para a canônica na mesma língua',
+  );
+  expect(
+    rdPtHtml.includes('rel="canonical" href="https://noos.study/pt/q/RAN-AZ900-00042/"'),
+    'canonical da página de alias aponta para a canônica',
+  );
+  expect(rdPtHtml.includes('noindex'), 'página de alias é noindex');
+  expect(!rdPtHtml.includes('<details'), 'página de alias não é página de conteúdo (sem gabarito)');
+  const rdEnHtml = existsSync(rdEn) ? await readFile(rdEn, 'utf8') : '';
+  expect(
+    rdEnHtml.includes('content="0; url=/en/q/RAN-AZ900-00042/"'),
+    'alias EN redireciona para a canônica EN',
+  );
+  expect(existsSync(rdNoLang), 'forma sem idioma da canônica gerada');
+  const rdNoLangHtml = existsSync(rdNoLang) ? await readFile(rdNoLang, 'utf8') : '';
+  expect(
+    rdNoLangHtml.includes('content="0; url=/pt/q/RAN-AZ900-00042/"'),
+    'forma sem idioma resolve para PT',
+  );
+  expect(existsSync(rdNoLangAlias), 'forma sem idioma da alias gerada');
+  const rdNoLangAliasHtml = existsSync(rdNoLangAlias) ? await readFile(rdNoLangAlias, 'utf8') : '';
+  expect(
+    rdNoLangAliasHtml.includes('content="0; url=/pt/q/RAN-AZ900-00042/"'),
+    'alias sem idioma resolve em salto único (destino já é a canônica)',
+  );
+  expect(
+    !existsSync(path.join(OUT_DIR, 'pt', 'q', 'RAN-AZ900-00043', 'index.html')) &&
+      !existsSync(path.join(OUT_DIR, 'q', 'RAN-AZ900-00043', 'index.html')),
+    'linha com checksum divergente não gerou página NEM redirect',
   );
 
   // sitemap
   const sitemap = await readFile(path.join(OUT_DIR, 'sitemap.xml'), 'utf8');
   expect(sitemap.includes('https://noos.study/pt/q/RAN-AZ900-00042/'), 'sitemap: entrada PT da questão');
   expect(sitemap.includes('https://noos.study/en/q/RAN-AZ900-00042/'), 'sitemap: entrada EN da questão');
-
-  // página da linha rejeitada não existe
-  expect(
-    !existsSync(path.join(OUT_DIR, 'pt', 'q', 'RAN-AZ900-00043', 'index.html')),
-    'linha com checksum divergente NÃO gerou página',
-  );
+  expect(!sitemap.includes('GLI-'), 'sitemap não lista alias (só canônicas)');
 
   console.log(`\n[qa] ${failures.length === 0 ? 'PASS — fixture conforme a spec' : `FAIL (${failures.length})`}`);
   process.exit(failures.length === 0 ? 0 : 1);

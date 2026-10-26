@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Redirecting — {{FROM_ID}} · Noos</title>
+<meta name="robots" content="noindex, follow" />
+<meta name="theme-color" content="#f7fbf9" />
+<link rel="canonical" href="{{CANONICAL_URL}}" />
+<meta http-equiv="refresh" content="0; url={{DESTINY_PATH}}" />
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+<style>
+  /* Redirect page (spec-pagina-de-questao.md, v10.2 revision — plan C).
+     Minimal by design: zero external CSS/fonts — the redirect is instant;
+     this style only shows if the refresh gets blocked. */
+  :root { color-scheme: light dark; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center;
+         font: 16px/1.6 "Instrument Sans", system-ui, -apple-system, sans-serif;
+         background: #f7fbf9; color: #17241f; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0c1512; color: #e8f2ec; }
+  }
+  main { max-width: 34rem; padding: 2rem; text-align: center; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+          font-size: .85rem; opacity: .7; }
+  code { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+         font-size: .9em; }
+  .dest { font-size: 1.05rem; word-break: break-all; }
+  .note { font-size: .9rem; opacity: .75; }
+</style>
+</head>
+<body>
+<main>
+  <p class="mono">noos.study</p>
+  <h1>This old address has moved</h1>
+  <p>Question <code>{{FROM_ID}}</code> now lives at:</p>
+  <p class="dest"><a href="{{DESTINY_PATH}}">{{DESTINY_PATH}}</a></p>
+  <p class="note">Redirecting… — if nothing happens, use the link above.</p>
+</main>
+<script>location.replace('{{DESTINY_PATH}}');</script>
+</body>
+</html>

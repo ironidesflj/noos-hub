@@ -4,14 +4,6 @@
   "trailingSlash": true,
   "buildCommand": "node build/gera-questoes.mjs",
   "outputDirectory": ".",
-  "rewrites": [
-    { "source": "/q/:id", "destination": "/api/q?p=/q/:id" },
-    { "source": "/pt/q/:id", "destination": "/api/q?p=/pt/q/:id" },
-    { "source": "/en/q/:id", "destination": "/api/q?p=/en/q/:id" },
-    { "source": "/q/:id/", "destination": "/api/q?p=/q/:id/" },
-    { "source": "/pt/q/:id/", "destination": "/api/q?p=/pt/q/:id/" },
-    { "source": "/en/q/:id/", "destination": "/api/q?p=/en/q/:id/" }
-  ],
   "headers": [
     {
       "source": "/(.*)",

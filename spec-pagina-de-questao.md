@@ -1,6 +1,6 @@
 # spec-pagina-de-questao
 
-Especificação do hub (noos.study) · estado: **implementada na v10** — rota, build e função no ar (routing de aliases corrigido na v10.1); conteúdo aguarda o primeiro manifesto (F2 item 2 para o transporte).
+Especificação do hub (noos.study) · estado: **implementada na v10 — roteamento revisado na v10.2 (plano C: 100% estático)** — conteúdo aguarda o primeiro manifesto (F2 item 2 para o transporte).
 
 ## Problema
 
@@ -157,3 +157,15 @@ Transporte dos manifestos até o repo (spec de ingestão, item 2 da F2);
 ativação e conteúdo das Discussões (item 3); badge no app (fatia 5, lado do
 app); listagem e busca de questões; JSON-LD; analytics; qualquer interação
 de estudo.
+
+## Revisão v10.2 — roteamento estático
+
+O desenho original de função e rewrites foi substituído por arquivos gerados
+no build. Páginas canônicas continuam estáticas. Aliases e URLs sem idioma
+agora recebem páginas com resposta 200, `meta refresh` imediato, URL canônica
+e `location.replace`; desconhecidas recebem o 404 estático do hub. Aliases
+levam diretamente à canônica no mesmo idioma; URLs sem idioma levam à
+canônica PT em um salto. O sitemap inclui somente as canônicas.
+
+Esta revisão substitui as referências anteriores a 301/308, `api/q.js` e
+rewrites nesta spec. O contrato de preservar IDs e aliases continua válido.
