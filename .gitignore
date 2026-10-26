@@ -4,6 +4,7 @@ Thumbs.db
 *.swp
 .idea/
 .vscode/
+*.bak
 
 # QA local — screenshots tirados na raiz do repo.
 # ⚠ Só a raiz: as og-images de assets/ PRECISAM subir no push

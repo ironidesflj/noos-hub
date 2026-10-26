@@ -12,8 +12,8 @@
   "library": {
     "name": "@ironidesflj/axon",
     "mode": "pacote",
-    "version": "0.1.0",
-    "phase": "spec-first"
+    "version": "0.2.1",
+    "phase": "publicada"
   },
   "rules": {
     "recycle": false,
