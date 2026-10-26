@@ -19,6 +19,18 @@ Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
 - **Domínio primário** — `noos.study` configurado como primário; `www` faz
   redirect 308 para o domínio nu.
 
+## Feito (v8 — out/2026)
+
+- ✅ **Registro da biblioteca alinhado ao npm** — `library.version` →
+  `0.2.2`, fase "publicada" (o pacote `@ironidesflj/axon` está público
+  desde 26/out/2026, com o Ranvier como consumidor #1 — fatia 1).
+- ✅ **Verificação de bordas 320 e 1920 px + 200% zoom** — item do
+  checklist do Guia de atualização fechado com evidência: noos.study
+  auditado ao vivo (PT e EN) em 320, 640 (equivalente a 200% zoom em 1280)
+  e 1920 px — zero overflow horizontal e zero elementos fora da viewport.
+  Cabeçalho em 2 linhas sem scroll interno a 320 px; conteúdo contido pelo
+  `.wrap` (1160 px) a 1920 px.
+
 ## Pendente (Fase 2 — engenharia do hub)
 
 - **Página `/q/{ID}`** — renderização estática da questão a partir do
@@ -29,8 +41,6 @@ Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
   último build bom segue servindo).
 - **Discussões por questão** — ligar a página ao quadro (GitHub Discussions
   primeiro; ritual "Passei na prova!").
-- **Verificação de bordas 320 e 1920 px + 200% zoom** — fechar o item do
-  checklist do Guia de atualização.
 
 ## Adiado (intencionalmente)
 

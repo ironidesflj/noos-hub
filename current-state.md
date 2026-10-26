@@ -1,6 +1,6 @@
 # current-state — hub Noos (noos.study)
 
-Última verificação: out/2026 · pacote v7 · sistema v1.1.1
+Última verificação: out/2026 · pacote v8 · sistema v1.1.1
 
 ## No ar (verificado)
 
@@ -8,11 +8,17 @@
   `www.noos.study` (308 → noos.study, path preservado),
   `noos-hub.vercel.app` (backup canônico). DNS GoDaddy → Vercel operacional
   desde 23/10.
+- **Bordas verificadas (v8):** 320, 640 (200% zoom de 1280) e 1920 px,
+  PT e EN — zero overflow horizontal, zero elementos fora da viewport.
 - **Deploy no ar: pacote v7**, atualizado pelos commits `01a5927`, `3b44aba`
   e `e0867e6`, com o alinhamento posterior do registry em `639c4fb`.
   O pacote v7 acumulou as alterações da v6+v7.
 
-## Estado do pacote (v7, este)
+## Estado do pacote (v8, este)
+
+- **v8 (out/2026):** registro da biblioteca alinhado ao npm (`0.2.2`, fase
+  "publicada") e verificação de bordas 320/640/1920 px fechada com evidência
+  (zero overflow, PT e EN).
 
 - **Família (seção 02), com domínios do Guia de aplicação nos apps:**
   - Synapse — QA · ISTQB · link `ctfl-app.vercel.app` · selo live
@@ -30,7 +36,7 @@
 - **CI com 3 jobs:** gate de placeholders, integridade/paridade PT-EN, e
   **sdd-lint** (novo: arquivos canônicos presentes + registro válido e em
   sincronia com as páginas PT/EN).
-- **Axon:** referenciado como contrato (`@ironidesflj/axon` v0.2.1 publicada,
+- **Axon:** referenciado como contrato (`@ironidesflj/axon` v0.2.2 publicada,
   repositório próprio); o hub **não consome o pacote em runtime** — é
   estático, sem build de aplicação.
 - Stack: HTML/CSS/JS estático, sem framework — Fig. 01 transplantada byte a
@@ -46,6 +52,4 @@
   o quadro depende de o mantenedor ativar a feature no repo.
 - **Canonical:** `noos.study` é o domínio primário; `www.noos.study` redireciona
   para o domínio nu.
-- **Testes de viewport cobrem 390/768/1440 px** — o Guia de atualização pede
-  320 e 1920 px na próxima verificação de bordas.
 - Sem CSP com hashes, fontes self-hosted, CSS de impressão (backlog P2).
