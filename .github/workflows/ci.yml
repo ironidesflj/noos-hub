@@ -98,7 +98,7 @@ jobs:
           assert len(prefixes) == len(set(prefixes)) == 5, 'esperava 5 prefixos únicos'
           for n in ns:
               assert n['status'] in canon, f"status não canônico: {n['app']} = {n['status']}"
-          assert reg['library']['name'] == '@noos/axon', 'registro deve apontar @noos/axon'
+          assert reg['library']['name'] == '@ironidesflj/axon', 'registro deve apontar @ironidesflj/axon'
           version = reg['version']
           for lang in ('pt', 'en'):
               html = open(f'{lang}/index.html', encoding='utf-8').read()

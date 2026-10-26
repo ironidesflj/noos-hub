@@ -78,7 +78,7 @@ conversa, não em quadro que ninguém abre):
 | `noos.registry.json` | **O registro da família** — fonte única de prefixos, status e versão do sistema; o job `sdd-lint` do CI valida e mantém o site em sincronia |
 
 O **contrato técnico compartilhado** (formato de ID, `manifest.jsonl`,
-deep-link canônico) mora no repositório do **Axon** (`@noos/axon`,
+deep-link canônico) mora no repositório do **Axon** (`@ironidesflj/axon`,
 spec-first v0.1.0) — este README aponta; não duplica. O Axon entra como
 **versão fixada** quando o hub tiver build de aplicação (Fase 2); na Fase 1
 o hub é estático e consome o contrato como referência.

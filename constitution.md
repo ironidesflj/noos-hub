@@ -9,7 +9,7 @@ gargalo nem produto de si mesma. Regras de identidade visual vivem no Manual
 de Identidade v1.0; regras de interface dos apps, no Guia de aplicação nos
 apps; a governança da mãe, no Guia de atualização da marca-mãe; o contrato
 técnico compartilhado (IDs, `manifest.jsonl`, deep-link), na `constitution.md`
-do repositório do **Axon** (`@noos/axon`). Em conflito, vale a camada mais
+do repositório do **Axon** (`@ironidesflj/axon`). Em conflito, vale a camada mais
 específica do assunto — e conflito se resolve por RFC, não por silêncio.
 
 ## O hub nunca

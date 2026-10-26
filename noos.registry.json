@@ -10,7 +10,7 @@
     { "prefix": "ENG", "app": "Engram", "domain": "Dados · AI", "status": "no horizonte", "color": "#267b4c" }
   ],
   "library": {
-    "name": "@noos/axon",
+    "name": "@ironidesflj/axon",
     "mode": "pacote",
     "version": "0.1.0",
     "phase": "spec-first"

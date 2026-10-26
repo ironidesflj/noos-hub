@@ -28,7 +28,7 @@
 - **CI com 3 jobs:** gate de placeholders, integridade/paridade PT-EN, e
   **sdd-lint** (novo: arquivos canônicos presentes + registro válido e em
   sincronia com as páginas PT/EN).
-- **Axon:** referenciado como contrato (`@noos/axon` v0.1.0 spec-first,
+- **Axon:** referenciado como contrato (`@ironidesflj/axon` v0.1.0 spec-first,
   repositório próprio); o hub **não consome o pacote em runtime** — é
   estático, sem build de aplicação.
 - Stack: HTML/CSS/JS estático, sem framework — Fig. 01 transplantada byte a
