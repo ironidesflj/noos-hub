@@ -12,14 +12,12 @@ Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
 - ✅ Rodapé com versão do sistema e data de build em PT e EN.
 - ✅ Job `sdd-lint` no CI (arquivos canônicos + registro em sincronia).
 
-## Pendente (mantenedor)
+## Feito (mantenedor)
 
-- **Push da v7** — acumula v6+v7; Vercel auto-deploy (comandos no
-  `DEPLOY.md`).
-- **INPI antes de divulgação ampla** (protocolar Noos 41+42 — decisão de
-  risco se adiada, registrada na Revisão do Time).
-- **Opcional:** tornar `noos.study` (nu) o domínio primário na Vercel para
-  alinhar com canonical/og:url/sitemap.
+- **Push da v7** — concluído; a Vercel faz o deploy automático.
+- **INPI** — cancelado pelo mantenedor em out/2026; não faz parte do plano.
+- **Domínio primário** — `noos.study` configurado como primário; `www` faz
+  redirect 308 para o domínio nu.
 
 ## Pendente (Fase 2 — engenharia do hub)
 

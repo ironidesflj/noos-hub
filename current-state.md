@@ -4,11 +4,13 @@
 
 ## No ar (verificado)
 
-- **Domínios funcionando:** `www.noos.study` (primário na Vercel),
-  `noos.study` (308 → www, path preservado), `noos-hub.vercel.app` (backup
-  canônico). DNS GoDaddy → Vercel operacional desde 23/10.
-- **Deploy no ar: pacote v7**, publicado no commit `01a5927` e servido pela
-  Vercel em produção. O pacote v7 acumulou as alterações da v6+v7.
+- **Domínios funcionando:** `noos.study` (primário na Vercel),
+  `www.noos.study` (308 → noos.study, path preservado),
+  `noos-hub.vercel.app` (backup canônico). DNS GoDaddy → Vercel operacional
+  desde 23/10.
+- **Deploy no ar: pacote v7**, atualizado pelos commits `01a5927`, `3b44aba`
+  e `e0867e6`, com o alinhamento posterior do registry em `639c4fb`.
+  O pacote v7 acumulou as alterações da v6+v7.
 
 ## Estado do pacote (v7, este)
 
@@ -28,7 +30,7 @@
 - **CI com 3 jobs:** gate de placeholders, integridade/paridade PT-EN, e
   **sdd-lint** (novo: arquivos canônicos presentes + registro válido e em
   sincronia com as páginas PT/EN).
-- **Axon:** referenciado como contrato (`@ironidesflj/axon` v0.1.0 spec-first,
+- **Axon:** referenciado como contrato (`@ironidesflj/axon` v0.2.1 publicada,
   repositório próprio); o hub **não consome o pacote em runtime** — é
   estático, sem build de aplicação.
 - Stack: HTML/CSS/JS estático, sem framework — Fig. 01 transplantada byte a
@@ -42,9 +44,8 @@
   `manifest.jsonl` até agora).
 - **Discussões (GitHub Discussions) são o quadro da Fase 2** — o link existe,
   o quadro depende de o mantenedor ativar a feature no repo.
-- **`noos.study` nu redireciona para www** — canonical/og:url/sitemap apontam
-  para `noos.study`; alinhar (tornar o nu primário na Vercel) é ajuste
-  opcional de 1 clique do mantenedor.
+- **Canonical:** `noos.study` é o domínio primário; `www.noos.study` redireciona
+  para o domínio nu.
 - **Testes de viewport cobrem 390/768/1440 px** — o Guia de atualização pede
   320 e 1920 px na próxima verificação de bordas.
 - Sem CSP com hashes, fontes self-hosted, CSS de impressão (backlog P2).
