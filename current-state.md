@@ -1,6 +1,6 @@
 # current-state — hub Noos (noos.study)
 
-Última verificação: out/2026 · pacote v8 · sistema v1.1.1
+Última verificação: out/2026 · pacote v9 · sistema v1.1.1
 
 ## No ar (verificado)
 
@@ -10,11 +10,17 @@
   desde 23/10.
 - **Bordas verificadas (v8):** 320, 640 (200% zoom de 1280) e 1920 px,
   PT e EN — zero overflow horizontal, zero elementos fora da viewport.
-- **Deploy no ar: pacote v7**, atualizado pelos commits `01a5927`, `3b44aba`
-  e `e0867e6`, com o alinhamento posterior do registry em `639c4fb`.
-  O pacote v7 acumulou as alterações da v6+v7.
+- **Deploy no ar: pacote v9**, sobre o v8 (`d57feea` — registry 0.2.2 +
+  bordas 320/640/1920 verificadas) e o v7 (`01a5927`, `3b44aba`, `e0867e6`,
+  com o registry alinhado em `639c4fb`). Da v7 para cá nenhuma página muda —
+  v8 e v9 são registro e documentação.
 
-## Estado do pacote (v8, este)
+## Estado do pacote (v9, este)
+
+- **v9 (out/2026):** spec da página `/q/{ID}` escrita como proposta v1
+  (`spec-pagina-de-questao.md`, F2 item 1) — rota, alias 301, geração no
+  build com o parser do Axon, leitura com proveniência. Documentação apenas;
+  implementação aguarda OK do mantenedor.
 
 - **v8 (out/2026):** registro da biblioteca alinhado ao npm (`0.2.2`, fase
   "publicada") e verificação de bordas 320/640/1920 px fechada com evidência
@@ -46,8 +52,9 @@
 ## Limitações conhecidas (verdade atual, sem maquiagem)
 
 - **A rota `/q/{ID}` ainda não existe** — deep-links de questão são entrega
-  da Fase 2; nenhum manifesto foi ingerido ainda (nenhum app publica
-  `manifest.jsonl` até agora).
+  da Fase 2 (spec escrita — proposta v1 em `spec-pagina-de-questao.md`;
+  implementação em lote próprio); nenhum manifesto foi ingerido ainda
+  (ninguém publica `manifest.jsonl` até agora).
 - **Discussões (GitHub Discussions) são o quadro da Fase 2** — o link existe,
   o quadro depende de o mantenedor ativar a feature no repo.
 - **Canonical:** `noos.study` é o domínio primário; `www.noos.study` redireciona

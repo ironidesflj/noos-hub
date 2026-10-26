@@ -31,11 +31,20 @@ Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
   Cabeçalho em 2 linhas sem scroll interno a 320 px; conteúdo contido pelo
   `.wrap` (1160 px) a 1920 px.
 
+## Feito (v9 — out/2026)
+
+- ✅ **Spec da página `/q/{ID}` escrita (proposta v1)** —
+  `spec-pagina-de-questao.md`: rotas e alias 301 (constitution §3), geração
+  no build com o parser do Axon (§2), página de leitura com proveniência e
+  volta ao app (§1), zero manifestos = site inalterado. Primeiro item de
+  engenharia da Fase 2 desenhado; implementação em lote próprio após OK.
+
 ## Pendente (Fase 2 — engenharia do hub)
 
 - **Página `/q/{ID}`** — renderização estática da questão a partir do
-  snapshot do manifesto, com proveniência e link para o app (spec a escrever:
-  `spec-pagina-de-questao.md`).
+  snapshot do manifesto, com proveniência e link para o app (**spec escrita —
+  proposta v1** em `spec-pagina-de-questao.md`; implementação em lote próprio
+  após OK do mantenedor).
 - **Ingestão de manifestos no build** — consumir os `manifest.jsonl`
   publicados pelos apps conforme o contrato do Axon (linha inválida → log;
   último build bom segue servindo).
