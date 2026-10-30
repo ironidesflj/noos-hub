@@ -1,6 +1,6 @@
 # current-state — hub Noos (noos.study)
 
-Última verificação: out/2026 · pacote v10.2 · sistema v1.2.0
+Última verificação: out/2026 · pacote v11 · sistema v1.2.0
 
 ## No ar (verificado)
 
@@ -14,7 +14,14 @@
   ou rewrites. Com zero manifestos, o conteúdo permanece igual ao da v9,
   exceto registro e rodapé em v1.2.0.
 
-## Estado do pacote (v10.2, este)
+## Estado do pacote (v11, este)
+
+- **v11 (out/2026):** primeiro manifesto real em `manifestos/RAN.jsonl`:
+  300 questões DBDEA do Ranvier, 0 rejeições, 0 aliases e checksums válidos.
+  O build gera 600 páginas canônicas, 300 redirects sem idioma e sitemap com
+  302 entradas. A saída real passou no QA local. O gerador também descarta
+  páginas geradas em builds anteriores para não servir IDs ausentes no
+  manifesto atual. Publicação no ar depende do deploy deste commit.
 
 - **v10.2 (out/2026):** o build gera páginas canônicas e páginas de
   redirecionamento para aliases e URLs sem idioma. Desconhecidas recebem
@@ -64,10 +71,9 @@
 
 ## Limitações conhecidas (verdade atual, sem maquiagem)
 
-- **A rota `/q/{ID}` existe, mas nenhuma questão está publicada** — páginas
-  canônicas e de redirecionamento são geradas no build; o
-  conteúdo acende com o primeiro `manifestos/{PREFIXO}.jsonl` (nenhum app
-  publica `manifest.jsonl` até agora — Ranvier segue na fatia 1).
+- **Ranvier é o primeiro emissor de manifesto** — as 300 questões DBDEA
+  estão no build da v11. O Synapse ainda aguarda seu próprio manifesto;
+  as páginas públicas devem ser verificadas após o deploy.
 - **Discussões (GitHub Discussions) são o quadro da Fase 2** — o link existe,
   o quadro depende de o mantenedor ativar a feature no repo.
 - **Canonical:** `noos.study` é o domínio primário; `www.noos.study` redireciona

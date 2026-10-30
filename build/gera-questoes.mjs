@@ -30,7 +30,7 @@
 // `.qa-dist/` e roda as asserções de aceitação da spec. Sai com 0 (PASS)
 // ou 1 (FAIL). O fixture NÃO é dado real — nunca acende páginas no ar.
 
-import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, readdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -148,6 +148,13 @@ log(
 
 const tplPt = await readFile(path.join(ROOT, 'build', 'templates', 'questao-pt.html'), 'utf8');
 const tplEn = await readFile(path.join(ROOT, 'build', 'templates', 'questao-en.html'), 'utf8');
+const tplRdPt = await readFile(path.join(ROOT, 'build', 'templates', 'redirect-pt.html'), 'utf8');
+const tplRdEn = await readFile(path.join(ROOT, 'build', 'templates', 'redirect-en.html'), 'utf8');
+
+// Cada build reflete apenas os manifestos atuais; arquivos gerados antigos não podem sobreviver.
+for (const dir of ['pt/q', 'en/q', 'q']) {
+  await rm(path.join(OUT_DIR, dir), { recursive: true, force: true });
+}
 
 const ogDescription = (statement) =>
   escapeHtml(`${statement.replace(/\s+/g, ' ').trim().slice(0, 197)}…`);
@@ -225,8 +232,6 @@ for (const q of accepted) {
 // estático. A alias resolve em salto único — o destino já é a canônica na
 // mesma língua; a forma sem idioma aponta direto para /pt/q/{resolvida}/.
 
-const tplRdPt = await readFile(path.join(ROOT, 'build', 'templates', 'redirect-pt.html'), 'utf8');
-const tplRdEn = await readFile(path.join(ROOT, 'build', 'templates', 'redirect-en.html'), 'utf8');
 
 // path normalizado (com barras) -> destino relativo; colisão = build falha
 const redirects = new Map();

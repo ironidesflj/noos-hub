@@ -64,11 +64,20 @@ Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
   refresh e canonical). Função e rewrites removidos; desconhecidas recebem
   o 404 estático. Sistema permanece v1.2.0.
 
+## Feito (v11 — out/2026)
+
+- **Primeiro manifesto real ingerido:** Ranvier DBDEA, 300 questões em
+  `manifestos/RAN.jsonl`, zero rejeições no build. O QA da saída real passou;
+  o gerador agora remove páginas antigas antes de reconstruí-las. Próxima
+  ingestão: SYN, quando o manifesto do Synapse estiver disponível.
+
 ## Pendente (Fase 2 — engenharia do hub)
 
-- **Ingestão de manifestos no build** — consumir os `manifest.jsonl`
-  publicados pelos apps conforme o contrato do Axon (linha inválida → log;
-  último build bom segue servindo).
+- **Transporte e retenção dos manifestos:** automatizar a atualização dos
+  arquivos publicados pelos apps e definir o comportamento para questões
+  retiradas do manifesto (F2 item 2). Hoje o manifesto RAN é copiado e
+  validado no build; o último deploy bem-sucedido permanece no ar se um
+  build falhar.
 - **Discussões por questão** — ligar a página ao quadro (GitHub Discussions
   primeiro; ritual "Passei na prova!").
 
