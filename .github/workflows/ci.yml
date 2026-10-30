@@ -20,7 +20,7 @@ jobs:
       - name: Nenhuma página com EDITAR/EDIT vivo
         run: |
           if grep -rnE 'EDITAR|EDIT' index.html 404.html pt/index.html en/index.html; then
-            echo "::error::Ainda há placeholders EDITAR/EDIT nas páginas. Preencha os dados do mantenedor (README, seção «Preencher antes do ir ao ar»), remova os comentários <!-- EDITAR/EDIT ... --> e faça push de novo."
+            echo "::error::Ainda há placeholders EDITAR/EDIT nas páginas. Preencha os dados antes do deploy."
             exit 1
           fi
           echo "OK — nenhum placeholder vivo."
@@ -98,7 +98,7 @@ jobs:
           import json
           reg = json.load(open('noos.registry.json', encoding='utf-8'))
           ns = reg['namespaces']
-          canon = {'em produção', 'em breve', 'no horizonte', 'descontinuado'}
+          canon = {'em constante atualização', 'em produção', 'em breve', 'no horizonte', 'descontinuado'}
           prefixes = [n['prefix'] for n in ns]
           assert len(prefixes) == len(set(prefixes)) == 5, 'esperava 5 prefixos únicos'
           for n in ns:

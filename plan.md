@@ -1,29 +1,28 @@
 # plan — hub Noos
 
-Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
-última mora nos repositórios dos apps — aqui só o que o hub espera deles).
+Revisado em 30/10/2026. Este plano registra entregas do Hub e dependências
+com os apps; o estado operacional fica em `current-state.md`.
 
-## Autorizado (nesta v7 — feito)
+## Feito (v7 — out/2026)
 
 - ✅ SDD no repositório: `constitution.md`, `current-state.md`, `plan.md`,
   `spec-rodape-versao.md`.
-- ✅ `noos.registry.json` como fonte única do registro (sistema v1.1.1),
+- ✅ `noos.registry.json` como fonte única do registro (sistema v1.2.0 atualmente),
   validado pelo CI.
 - ✅ Rodapé com versão do sistema e data de build em PT e EN.
 - ✅ Job `sdd-lint` no CI (arquivos canônicos + registro em sincronia).
 
-## Feito (mantenedor)
+## Infraestrutura concluída
 
-- **Push da v7** — concluído; a Vercel faz o deploy automático.
-- **INPI** — cancelado pelo mantenedor em out/2026; não faz parte do plano.
-- **Domínio primário** — `noos.study` configurado como primário; `www` faz
-  redirect 308 para o domínio nu.
+- GitHub conectado à Vercel para deploy automático da `main`.
+- `noos.study` configurado como domínio principal; `www` redireciona para ele.
+- O assunto INPI foi cancelado pelo mantenedor e está fora deste plano.
 
 ## Feito (v8 — out/2026)
 
 - ✅ **Registro da biblioteca alinhado ao npm** — `library.version` →
   `0.2.2`, fase "publicada" (o pacote `@ironidesflj/axon` está público
-  desde 26/out/2026, com o Ranvier como consumidor #1 — fatia 1).
+  desde 26/out/2026; o Ranvier iniciou a adoção como consumidor #1).
 - ✅ **Verificação de bordas 320 e 1920 px + 200% zoom** — item do
   checklist do Guia de atualização fechado com evidência: noos.study
   auditado ao vivo (PT e EN) em 320, 640 (equivalente a 200% zoom em 1280)
@@ -52,10 +51,9 @@ Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
 
 ## Feito (v10.1 — out/2026)
 
-- ✅ **Fix de routing da rota `/q/{ID}`** — rewrites por `:id` de segmento
-  único, com e sem barra final, e `handle: filesystem` para preservar as
-  páginas canônicas estáticas. O fixture de QA fica fora do deploy via
-  `.vercelignore`.
+- **Tentativa substituída pela v10.2:** o routing por rewrites não foi
+  mantido; `handle: filesystem` foi rejeitado pela Vercel. O fixture de QA
+  fica fora do deploy via `.vercelignore`.
 
 ## Feito (v10.2 — out/2026)
 
@@ -71,7 +69,7 @@ Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
   o gerador agora remove páginas antigas antes de reconstruí-las.
 - **Manifesto Synapse integrado:** 431 questões dos pools de estudo
   CTFL/CTAL-TA/CTAL-TM em `manifestos/SYN.jsonl`, com zero rejeições no build.
-  Ativar links no app somente após verificar as URLs públicas (PR #15).
+  O PR #15 dos links no app permanece sob responsabilidade do Synapse.
 
 ## Pendente (Fase 2 — engenharia do hub)
 
