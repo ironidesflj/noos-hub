@@ -68,15 +68,17 @@ Out/2026 · três pistas: **hub**, **biblioteca (Axon)** e **apps** (esta
 
 - **Primeiro manifesto real ingerido:** Ranvier DBDEA, 300 questões em
   `manifestos/RAN.jsonl`, zero rejeições no build. O QA da saída real passou;
-  o gerador agora remove páginas antigas antes de reconstruí-las. Próxima
-  ingestão: SYN, quando o manifesto do Synapse estiver disponível.
+  o gerador agora remove páginas antigas antes de reconstruí-las.
+- **Manifesto Synapse integrado:** 431 questões dos pools de estudo
+  CTFL/CTAL-TA/CTAL-TM em `manifestos/SYN.jsonl`, com zero rejeições no build.
+  Ativar links no app somente após verificar as URLs públicas (PR #15).
 
 ## Pendente (Fase 2 — engenharia do hub)
 
 - **Transporte e retenção dos manifestos:** automatizar a atualização dos
   arquivos publicados pelos apps e definir o comportamento para questões
-  retiradas do manifesto (F2 item 2). Hoje o manifesto RAN é copiado e
-  validado no build; o último deploy bem-sucedido permanece no ar se um
+  retiradas do manifesto (F2 item 2). Hoje RAN e SYN são copiados e
+  validados no build; o último deploy bem-sucedido permanece no ar se um
   build falhar.
 - **Discussões por questão** — ligar a página ao quadro (GitHub Discussions
   primeiro; ritual "Passei na prova!").

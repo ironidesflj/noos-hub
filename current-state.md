@@ -22,11 +22,12 @@
   302 entradas. A saída real passou no QA local. O gerador também descarta
   páginas geradas em builds anteriores para não servir IDs ausentes no
   manifesto atual.
-- **Synapse, preparado localmente:** `manifestos/SYN.jsonl` tem 431 questões
+- **Synapse, manifesto integrado:** `manifestos/SYN.jsonl` tem 431 questões
   de estudo CTFL/CTAL-TA/CTAL-TM após a revisão das 50 retenções. Duas questões
   CTFL de casos de uso estão identificadas como conteúdo complementar fora do
-  exame CTFL v4.0.1. O build local aceitou 731 questões nos dois manifestos e
-  gerou 1.462 páginas canônicas, sem rejeições. Git e deploy ainda pendem.
+  exame CTFL v4.0.1. O build do PR aceitou 731 questões nos dois manifestos e
+  gerou 1.462 páginas canônicas, sem rejeições. Confirmar as URLs públicas
+  após o deploy; os links no app permanecem no PR #15 do Synapse.
 
 - **v10.2 (out/2026):** o build gera páginas canônicas e páginas de
   redirecionamento para aliases e URLs sem idioma. Desconhecidas recebem
@@ -76,9 +77,8 @@
 
 ## Limitações conhecidas (verdade atual, sem maquiagem)
 
-- **Ranvier é o primeiro emissor de manifesto** — as 300 questões DBDEA
-  estão no build da v11. O Synapse ainda aguarda seu próprio manifesto;
-  as páginas públicas devem ser verificadas após o deploy.
+- **Publicação do Synapse:** o manifesto está integrado ao Hub; conferir as
+  páginas públicas após o deploy antes de ativar os links no app (PR #15).
 - **Discussões (GitHub Discussions) são o quadro da Fase 2** — o link existe,
   o quadro depende de o mantenedor ativar a feature no repo.
 - **Canonical:** `noos.study` é o domínio primário; `www.noos.study` redireciona
