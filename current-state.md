@@ -21,7 +21,12 @@
   O build gera 600 páginas canônicas, 300 redirects sem idioma e sitemap com
   302 entradas. A saída real passou no QA local. O gerador também descarta
   páginas geradas em builds anteriores para não servir IDs ausentes no
-  manifesto atual. Publicação no ar depende do deploy deste commit.
+  manifesto atual.
+- **Synapse, preparado localmente:** `manifestos/SYN.jsonl` tem 431 questões
+  de estudo CTFL/CTAL-TA/CTAL-TM após a revisão das 50 retenções. Duas questões
+  CTFL de casos de uso estão identificadas como conteúdo complementar fora do
+  exame CTFL v4.0.1. O build local aceitou 731 questões nos dois manifestos e
+  gerou 1.462 páginas canônicas, sem rejeições. Git e deploy ainda pendem.
 
 - **v10.2 (out/2026):** o build gera páginas canônicas e páginas de
   redirecionamento para aliases e URLs sem idioma. Desconhecidas recebem
