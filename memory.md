@@ -1,6 +1,6 @@
 # Memória do projeto — Noos Hub (noos.study)
 
-**Atualizado:** 2026-11-06 · **base:** `main` @ c418b7b
+**Atualizado:** 2026-11-06 · **base:** `main` @ 57d14ba
 **O que é:** a marca-mãe do ecossistema Noos — vitrine bilíngue PT/EN e páginas
 públicas de leitura `/q/{ID}`. Não é sexto app, não hospeda estudo, não guarda
 aluno (`constitution.md`). Não repete o que já está em `current-state.md`,
@@ -14,7 +14,12 @@ aluno (`constitution.md`). Não repete o que já está em `current-state.md`,
   **1.462 páginas canônicas** (731 PT + 731 EN) e **731 redirects** sem idioma
   (os manifestos reais não têm alias); `.gitignore` exclui as saídas.
 - `sitemap.xml` gerado = **733 entradas** (2 da base + 731 canônicas PT).
-- `npm run qa` → **29/29 PASS** (fixture da spec, não acende páginas no ar).
+- **Gabarito por texto (v12, D1+D3):** as páginas exibem "Resposta correta:
+  <texto>" / "Correct answer: <texto>" — texto de `snapshot.options[índice]`
+  da letra canônica A–D, nunca a letra isolada (incidente A/C). Build falha
+  com id/motivo se o gabarito for inválido; `--qa` tem assert de paridade
+  por record aceito e idioma, e as alternativas seguem na ordem canônica.
+- `npm run qa` → **35/35 PASS** (fixture da spec, não acende páginas no ar).
 - Axon `@ironidesflj/axon@0.2.2` como devDependency com pin exato; nada do
   pacote no output servido (paridade PT/EN do rodapé lida do registro).
 - Rotas v10.2: canônica = arquivo estático; alias e forma sem idioma = página
