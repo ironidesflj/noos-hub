@@ -1,12 +1,13 @@
 # Estado atual — Noos Hub
 
-Revisão documental: 30/10/2026 · versão do sistema: **1.2.0**.
+Revisão documental: 06/11/2026 · versão do sistema: **1.2.0**.
 
 ## Publicado no Hub
 
 - `noos.study` é o endereço principal. `www.noos.study` redireciona para ele; `noos-hub.vercel.app` é outra URL do mesmo projeto Vercel.
 - O Hub tem interface PT/EN e páginas estáticas de leitura para questões. O build consome `manifestos/*.jsonl`, valida cada linha pelo Axon `@ironidesflj/axon@0.2.2`, gera as páginas e atualiza o sitemap.
 - `RAN.jsonl`: 300 questões DBDEA do Ranvier. `SYN.jsonl`: 431 questões de estudo do Synapse. No último build local: **731 aceitas, 0 rejeitadas, 1.462 páginas canônicas e 731 redirecionamentos sem idioma**.
+- As páginas de questão publicam o gabarito como **texto da alternativa correta** (v12, decisões D1+D3), derivado de `snapshot.answer` (letra canônica A–D) e `snapshot.options`; a letra isolada não é publicada. O `npm run qa` tem assert de paridade página ↔ manifesto por questão e idioma, e o build falha com id/motivo se o gabarito for inválido.
 - Synapse e Ranvier estão acessíveis e em constante atualização. “Em produção” não descreve o estágio comunicado pelo mantenedor para nenhum dos dois.
 - O CI verifica placeholders, paridade PT/EN, referências locais, geração das páginas, sitemap e registro.
 

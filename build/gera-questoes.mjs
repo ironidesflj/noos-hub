@@ -144,6 +144,43 @@ log(
     : `manifestos: ${manifestFiles.length}; questões aceitas: ${accepted.length}; linhas rejeitadas: ${rejections.length}`,
 );
 
+// ---------- D1 (v12): gabarito por TEXTO, derivado do índice canônico
+//
+// `snapshot.answer` chega como LETRA ("B") na ordem canônica de
+// `snapshot.options`. A página publica o TEXTO da alternativa correta — a
+// letra do app pode ser outra (alternativas embaralhadas na sessão) e exibir
+// a letra do hub é exatamente o incidente A/C. Letra fora de A–D (ou índice
+// sem alternativa) é gabarito inválido: FALHA o build com id e motivo, em
+// vez de publicar uma página com gabarito silenciosamente errado.
+
+const ANSWER_LETTERS = 'ABCD';
+const answerErrors = [];
+for (const q of accepted) {
+  const letter = q.record.snapshot.answer;
+  const index = typeof letter === 'string' ? ANSWER_LETTERS.indexOf(letter) : -1;
+  if (index === -1) {
+    answerErrors.push(
+      `${q.record.id}: snapshot.answer ${JSON.stringify(letter)} não é uma letra canônica A–D`,
+    );
+    continue;
+  }
+  const answerText = q.record.snapshot.options[index];
+  if (typeof answerText !== 'string' || answerText.trim() === '') {
+    answerErrors.push(
+      `${q.record.id}: snapshot.answer "${letter}" aponta para options[${index}], mas a questão tem ${q.record.snapshot.options.length} alternativa(s)`,
+    );
+    continue;
+  }
+  q.answerText = answerText;
+}
+if (answerErrors.length > 0) {
+  for (const error of answerErrors) console.error(`[gera-questoes] FALHA: ${error}`);
+  console.error(
+    `[gera-questoes] ${answerErrors.length} questão(ões) com gabarito inválido — build abortado, nenhuma página foi gerada.`,
+  );
+  process.exit(1);
+}
+
 // ---------- páginas
 
 const tplPt = await readFile(path.join(ROOT, 'build', 'templates', 'questao-pt.html'), 'utf8');
@@ -189,7 +226,7 @@ const commonMap = (q, lang) => {
     LANG_NOTE: langNote(r.lang, lang),
     STATEMENT: escapeHtml(r.snapshot.statement),
     OPTIONS: r.snapshot.options.map((o) => `<li>${escapeHtml(o)}</li>`).join('\n        '),
-    ANSWER: escapeHtml(r.snapshot.answer),
+    ANSWER_TEXT: escapeHtml(q.answerText),
     REFERENCE_BLOCK: refBlock(r.snapshot.reference, lang),
     VERSION: escapeHtml(String(r.version)),
     CHECKSUM: escapeHtml(r.checksum),
@@ -330,7 +367,7 @@ if (QA) {
   expect(ptHtml.includes('nº 42 da prova AZ-900'), 'enunciado presente na página PT');
   expect(ptHtml.includes('<details class="q-answer">'), 'gabarito em <details> (fechado por padrão)');
   expect(
-    ptHtml.includes('sha256:1ce39bf5fb075637e16d7f9a39ab626228dcb8c49a52478b5cf031113bc65f09'),
+    ptHtml.includes('sha256:da215a61f90cc5a363c6c49cf50f592a000587cbe38f55ef3a5d1c6ff2b036a7'),
     'checksum completo na proveniência',
   );
   expect(ptHtml.includes('manifestos/RAN.jsonl'), 'link para o manifesto na proveniência');
@@ -340,6 +377,38 @@ if (QA) {
   expect(enHtml.includes('Train this exam on Ranvier'), 'volta ao app presente na EN');
   expect(enHtml.includes(`Noos system v${registry.version}`), 'rodapé EN = versão do registry');
   expect(enHtml.includes('This question is in pt-BR.'), 'nota de idioma da questão na página EN');
+
+  // D3 (v12): assert de PARIDADE — para CADA record aceito e CADA idioma, a
+  // página mostra o TEXTO de options[índice] (nunca a letra isolada como
+  // gabarito) e as alternativas continuam na ordem canônica. Divergência
+  // falha o QA com o id e o motivo — é o guarda contra o incidente A/C.
+  const answerLabel = { pt: 'Resposta correta:', en: 'Correct answer:' };
+  for (const q of accepted) {
+    const id = q.record.id;
+    const letter = q.record.snapshot.answer;
+    const index = 'ABCD'.indexOf(letter);
+    const expectedText = q.record.snapshot.options[index];
+    for (const lang of ['pt', 'en']) {
+      const pagePath = path.join(OUT_DIR, lang, 'q', id, 'index.html');
+      const html = existsSync(pagePath) ? await readFile(pagePath, 'utf8') : '';
+      expect(
+        html.includes(`<strong>${answerLabel[lang]}</strong> ${escapeHtml(expectedText)}`),
+        `paridade ${lang} ${id}: gabarito mostra o texto de options[${index}] (letra canônica ${letter})`,
+      );
+      expect(
+        !html.includes(`<strong>${answerLabel[lang]}</strong> ${q.record.snapshot.answer}</p>`),
+        `paridade ${lang} ${id}: gabarito não exibe a letra isolada`,
+      );
+      let cursor = -1;
+      const ordered = q.record.snapshot.options.every((option) => {
+        const at = html.indexOf(`<li>${escapeHtml(option)}</li>`);
+        if (at === -1 || at < cursor) return false;
+        cursor = at;
+        return true;
+      });
+      expect(ordered, `paridade ${lang} ${id}: alternativas na ordem canônica (letras A–D do <ol> rotulam a ordem, não o acerto)`);
+    }
+  }
 
   // páginas de redirect (plano C — alias e forma sem idioma)
   const rdPt = path.join(OUT_DIR, 'pt', 'q', 'GLI-AZ900-00012', 'index.html');

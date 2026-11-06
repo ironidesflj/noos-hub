@@ -1,6 +1,6 @@
 # spec-pagina-de-questao
 
-Especificação do hub (noos.study) · estado: **publicada na v10.2 — roteamento 100% estático (plano C)** — conteúdo **no ar**: 731 questões (RAN 300 + SYN 431), 1.462 páginas canônicas, 731 redirects e sitemap com 733 entradas (números de `current-state.md`). Transporte automático dos manifestos segue pendente (F2 item 2).
+Especificação do hub (noos.study) · estado: **publicada na v10.2 — roteamento 100% estático (plano C)** · **v12 — gabarito por texto + assert de paridade** — conteúdo **no ar**: 731 questões (RAN 300 + SYN 431), 1.462 páginas canônicas, 731 redirects e sitemap com 733 entradas (números de `current-state.md`). Transporte automático dos manifestos segue pendente (F2 item 2).
 
 ## Problema
 
@@ -77,11 +77,17 @@ Conteúdo, em ordem:
    (vocabulário do app emissor, agregado) e idioma da questão quando difere
    do idioma da página.
 2. **Enunciado** (`snapshot.statement`, quebras preservadas) e
-   **alternativas** (`snapshot.options`) em lista ordenada de leitura — sem
-   `input`, sem seleção, sem cronômetro, sem resultado.
+   **alternativas** (`snapshot.options`) em lista ordenada de leitura na
+   ordem canônica do snapshot — as letras A–D do `<ol type="A">` rotulam a
+   ordem canônica, não o acerto; sem `input`, sem seleção, sem cronômetro,
+   sem resultado.
 3. **Gabarito e referência** em `<details>` ("Revelar gabarito") — revelar é
    um clique deliberado, não um resultado; a referência oficial acompanha.
-   Nada de certo/errado, pontuação ou progresso.
+   O gabarito é o **texto da alternativa correta** ("Resposta correta: …"),
+   derivado de `snapshot.answer` (letra canônica A–D) + índice em
+   `snapshot.options`; a letra isolada nunca é publicada — a letra do app
+   embaralhado difere e exibi-la é o incidente A/C. Nada de certo/errado,
+   pontuação ou progresso.
 4. **Proveniência** — `version`, `checksum` completo em corpo mono, aliases
    legadas, número da linha no manifesto e link direto para
    `manifestos/{PREFIXO}.jsonl` servido público; data do build no rodapé
@@ -103,6 +109,14 @@ Todo texto do manifesto é HTML-escapado (o snapshot é texto arbitrário).
   `api/q-data.mjs` (mapa de aliases + corpo do 404 embutido) e escreve
   `sitemap.xml` (base de `build/templates/sitemap-base.xml` + uma entrada
   por questão, hreflang pt/en/x-default).
+- O gabarito é derivado no build: `snapshot.answer` é a letra canônica
+  (A–D) e o texto publicado é `snapshot.options[índice]`. Letra fora de A–D
+  ou índice sem alternativa **aborta o build** com id e motivo — o hub
+  nunca publica uma página com gabarito silenciosamente errado.
+- `node build/gera-questoes.mjs --qa` inclui assert de **paridade** para
+  cada record aceito e cada idioma: a página contém o texto de
+  `options[índice]`, não exibe a letra isolada como gabarito e mantém as
+  alternativas na ordem canônica; divergência falha com id e motivo.
 - Saídas geradas **não são commitadas** (`.gitignore`: `pt/q/`, `en/q/`,
   `api/q-data.mjs`, `sitemap.xml`).
 - Vercel: framework "Other", `buildCommand: node build/gera-questoes.mjs`,
@@ -127,6 +141,10 @@ Todo texto do manifesto é HTML-escapado (o snapshot é texto arbitrário).
   canonical/hreflang/OG presentes, rodapé = registry, link do app quando
   `url` existir, header e rodapé sem overflow a 320 px (o QA de bordas da
   v8 vale para as páginas novas).
+- Gabarito por texto: para cada questão e idioma, a página mostra o texto
+  de `snapshot.options[índice de snapshot.answer]`; o assert de paridade do
+  `--qa` falha com id e motivo em divergência e o build falha com gabarito
+  inválido (letra fora de A–D ou índice inexistente).
 - Nada do pacote Axon no output servido (é só devDependency de build).
 
 ## Efeito no manifesto
@@ -171,3 +189,26 @@ canônica PT em um salto. O sitemap inclui somente as canônicas.
 
 Esta revisão substitui as referências anteriores a 301/308, `api/q.js` e
 rewrites nesta spec. O contrato de preservar IDs e aliases continua válido.
+
+## Revisão v12 — gabarito por texto + assert de paridade (2026-11-06)
+
+**D1 — gabarito por texto.** A página de questão deixa de exibir a LETRA do
+gabarito e passa a exibir o **TEXTO da alternativa correta**, derivado do
+índice canônico: `snapshot.answer` chega como letra A–D e o texto publicado
+é `snapshot.options[índice]`. As letras A–D do `<ol type="A">` continuam
+sendo rótulos da **ordem canônica** do snapshot — nunca do acerto. Isso
+fecha o incidente A/C: a letra vista no app embaralhado não coincide com a
+do hub, e o hub passa a publicar a alternativa por extenso. Gabarito
+inválido (letra fora de A–D ou índice sem alternativa) **aborta o build**
+com id e motivo — nunca uma página silenciosamente errada.
+
+**D3 — assert de paridade.** O `--qa` ganha asserção para cada record
+aceito e cada idioma: a página contém o texto de `options[índice]`, não
+exibe a letra isolada como gabarito e mantém as alternativas na ordem
+canônica. Divergência falha o QA com id e motivo. O fixture
+`RAN-AZ900-00042` foi canonicalizado (answer `B`, checksum recalculado)
+para exercitar o caminho letra → texto no QA.
+
+Verificação com os manifestos reais: 731 aceitas, 0 rejeitadas, 1.462
+páginas canônicas, 731 redirects, sitemap com 733 entradas; `npm run qa`
+35/35 PASS.

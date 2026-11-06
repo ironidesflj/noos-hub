@@ -13,6 +13,7 @@ Thumbs.db
 /sitemap.xml
 .qa-dist/
 node_modules/
+/.npm-cache/
 
 # QA local — screenshots tirados na raiz do repo.
 # ⚠ Só a raiz: as og-images de assets/ PRECISAM subir no push
