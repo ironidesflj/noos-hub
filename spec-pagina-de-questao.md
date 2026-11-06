@@ -1,6 +1,6 @@
 # spec-pagina-de-questao
 
-Especificação do hub (noos.study) · estado: **implementada na v10 — roteamento revisado na v10.2 (plano C: 100% estático)** — conteúdo aguarda o primeiro manifesto (F2 item 2 para o transporte).
+Especificação do hub (noos.study) · estado: **publicada na v10.2 — roteamento 100% estático (plano C)** — conteúdo **no ar**: 731 questões (RAN 300 + SYN 431), 1.462 páginas canônicas, 731 redirects e sitemap com 733 entradas (números de `current-state.md`). Transporte automático dos manifestos segue pendente (F2 item 2).
 
 ## Problema
 
@@ -147,8 +147,10 @@ Nenhum no pacote. O guia de adoção (fatia 5) passa a citar esta spec como o
 
 ## Efeito no Ranvier
 
-Com a rota implementada e o primeiro `manifestos/RAN.jsonl` ingerido, as
-páginas acendem e a fatia 5 (badge) sai da espera — os dois trilhos são
+Rota publicada na v10.2 e os dois manifestos ingeridos: `manifestos/RAN.jsonl`
+(300 questões DBDEA) e `manifestos/SYN.jsonl` (431 questões), zero rejeições
+no build. As páginas estão no ar; o badge (fatia 5) deixou de estar bloqueado
+pelo hub — ativação e conteúdo ficam no lado do app, onde os dois trilhos são
 independentes e se encontram no build.
 
 ## Fora de escopo
