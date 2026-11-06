@@ -67,3 +67,5 @@ aluno (`constitution.md`). Não repete o que já está em `current-state.md`,
 2. Antes de editar: `npm ci && npm run build && npm run qa` (cache:
    `npm_config_cache="$PWD/.npm-cache"`) e conferir os números acima.
 3. Qualquer bump: `package.json` × `noos.registry.json` × rodapé iguais.
+
+- **CI:** o job `Integridade e paridade PT/EN` passou a rodar `npm run qa` — o assert de paridade gabarito × `options` (incidente A/C) agora é gate de PR, além do build.
