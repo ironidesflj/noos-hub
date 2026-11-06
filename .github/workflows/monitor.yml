@@ -1,0 +1,71 @@
+name: Monitor
+
+# Monitor de disponibilidade do ecossistema Noos.
+# GitHub Actions em repo público: sem custo. Cada falha abre/atualiza uma
+# issue no próprio repo (e-mail do GitHub notifica o mantenedor).
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  disponibilidade:
+    name: Disponibilidade (hub + apps)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checar endpoints
+        id: check
+        shell: bash
+        run: |
+          set -u
+          fail=0
+          check() {
+            code=$(curl -s -o /dev/null -w '%{http_code}' -m 20 "$1")
+            echo "$2: HTTP $code (esperado $3)"
+            [ "$code" = "$3" ] || fail=1
+          }
+          check https://noos.study/noos.registry.json registry 200
+          check https://noos.study/pt/q/RAN-DBDEA-00001/ pagina-ran-pt 200
+          check https://noos.study/pt/q/SYN-CTFL-00001/ pagina-syn-pt 200
+          check https://noos.study/pt/q/RAN-DBDEA-99999/ pagina-inexistente 404
+          check https://ctfl-app.vercel.app/ synapse 200
+          check https://ctfl-app.vercel.app/manifest.jsonl manifest-synapse 200
+          check https://ranvier-seven.vercel.app/ ranvier 200
+          check https://ranvier-seven.vercel.app/api/health health-ranvier 200
+
+          locs=$(curl -s -m 20 https://noos.study/sitemap.xml | grep -c '<loc>')
+          echo "sitemap: $locs locs (esperado 733)"
+          [ "$locs" -eq 733 ] || fail=1
+
+          syn=$(curl -s -m 20 https://ctfl-app.vercel.app/manifest.jsonl | wc -l | tr -d ' ')
+          echo "manifesto SYN: $syn linhas (esperado 431)"
+          [ "$syn" = "431" ] || fail=1
+
+          echo "fail=$fail" >> "$GITHUB_OUTPUT"
+
+      - name: Abrir ou atualizar alerta
+        if: steps.check.outputs.fail == '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search 'Monitor: falha de disponibilidade in:title' --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "Nova falha detectada em $(date -u +%FT%TZ). Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "Monitor: falha de disponibilidade" --body "Falha detectada em $(date -u +%FT%TZ).\n\nRun: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\n\nVerifique: hub, Synapse (app/manifesto) e Ranvier (/api/health)."
+          fi
+
+      - name: Fechar alerta quando tudo voltar
+        if: steps.check.outputs.fail == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search 'Monitor: falha de disponibilidade in:title' --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "Disponibilidade restabelecida em $(date -u +%FT%TZ). Fechando."
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY"
+          fi
