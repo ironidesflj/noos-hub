@@ -76,6 +76,11 @@ jobs:
           grep -q 'https://noos.study/pt/' sitemap.xml
           grep -q 'https://noos.study/en/' sitemap.xml
 
+      # Fecha o risco do D3: o assert de paridade gabarito × options
+      # (incidente A/C) precisa rodar em CI, não só por comando manual.
+      - name: QA do gerador — paridade gabarito × options (PT e EN)
+        run: npm run qa
+
   sdd-lint:
     name: SDD — arquivos canônicos e registro
     runs-on: ubuntu-latest
