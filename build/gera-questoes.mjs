@@ -34,7 +34,7 @@ import { readFile, writeFile, mkdir, readdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseManifest, verifyChecksum, validateId } from '@ironidesflj/axon';
+import { parseManifest, verifyChecksum, validateId, isRetired } from '@ironidesflj/axon';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const QA = process.argv.includes('--qa');
@@ -226,8 +226,20 @@ const commonMap = (q, lang) => {
     LANG_NOTE: langNote(r.lang, lang),
     STATEMENT: escapeHtml(r.snapshot.statement),
     OPTIONS: r.snapshot.options.map((o) => `<li>${escapeHtml(o)}</li>`).join('\n        '),
-    ANSWER_TEXT: escapeHtml(q.answerText),
-    REFERENCE_BLOCK: refBlock(r.snapshot.reference, lang),
+    ANSWER_BLOCK: isRetired(r)
+      ? ''
+      : `<details class="q-answer">
+          <summary>${lang === 'pt' ? 'Revelar gabarito' : 'Reveal answer'}</summary>
+          <p><strong>${lang === 'pt' ? 'Resposta correta:' : 'Correct answer:'}</strong> ${escapeHtml(q.answerText)}</p>
+          ${refBlock(r.snapshot.reference, lang)}
+        </details>`,
+    RETIRED_BANNER: isRetired(r)
+      ? `<aside class="q-retired"><p>${escapeHtml(
+          lang === 'pt'
+            ? 'Questão retirada do banco ativo — mantida por citação. O texto permanece publicado para que links antigos continuem válidos.'
+            : 'Question retired from the active bank — kept for citation. The text remains published so older links keep working.',
+        )}</p></aside>`
+      : '',
     VERSION: escapeHtml(String(r.version)),
     CHECKSUM: escapeHtml(r.checksum),
     ALIASES: r.aliases.length ? r.aliases.map(escapeHtml).join(' · ') : '—',
@@ -345,15 +357,20 @@ if (QA) {
     if (!cond) failures.push(label);
   };
 
-  // fixture esperado: 1 aceita (RAN-AZ900-00042), 2 rejeitadas (checksum + JSON)
-  expect(accepted.length === 1, `1 questão aceita (veio ${accepted.length})`);
+  // fixture esperado: 2 aceitas (RAN-AZ900-00042 ativa + RAN-AZ900-00044 retirada),
+  // 2 rejeitadas (checksum + JSON)
+  expect(accepted.length === 2, `2 questões aceitas (veio ${accepted.length})`);
   expect(
     rejections.length === 2 && rejections.every((r) => r.file === 'RAN.jsonl'),
     `2 linhas rejeitadas com log (veio ${rejections.length})`,
   );
   expect(
     accepted[0]?.record.id === 'RAN-AZ900-00042',
-    'a aceita é a RAN-AZ900-00042 (exemplo trabalhado do guia)',
+    'a ativa é a RAN-AZ900-00042 (exemplo trabalhado do guia)',
+  );
+  expect(
+    accepted.some((q) => q.record.id === 'RAN-AZ900-00044' && isRetired(q.record)),
+    'a retirada é a RAN-AZ900-00044 (campo retired)',
   );
 
   // páginas em par
@@ -385,6 +402,18 @@ if (QA) {
   const answerLabel = { pt: 'Resposta correta:', en: 'Correct answer:' };
   for (const q of accepted) {
     const id = q.record.id;
+    if (isRetired(q.record)) {
+      for (const lang of ['pt', 'en']) {
+        const pagePath = path.join(OUT_DIR, lang, 'q', id, 'index.html');
+        const html = existsSync(pagePath) ? await readFile(pagePath, 'utf8') : '';
+        expect(html.includes('class="q-retired"'), `retirada ${lang} ${id}: aviso de questão retirada presente`);
+        expect(
+          !html.includes('<details class="q-answer">'),
+          `retirada ${lang} ${id}: sem gabarito interativo`,
+        );
+      }
+      continue;
+    }
     const letter = q.record.snapshot.answer;
     const index = 'ABCD'.indexOf(letter);
     const expectedText = q.record.snapshot.options[index];
@@ -454,6 +483,10 @@ if (QA) {
   const sitemap = await readFile(path.join(OUT_DIR, 'sitemap.xml'), 'utf8');
   expect(sitemap.includes('https://noos.study/pt/q/RAN-AZ900-00042/'), 'sitemap: entrada PT da questão');
   expect(sitemap.includes('https://noos.study/en/q/RAN-AZ900-00042/'), 'sitemap: entrada EN da questão');
+  expect(
+    sitemap.includes('https://noos.study/pt/q/RAN-AZ900-00044/'),
+    'sitemap: questão retirada continua citável',
+  );
   expect(!sitemap.includes('GLI-'), 'sitemap não lista alias (só canônicas)');
 
   console.log(`\n[qa] ${failures.length === 0 ? 'PASS — fixture conforme a spec' : `FAIL (${failures.length})`}`);

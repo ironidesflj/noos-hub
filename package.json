@@ -9,7 +9,7 @@
     "qa": "node build/gera-questoes.mjs --qa"
   },
   "devDependencies": {
-    "@ironidesflj/axon": "0.2.2"
+    "@ironidesflj/axon": "0.3.0"
   },
   "engines": {
     "node": ">=20"
