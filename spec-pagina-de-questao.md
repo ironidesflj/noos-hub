@@ -212,3 +212,8 @@ para exercitar o caminho letra → texto no QA.
 Verificação com os manifestos reais: 731 aceitas, 0 rejeitadas, 1.462
 páginas canônicas, 731 redirects, sitemap com 733 entradas; `npm run qa`
 35/35 PASS.
+
+
+## Epitáfio (v0.3, 2026-11-09)
+
+Registro com `retired: true` (campo opcional do Axon 0.3.0) gera a mesma página canônica, com aviso "questão retirada do banco ativo — mantida por citação", **sem bloco de gabarito**, e permanece no sitemap. Alias continua 301 para a canônica. ID nunca é reciclada.
