@@ -71,13 +71,20 @@ com os apps; o estado operacional fica em `current-state.md`.
   CTFL/CTAL-TA/CTAL-TM em `manifestos/SYN.jsonl`, com zero rejeições no build.
   O PR #15 dos links no app permanece sob responsabilidade do Synapse.
 
+## Feito (v13 — nov/2026)
+
+- ✅ **Transporte automático dos manifestos (F2 item 2)** — apps publicam
+  `manifest.jsonl`; workflow do app faz `repository_dispatch` para o hub
+  (`.github/workflows/ingest-manifest.yml`), que baixa, confere o SHA-256,
+  abre PR idempotente em `manifestos/{PREFIX}.jsonl` e mantém o merge manual.
+  Cópia manual continua como fallback. Token: `HUB_SYNC_TOKEN` nos apps.
+- ✅ **Política de questões retiradas (epitáfio)** — Axon 0.3.0 (`retired` +
+  `isRetired`); record retirado mantém a página canônica com aviso, sem
+  gabarito e no sitemap; alias continua 301. QA do fixture cobre ativa +
+  retirada.
+
 ## Pendente (Fase 2 — engenharia do hub)
 
-- **Transporte e retenção dos manifestos:** automatizar a atualização dos
-  arquivos publicados pelos apps e definir o comportamento para questões
-  retiradas do manifesto (F2 item 2). Hoje RAN e SYN são copiados e
-  validados no build; o último deploy bem-sucedido permanece no ar se um
-  build falhar.
 - **Discussões por questão** — ligar a página ao quadro (GitHub Discussions
   primeiro; ritual "Passei na prova!").
 

@@ -15,8 +15,13 @@ Revisão documental: 06/11/2026 · versão do sistema: **1.2.0**.
 
 - O manifesto do Synapse está integrado ao Hub. Os links de comunidade no app seguem no PR #15 do Synapse; sua ativação deve ser coordenada naquele repositório.
 - O Ranvier já publica o manifesto. A URL canônica usada pelo botão do app depende de `NEXT_PUBLIC_NOOS_HUB_URL` no projeto Vercel do Ranvier; o repositório do Hub não controla essa configuração.
-- Os manifestos ainda são copiados para este repositório. O transporte automático e a política para IDs retiradas continuam pendentes em [plan.md](plan.md).
+- Os manifestos são ingeridos por **PR automático** (F2): o app dispara o workflow, o hub confere o SHA-256 e abre o PR; merge continua manual. Questões retiradas seguem a política epitáfio (Axon 0.3.0): página canônica mantida com aviso, sem gabarito, no sitemap.
 
 ## Limites
 
 O Hub não guarda progresso nem respostas e não hospeda provas jogáveis. O pacote Axon é dependência de build, sem código do pacote no navegador. A URL `vercel.app` não oferece redundância de hospedagem independente.
+
+
+## Adendo 09/nov/2026 (v13)
+
+- F2 implementado (`ingest-manifest.yml`) + política epitáfio (Axon 0.3.0) publicada; build 731 aceitas/0 rejeitadas, QA PASS, páginas com gabarito por texto (`7313f302…`).
