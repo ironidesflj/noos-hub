@@ -73,3 +73,5 @@ aluno (`constitution.md`). Não repete o que já está em `current-state.md`,
 - **Monitoramento:** `.github/workflows/monitor.yml` checa a cada 15 min hub (registry, páginas, sitemap 733), Synapse (app + `/manifest.jsonl` 431 linhas) e Ranvier (`/api/health`); falha abre/atualiza issue "(Monitor: falha de disponibilidade)" e o GitHub notifica por e-mail; sucesso fecha.
 
 - **2026-11-09:** Axon pin 0.3.0; página `/q/{ID}` suporta `retired` (política epitáfio, MINOR): questão retirada mantém a página canônica com aviso e **sem gabarito interativo**; sitemap permanece. QA cobre ativa + retirada no fixture.
+
+- **2026-11-09:** CSP em **Report-Only** nos headers (`Content-Security-Policy-Report-Only`): coleta violações sem bloquear o site; quando estabilizar, vira enforce. Sem impacto nas páginas atuais.
