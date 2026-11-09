@@ -1,0 +1,75 @@
+name: Ingest manifest (F2)
+
+# Recebe o aviso do app (repository_dispatch) e abre PR atualizando
+# manifestos/{PREFIX}.jsonl — o hub continua ingerindo no build, nunca em
+# runtime. O merge é manual (revisão). Idempotente: se o SHA já é o do
+# arquivo commitado, não abre PR.
+on:
+  repository_dispatch:
+    types: [manifest-updated]
+  workflow_dispatch:
+    inputs:
+      prefix:
+        description: "Prefixo (RAN, SYN)"
+        required: true
+      sha256:
+        description: "SHA-256 do manifest"
+        required: true
+      url:
+        description: "URL pública do manifest"
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolver payload
+        run: |
+          PREFIX="${{ github.event.client_payload.prefix || inputs.prefix }}"
+          SHA256="${{ github.event.client_payload.sha256 || inputs.sha256 }}"
+          URL="${{ github.event.client_payload.url || inputs.url }}"
+          test -n "$PREFIX" -a -n "$SHA256" -a -n "$URL" || { echo "::error::prefix/sha256/url ausentes"; exit 1; }
+          echo "PREFIX=$PREFIX" >> "$GITHUB_ENV"
+          echo "SHA256=$SHA256" >> "$GITHUB_ENV"
+          echo "URL=$URL" >> "$GITHUB_ENV"
+
+      - name: Baixar e verificar SHA
+        run: |
+          curl -fsS "$URL" -o /tmp/manifest.jsonl
+          echo "$SHA256  /tmp/manifest.jsonl" | sha256sum -c -
+          echo "linhas: $(wc -l < /tmp/manifest.jsonl)"
+
+      - name: Idempotência
+        run: |
+          TARGET="manifestos/$PREFIX.jsonl"
+          if [ -f "$TARGET" ] && [ "$(sha256sum "$TARGET" | cut -d' ' -f1)" = "$SHA256" ]; then
+            echo "::notice::manifesto já está em $TARGET com o mesmo SHA — nada a fazer"
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Atualizar manifesto
+        if: env.SKIP != '1'
+        run: |
+          mkdir -p manifestos
+          cp /tmp/manifest.jsonl "manifestos/$PREFIX.jsonl"
+
+      - uses: peter-evans/create-pull-request@v6
+        if: env.SKIP != '1'
+        with:
+          branch: "sync/${{ env.PREFIX }}-manifest"
+          title: "sync: manifesto ${{ env.PREFIX }} ${{ env.SHA256 }}"
+          body: |
+            Ingestão automática (F2) do manifesto ${{ env.PREFIX }}.
+
+            - Fonte: ${{ env.URL }}
+            - SHA-256: `${{ env.SHA256 }}`
+            - Validado no CI do hub (build + QA + asserts de paridade).
+
+            Merge manual obrigatório; nada é publicado sozinho.
+          commit-message: "sync: atualizar manifesto ${{ env.PREFIX }}"
