@@ -1,15 +1,36 @@
 {
+  "SYN-CTFL-00001": {
+    "synthesis": {
+      "summary": "A cadeia causal do ISTQB CTFL v4.0.1 nunca muda de direção: Pessoa comete um ERRO (engano humano) → que introduz um DEFEITO (falha estática / bug no código ou requisito) → que, quando executado, pode causar uma FALHA (comportamento externo incorreto percebido no sistema). Isso elimina A, B e C imediatamente.",
+      "sourceUrl": "https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf",
+      "sourceTitle": "ISTQB CTFL v4.0.1 — LO FL-1.2.3",
+      "authors": ["@helena-qa-2b", "@ironidesflj"],
+      "version": 2
+    },
+    "comments": [
+      {
+        "handle": "@helena-qa-2b",
+        "tier": 4,
+        "passed": true,
+        "option": "B",
+        "body": "A alternativa B é a pegadinha clássica da prova porque inverte a linha do tempo ('falha gera defeito que causa erro'). Grave a ordem alfabética em português: E → D → F (Erro humano → Defeito no artefato → Falha em execução, alternativa D).",
+        "sourceUrl": "https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf",
+        "accelerations": 29,
+        "accepted": true
+      }
+    ]
+  },
   "SYN-CTALTM-00001": {
     "comments": [
       {
         "handle": "@ironidesflj",
         "tier": 4,
         "passed": true,
-        "option": "",
-        "body": "Primeiro comentario teste",
-        "sourceUrl": "",
-        "accelerations": 0,
-        "accepted": false,
+        "option": "B",
+        "body": "No CTAL-TM, o foco está sempre em alinhar o critério de saída e o controle do teste ao nível de risco residual do negócio.",
+        "sourceUrl": "https://www.istqb.org/",
+        "accelerations": 11,
+        "accepted": true,
         "createdAt": "2026-11-10T17:38:05Z"
       }
     ]

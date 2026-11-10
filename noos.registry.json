@@ -1,6 +1,6 @@
 {
  "system": "noos",
- "version": "1.4.0",
+ "version": "1.5.0",
  "updated": "2026-11",
  "namespaces": [
   {
@@ -45,7 +45,7 @@
  "library": {
   "name": "@ironidesflj/axon",
   "mode": "pacote",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "phase": "publicada"
  },
  "rules": {
@@ -59,7 +59,7 @@
   "registry-source": "Fonte única do registro da família. O CI valida este arquivo e a presença dos 5 apps nas páginas PT e EN. Contrato técnico completo (IDs, manifest.jsonl, deep-link) mora no repositório do Axon (constitution.md). O campo opcional 'url' por namespace alimenta o link de volta ao app nas páginas /q/{ID} (spec-pagina-de-questao.md)."
  },
  "discussions": {
-  "provider": "giscus",
+  "provider": "github-discussions",
   "enabled": true,
   "repo": "ironidesflj/noos-hub",
   "repoId": "R_kgDOVVHVoQ",

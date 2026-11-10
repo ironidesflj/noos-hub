@@ -96,6 +96,10 @@
       <a href="/en/#contato">Contact</a>
     </nav>
     <div class="head-right">
+      <button class="mielina-chip" type="button" data-tiers-toggle title="See how Badges and the Embrace of the Sphere work">
+        <span style="color:var(--signal)">✦</span>
+        <span>Reputation &amp; Sphere Embrace</span>
+      </button>
       <span class="lang-switch" role="group" aria-label="Language">
         <a data-lang="pt" href="/pt/q/{{ID}}/">PT</a>
         <a data-lang="en" href="/en/q/{{ID}}/" aria-current="true">EN</a>
@@ -119,48 +123,67 @@
         <a href="/en/">Noos</a><span class="sep">/</span><a href="/en/#familia">{{APP_NAME}}</a><span class="sep">/</span><span>{{ID}}</span>
       </nav>
 
-      <header class="q-head">
-        <div class="q-id-line">
-          <span class="mono">{{ID}}</span>
-          <span class="q-app"><i style="--c:{{APP_COLOR}}"></i>{{APP_NAME}}</span>
-        </div>
-        <p class="q-meta">
-          <span>Exam {{EXAM}}</span>
-          <span>Topics: {{TOPICS}}</span>
-          <span>Difficulty: {{DIFFICULTY}}</span>
-          {{LANG_NOTE}}
-        </p>
-      </header>
+      {{RITUAL_BANNER}}
 
       <div class="q-grid">
-        <div class="q-col-problem q-body">
-        <p class="q-statement">{{STATEMENT}}</p>
-        <ol class="q-options" type="A">
-        {{OPTIONS}}
-        </ol>
-        {{RETIRED_BANNER}}
-        {{ANSWER_BLOCK}}
+        <div class="q-col-problem">
+          <div class="q-problem-card corner-box">
+            <span class="corner tl"></span><span class="corner tr"></span>
+            <span class="corner bl"></span><span class="corner br"></span>
 
-      <aside class="q-prov">
-        <h2>Provenance</h2>
-        <dl>
-          <dt>Question version</dt><dd>{{VERSION}}</dd>
-          <dt>Checksum</dt><dd class="mono q-checksum">{{CHECKSUM}}</dd>
-          <dt>Legacy IDs</dt><dd class="mono">{{ALIASES}}</dd>
-          <dt>Source</dt><dd>Line {{LINE}} of <a href="/manifestos/{{PREFIX}}.jsonl">manifestos/{{PREFIX}}.jsonl</a> — the emitting app's public manifest, ingested at this site's build.</dd>
-        </dl>
-        <p class="sec-note mono">This page is reading: no selection, no timer, no score — studying lives in the app.</p>
-      </aside>
+            <header class="q-head q-head-card">
+              <div class="q-id-row">
+                <div class="q-id-left">
+                  <span class="q-id-code">{{ID}}</span>
+                  <button type="button" class="mielina-chip" data-copy-id="https://noos.study/en/q/{{ID}}/" data-copy-done="✓ Copied: /en/q/{{ID}}/" style="padding:2px 8px">
+                    <span>📋 Cite ID</span>
+                  </button>
+                </div>
+                <span class="q-app"><i style="--c:{{APP_COLOR}}"></i>{{APP_NAME}} · {{EXAM}}</span>
+              </div>
+              <p class="q-meta" style="margin-top:10px;font-size:.8rem">
+                <span>Exam {{EXAM}}</span>
+                <span>Topics: {{TOPICS}}</span>
+                <span>Difficulty: {{DIFFICULTY}}</span>
+                {{LANG_NOTE}}
+              </p>
+            </header>
 
-        {{APP_URL_BLOCK}}
+            <div class="q-body" style="margin-top:18px">
+              <p class="q-statement">{{STATEMENT}}</p>
+              <div class="q-options-head">
+                <span class="mono">Options (Reading Mode)</span>
+                <span style="font-size:11.5px;color:var(--muted)">Click to filter discussion →</span>
+              </div>
+              <ol class="q-options q-options-interactive" type="A">
+              {{OPTIONS}}
+              </ol>
+              {{RETIRED_BANNER}}
+              {{ANSWER_BLOCK}}
 
+              <aside class="q-prov" style="margin-top:26px;padding-top:18px">
+                <h2>Provenance</h2>
+                <dl>
+                  <dt>Question version</dt><dd>{{VERSION}}</dd>
+                  <dt>Checksum</dt><dd class="mono q-checksum">{{CHECKSUM}}</dd>
+                  <dt>Legacy IDs</dt><dd class="mono">{{ALIASES}}</dd>
+                  <dt>Source</dt><dd>Line {{LINE}} of <a href="/manifestos/{{PREFIX}}.jsonl">manifestos/{{PREFIX}}.jsonl</a> — the emitting app's public manifest, ingested at this site's build.</dd>
+                </dl>
+                <p class="sec-note mono" style="margin-top:14px">This page is reading: no selection, no timer, no score — studying lives in the app.</p>
+              </aside>
+
+              {{APP_URL_BLOCK}}
+            </div>
+          </div>
+
+          {{GRAVITY_BLOCK}}
         </div>
 
         <section class="q-col-mielina" id="discussao" aria-labelledby="mielina-title">
+          {{TIERS_DRAWER}}
           {{DISCUSSION_HEAD}}
           {{DISCUSSION_MATRIX}}
           {{DISCUSSION_SYNTHESIS}}
-          {{RITUAL_BANNER}}
           {{DISCUSSION_COMPOSER}}
           {{DISCUSSION_FILTERS}}
           {{DISCUSSION_THREAD}}

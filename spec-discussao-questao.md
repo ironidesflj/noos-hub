@@ -1,4 +1,4 @@
-# 01 · spec-discussao-questao (Proposta SDD v2 — A Camada de Mielina & O Abraço da Esfera)
+# 01 · spec-discussao-questao (Spec SDD v2 — implementada · Opção A · 10/nov/2026)
 
 Especificação do hub (`noos.study`) · complementar à `spec-pagina-de-questao.md` (item 6: Slot Discussão, Fase 2).
 
@@ -6,7 +6,7 @@ Especificação do hub (`noos.study`) · complementar à `spec-pagina-de-questao
 
 ## 1. Problema e Visão
 
-A rota canônica `/pt/q/{ID}/` e `/en/q/{ID}/` já existe e publica 731 questões reais (`RAN` + `SYN`). Hoje, o item 6 da `spec-pagina-de-questao.md` (*Slot Discussão*) está omitido aguardando ativação.
+A rota canônica `/pt/q/{ID}/` e `/en/q/{ID}/` existe e publica **1.031 questões reais** (`RAN` 600 + `SYN` 431). O item 6 da `spec-pagina-de-questao.md` (*Slot Discussão*) foi **implementado** como a Camada de Mielina v2 (F2.1 + F2.2) em 10/nov/2026.
 
 Fóruns tradicionais de questões de certificação falham por quatro motivos:
 1. **Mural de achismos:** comentários soltos dizendo *"acho que é a C"* sem citar a documentação oficial (violando o Inegociável 5 da Carta).
@@ -105,6 +105,40 @@ Inspirado na neurobiologia (onde a célula glial abraça o axônio com camadas d
    - Segue a mesma lei dos manifestos (`constitution.md` § Sempre 2 e Carta cap. 12: *"discussões e manifesto têm dumps públicos periódicos em JSON no repositório"*).
    - No build (`build/gera-questoes.mjs`), se existir um dump de discussões para aquela `ID`, a Síntese Wiki e os comentários principais já saem **pré-renderizados no HTML estático** (indexáveis pelo Google — o motor de crescimento orgânico descrito no Cap. 9 da Carta!).
    - Se a questão ainda tiver zero comentários no dump, a página renderiza o **Estado Vazio Orientador** (regra `estado-vazio` do `guia-noos.html`): mostra a referência oficial do manifesto como ponto de partida e convida o primeiro aprovado a inaugurar a Síntese Wiki.
-2. **Camada Dinâmica Leve (Fase 2 — GitHub Discussions API / Giscus Customizado):**
-   - Cada questão mapeia por `pathname` ou `term = ID` (`RAN-AZ900-00042`) para uma thread na categoria `Questões / Q&A` do repositório `ironidesflj/noos-hub` no GitHub Discussions.
-   - Leitura funciona via endpoint público/estático sem exigir login; escrita aciona o OAuth leve (GitHub / Microsoft) apenas no momento em que o estudante clica em *"Publicar na Noosfera"*.
+2. **Camada Dinâmica Leve (Opção A — GitHub Discussions como back-end, sem iframe):**
+   - Cada questão mapeia por `title = ID` (`RAN-AZ900-00042`) para uma thread na categoria `Q&A` do repositório `ironidesflj/noos-hub` no GitHub Discussions.
+   - **Escrita:** o Compositor Guiado monta a Discussion (título = ID) e abre o GitHub; não há backend próprio no hub.
+   - **Leitura:** `scripts/sync-discussao.mjs` (fora do build, workflow diário 06:23 UTC) lê post raiz + comentários e grava `discussao/{PREFIX}.json`; o build lê apenas o arquivo local (zero rede, pitfall #7).
+   - **Sem giscus:** o iframe foi removido (Opção A); a página é a UI nativa e o dump é o snapshot estático indexável.
+
+---
+
+## 6. Registro de implementação (10/nov/2026 — Opção A, aprovada)
+
+**Decisão:** a interface é **100% nativa da Camada de Mielina**; o iframe do
+giscus foi **removido** das páginas de questão. O GitHub Discussions
+(`ironidesflj/noos-hub`, categoria Q&A) é o back-end gratuito de escrita/leitura,
+consumido em duas etapas:
+
+1. **Escrita:** o Compositor Guiado monta a Discussion (título = ID público;
+   corpo estruturado com alternativa, status/flair e fonte https) e abre o
+   GitHub — sem backend próprio e sem guardar dado privado no hub.
+2. **Leitura:** `scripts/sync-discussao.mjs` roda **fora do build** (workflow
+   diário 06:23 UTC, abre PR), lê **post raiz + comentários**, parseia
+   `**Alternativa que confundiu:**`, `**Status:** ✦ Passei na prova!`,
+   explicação e `**Fonte oficial:**`, **deriva o tier 1–4** por atividade
+   (reações 🚀/👍/❤, fontes, respostas aceitas, aprovação) com overrides em
+   `discussao/authors.json`, **preserva `synthesis`** curadas e escreve
+   `discussao/{PREFIX}.json`.
+
+**Entregue também:** coluna esquerda em cartão com cantoneiras + `Citar ID`;
+alternativas em cartões com âncoras; **Gravidade Cross-App**; gaveta dos 4
+níveis (botão “Reputação & Abraço da Esfera”); síntese com **baseline v1
+automática** (gabarito + fonte oficial do manifesto) e **diff inline**; upvote
+persistente em `localStorage`; card otimista ao publicar; filtros cruzados;
+QA com **61 asserções** (zero iframe giscus incluído).
+
+**Pendências desta spec:** histórico de revisões completo (o diff atual compara
+as duas últimas versões), fluxo editorial de curadoria da síntese e promoção
+automática de “resposta aceita”.
+

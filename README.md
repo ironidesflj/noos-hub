@@ -1,26 +1,29 @@
 # Noos Hub
 
-[noos.study](https://noos.study) é o ponto de entrada bilíngue do ecossistema Noos. Apresenta os apps, o manifesto e páginas públicas de questões. O estudo, o progresso e as respostas ficam nos apps.
+[noos.study](https://noos.study) é o ponto de entrada bilíngue do ecossistema Noos. Apresenta os apps, o manifesto e páginas públicas de questões em PT/EN. O estudo, o progresso e as respostas ficam nos apps.
 
 ## Estado atual
 
 - **Synapse** e **Ranvier** estão acessíveis e em constante atualização. Os outros nomes da família estão no horizonte.
-- O Hub publica páginas de leitura para 431 questões do Synapse e 300 do Ranvier a partir de `manifestos/SYN.jsonl` e `manifestos/RAN.jsonl`.
-- O Axon (`@ironidesflj/axon@0.2.2`) é usado no build para validar os manifestos. O Hub não depende dele no navegador.
+- O Hub publica páginas de leitura para **1.031 questões**: **600 do Ranvier** (DBDEA 300 + AZ-900 300) e **431 do Synapse**, a partir de `manifestos/RAN.jsonl` e `manifestos/SYN.jsonl`.
+- O Axon (`@ironidesflj/axon@0.3.0`) é usado **apenas no build** para validar os manifestos; o Hub não depende dele no navegador.
+- **A Camada de Mielina v2** (F2.1 + F2.2, Opção A): páginas dual-column com matriz de dissecção, síntese consolidada (baseline automática v1 + versões curadas), reputação/identicon em 4 níveis, filtros, ritual “Passei na prova!” e compositor guiado. A discussão é **100% UI nativa** (sem iframe do giscus); o **GitHub Discussions** é o back-end — o compositor publica o fio e o sync periódico gera `discussao/{PREFIX}.json`.
 - O domínio principal é `noos.study`; `www.noos.study` redireciona para ele. A implantação é feita pela Vercel a partir da branch `main`.
+- Versão do sistema: **1.5.0** (fonte em `noos.registry.json`, replicada no rodapé PT/EN e verificada pelo CI).
 
-O estado verificado e as pendências ficam em [current-state.md](current-state.md) e [plan.md](plan.md). A [constitution.md](constitution.md) define as regras permanentes; [spec-pagina-de-questao.md](spec-pagina-de-questao.md) descreve as páginas de questões. O [noos.registry.json](noos.registry.json) é a fonte dos prefixos, status e versão do sistema.
+O estado verificado e as pendências ficam em [current-state.md](current-state.md) e [plan.md](plan.md). A [constitution.md](constitution.md) define as regras permanentes; [spec-pagina-de-questao.md](spec-pagina-de-questao.md) descreve as páginas de questões e [spec-discussao-questao.md](spec-discussao-questao.md) a Camada de Mielina. O contrato dos dumps está em [discussao/README.md](discussao/README.md). O [noos.registry.json](noos.registry.json) é a fonte dos prefixos, status e versão do sistema.
 
 ## Desenvolvimento
 
-O site usa HTML, CSS e JavaScript. O build gera páginas estáticas de questões e o sitemap. As páginas são apenas leitura; o retorno ao app usa a URL registrada para cada namespace.
+O site usa HTML, CSS e JavaScript. O build gera páginas estáticas de questões e o sitemap; as páginas são apenas leitura.
 
 ```bash
 npm ci
-npm run build
+npm run build      # gera pt/q, en/q, redirects e sitemap
+npm run qa         # valida a geração com o fixture local (61 asserções)
 python3 -m http.server 8000
 ```
 
-Abra `http://localhost:8000/`. `npm run qa` valida a geração com o fixture local. O CI também verifica a integridade PT/EN, os placeholders e o registro.
+Abra `http://localhost:8000/`. O CI também verifica integridade PT/EN, placeholders, referências locais e a sincronia do registro (`sdd-lint`).
 
 Consulte [DEPLOY.md](DEPLOY.md) para o fluxo de publicação. O conteúdo e o código seguem as condições em [LICENSE.md](LICENSE.md).

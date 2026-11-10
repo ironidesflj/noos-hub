@@ -14,8 +14,8 @@ não há como saber qual build está no ar nem qual changelog reivindicar.
 ## Contrato
 
 - O rodapé de **cada página** (PT e EN) exibe uma linha adicional:
-  - PT: `Sistema Noos v1.1.1 · build out/2026`
-  - EN: `Noos system v1.1.1 · build Oct/2026`
+  - PT: `Sistema Noos v1.5.0 · build nov/2026`
+  - EN: `Noos system v1.5.0 · build Nov/2026`
 - **Fonte única:** a versão vem de `noos.registry.json` (`version`). Como o
   hub é estático (sem build de aplicação), a string é editada no HTML junto
   com o registro — e o **CI (`sdd-lint`) garante que não divergem**: o job

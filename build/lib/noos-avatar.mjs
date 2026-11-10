@@ -51,14 +51,14 @@ export function renderNoosAvatarSvg(handle, tier = 1) {
     boxStroke = "var(--fg)";
     orbits = `
       <g class="noos-avatar-orbits">
-        <ellipse cx="32" cy="32" rx="29" ry="11.5" transform="rotate(-28 32 32)" fill="none" stroke="var(--accent)" stroke-width="1.15" opacity="0.6"/>
-        <ellipse cx="32" cy="32" rx="29" ry="11.5" transform="rotate(28 32 32)" fill="none" stroke="var(--signal)" stroke-width="1.15" opacity="0.6"/>
-        <path d="M 10 38 A 23 23 0 1 1 54 38" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round"/>
+        <ellipse cx="32" cy="32" rx="29" ry="11.5" transform="rotate(-28 32 32)" fill="none" stroke="var(--accent)" stroke-width="1.2" opacity="0.65"/>
+        <ellipse cx="32" cy="32" rx="29" ry="11.5" transform="rotate(28 32 32)" fill="none" stroke="var(--signal)" stroke-width="1.2" opacity="0.65"/>
+        <path d="M 10 38 A 23 23 0 1 1 54 38" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
       </g>`;
     badgeNodes = `
-      <circle cx="14" cy="25" r="4.4" fill="var(--accent-bright)" stroke="var(--bg)" stroke-width="1.5"/>
-      <circle cx="50" cy="25" r="4.4" fill="var(--signal)" stroke="var(--bg)" stroke-width="1.5"/>
-      <circle cx="32" cy="8" r="2.6" fill="var(--fg)"/>`;
+      <circle cx="14" cy="25" r="4.6" fill="var(--accent-bright)" stroke="var(--bg)" stroke-width="1.6"/>
+      <circle cx="50" cy="25" r="4.6" fill="var(--signal)" stroke="var(--bg)" stroke-width="1.6"/>
+      <circle cx="32" cy="8" r="2.8" fill="var(--fg)"/>`;
   }
 
   return `<svg class="noos-identicon tier-${tier}" width="46" height="46" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
