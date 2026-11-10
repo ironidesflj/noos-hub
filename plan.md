@@ -85,11 +85,10 @@ com os apps; o estado operacional fica em `current-state.md`.
 
 ## Pendente (Fase 2 — engenharia do hub)
 
-- **Discussões por questão** — implementado com giscus (opt-in): config em
-  `noos.registry.json` (`discussions`), bloco nas páginas canônicas com
-  `term` = ID público, CSP liberando giscus.app. Falta APENAS instalar o app
-  giscus no repositório e ligar `enabled: true` (ação do mantenedor; depois
-  vira uma linha de PR).
+- ✅ **Discussões por questão** — giscus ativo (10/nov): bloco nas páginas
+  canônicas com `term` = ID público (uma conversa por questão, PT/EN juntas),
+  categoria Q&A, CSP liberando giscus.app. Mantenedor instalou o app e a flag
+  foi ligada.
 
 ## Adiado (intencionalmente)
 
