@@ -79,3 +79,5 @@ aluno (`constitution.md`). Não repete o que já está em `current-state.md`,
 - **2026-11-10:** discussões por questão (giscus) implementadas como **opt-in**: config em `noos.registry.json` (`discussions`, repo/categoria Q&A do próprio hub), bloco só nas páginas canônicas com `data-term` = ID, CSP libera giscus.app. `enabled:false` até o app giscus ser instalado no repositório (uma ação no GitHub); ao ligar, o widget passa a valer nas 1031 páginas.
 
 - **2026-11-10 (ativação):** app giscus instalado pelo mantenedor no repositório; `discussions.enabled` ligado — o bloco “Conversar sobre esta questão” passa a valer nas páginas canônicas (uma discussion por ID, PT/EN juntas).
+
+- **2026-11-10:** A Camada de Mielina v2 no ar (1.3.0): dual-column, matriz de distratores, síntese consolidada (estado vazio orientador), ritual `?ritual=passed`, identicons com tiers 1–4, filtros e giscus dinâmico. Dumps estáticos em `discussao/{PREFIX}.json` (contrato no README da pasta); QA cobre 4 células da matriz, síntese, avatar tier ≥3, flair aprovado, filtros e estado vazio.

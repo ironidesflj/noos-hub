@@ -132,15 +132,14 @@
         </p>
       </header>
 
-      <div class="q-body">
+      <div class="q-grid">
+        <div class="q-col-problem q-body">
         <p class="q-statement">{{STATEMENT}}</p>
         <ol class="q-options" type="A">
         {{OPTIONS}}
         </ol>
         {{RETIRED_BANNER}}
         {{ANSWER_BLOCK}}
-        {{DISCUSSIONS_BLOCK}}
-      </div>
 
       <aside class="q-prov">
         <h2>Proveniência</h2>
@@ -153,7 +152,21 @@
         <p class="sec-note mono">Esta página é leitura: sem seleção, sem cronômetro, sem resultado — estudar mora no app.</p>
       </aside>
 
-      {{APP_URL_BLOCK}}
+        {{APP_URL_BLOCK}}
+
+        </div>
+
+        <section class="q-col-mielina" id="discussao" aria-labelledby="mielina-title">
+          {{DISCUSSION_HEAD}}
+          {{DISCUSSION_MATRIX}}
+          {{DISCUSSION_SYNTHESIS}}
+          {{RITUAL_BANNER}}
+          {{DISCUSSION_FILTERS}}
+          {{DISCUSSION_THREAD}}
+          {{DISCUSSIONS_BLOCK}}
+        </section>
+
+      </div>
 
     </div>
   </section>
@@ -193,5 +206,6 @@
 </footer>
 
 <script src="/js/noos.js"></script>
+  <script src="/js/mielina.js" defer></script>
 </body>
 </html>

@@ -25,3 +25,16 @@ O Hub não guarda progresso nem respostas e não hospeda provas jogáveis. O pac
 ## Adendo 09/nov/2026 (v13)
 
 - F2 implementado (`ingest-manifest.yml`) + política epitáfio (Axon 0.3.0) publicada; build 731 aceitas/0 rejeitadas, QA PASS, páginas com gabarito por texto (`7313f302…`).
+
+## Adendo 2026-11-10 — A Camada de Mielina v2 (discussão por questão)
+
+- Página `/q/{ID}/` agora é **dual-column** (≥1024px): questão sticky à esquerda; à direita a
+  **Camada de Mielina**: matriz de dissecção das alternativas, Síntese Consolidada (wiki
+  reversível em estado vazio orientador quando não há dump), filtros, contribuições dos pares
+  (identicon + tiers 1–4 do Abraço da Esfera) e o fio dinâmico no giscus.
+- Dados estáticos opcionais em `discussao/{PREFIX}.json` (contrato em `discussao/README.md`);
+  sem dump, nada é inventado — estado vazio com a referência oficial do manifesto.
+- Ritual "Passei na prova!" ativa com `?ritual=passed&trap=C` (JS progressivo; sem JS o
+  conteúdo continua legível). Filtros por alternativa, aprovados e fontes.
+- Guarda de layout: 320px sem overflow horizontal; sticky com scroll interno (kit pitfalls 8–9).
+- Versão do sistema: **1.3.0** (registry + rodapés PT/EN).
