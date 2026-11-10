@@ -302,6 +302,15 @@ const mielinaT = (lang) =>
         source: 'Fonte',
         dynamic: 'Discussão dinâmica no GitHub',
         dynamicHint: 'O fio ao vivo abre no giscus; a síntese acima é o snapshot revisável.',
+        composerTitle: 'Compositor guiado',
+        composerHint: 'Três perguntas para transformar sua experiência em explicação com fonte — publica no GitHub Discussions e vira snapshot na síntese.',
+        composerOpt: 'Qual alternativa te confundiu?',
+        composerBody: 'O que a documentação oficial não conta de primeira?',
+        composerSource: 'Âncora verificada (URL oficial, https)',
+        composerPublish: 'Publicar na Noosfera',
+        composerMissing: 'Escreva ao menos uma frase de explicação.',
+        composerBadUrl: 'A fonte precisa começar com https://.',
+        composerReady: 'Abrindo o GitHub para publicar…',
       }
     : {
         title: 'The Myelin Layer',
@@ -332,6 +341,15 @@ const mielinaT = (lang) =>
         source: 'Source',
         dynamic: 'Live discussion on GitHub',
         dynamicHint: 'The live thread opens in giscus; the synthesis above is the reviewable snapshot.',
+        composerTitle: 'Guided composer',
+        composerHint: 'Three questions turn your experience into a sourced explanation — published to GitHub Discussions and snapshotted into the synthesis.',
+        composerOpt: 'Which option confused you?',
+        composerBody: 'What does the official documentation not tell you up front?',
+        composerSource: 'Verified anchor (official https URL)',
+        composerPublish: 'Publish to the Noosphere',
+        composerMissing: 'Write at least one sentence of explanation.',
+        composerBadUrl: 'The source must start with https://.',
+        composerReady: 'Opening GitHub to publish…',
       };
 
 const isSafeUrl = (u) => {
@@ -510,6 +528,36 @@ function renderThread(entry, lang) {
           </section>`;
 }
 
+function renderComposer(q, lang) {
+  const t = mielinaT(lang);
+  const id = escapeHtml(q.record.id);
+  const d = registry.discussions ?? {};
+  const repo = escapeHtml(String(d.repo ?? ''));
+  const cat = escapeHtml(String(d.categorySlug ?? 'q-a'));
+  const opts = ['A', 'B', 'C', 'D', 'Geral'];
+  return `<section class="mielina-box mielina-composer" id="composer" aria-labelledby="composer-title"
+            data-repo="${repo}" data-category="${cat}" data-term="${id}">
+            <h3 id="composer-title" class="mielina-section-title">${escapeHtml(t.composerTitle)}</h3>
+            <p class="mielina-hint">${escapeHtml(t.composerHint)}</p>
+            <label class="mielina-field">
+              <span class="mono">${escapeHtml(t.composerOpt)}</span>
+              <select data-composer-opt>${opts.map((o) => `<option value="${o}">${o}</option>`).join('')}</select>
+            </label>
+            <label class="mielina-field">
+              <span class="mono">${escapeHtml(t.composerBody)}</span>
+              <textarea data-composer-body rows="3" maxlength="1200" required></textarea>
+            </label>
+            <label class="mielina-field">
+              <span class="mono">${escapeHtml(t.composerSource)}</span>
+              <input data-composer-source type="url" inputmode="url" placeholder="https://" />
+            </label>
+            <div class="mielina-composer-actions">
+              <button type="button" class="mielina-chip" data-composer-publish>${escapeHtml(t.composerPublish)} →</button>
+              <span class="mono mielina-composer-status" data-composer-status role="status" aria-live="polite"></span>
+            </div>
+          </section>`;
+}
+
 const langNote = (recordLang, pageLang) => {
   if (pageLang === 'pt' && !/^pt\b/i.test(recordLang))
     return `<span class="q-lang-note">A questão está em ${escapeHtml(recordLang)}.</span>`;
@@ -537,6 +585,7 @@ const commonMap = (q, lang) => {
     RITUAL_BANNER: renderRitual(lang),
     DISCUSSION_FILTERS: renderFilters(lang),
     DISCUSSION_THREAD: renderThread(entry, lang),
+    DISCUSSION_COMPOSER: renderComposer(q, lang),
     DISCUSSIONS_BLOCK: discussionsBlock(r.id, lang),
     ANSWER_BLOCK: isRetired(r)
       ? ''
@@ -722,6 +771,8 @@ if (QA) {
   expect(ptHtml.includes('noos-identicon tier-3'), 'avatar identicon com tier de reputação');
   expect(ptHtml.includes('Passei na prova'), 'flair de aprovado presente');
   expect(ptHtml.includes('data-filter-opt="B"'), 'âncora de discussão por alternativa');
+  expect(ptHtml.includes('data-composer-publish'), 'compositor guiado presente');
+  expect(ptHtml.includes('/js/mielina.js'), 'hidratação progressiva carregada');
   expect(!ptHtml.includes('by Noos'), 'zero "by Noos" na discussão');
   const retiredHtml = existsSync(path.join(OUT_DIR, 'pt', 'q', 'RAN-AZ900-00044', 'index.html'))
     ? await readFile(path.join(OUT_DIR, 'pt', 'q', 'RAN-AZ900-00044', 'index.html'), 'utf8')

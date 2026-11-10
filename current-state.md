@@ -38,3 +38,15 @@ O Hub não guarda progresso nem respostas e não hospeda provas jogáveis. O pac
   conteúdo continua legível). Filtros por alternativa, aprovados e fontes.
 - Guarda de layout: 320px sem overflow horizontal; sticky com scroll interno (kit pitfalls 8–9).
 - Versão do sistema: **1.3.0** (registry + rodapés PT/EN).
+
+## Adendo 2026-11-10 (2) — F2.2 parcial: sync do Discussions e compositor guiado
+
+- **Sync real dos fios**: `scripts/sync-discussao.mjs` lê o GitHub Discussions (GraphQL) e gera
+  `discussao/{PREFIX}.json`; workflow diário (`sync-discussao.yml`) abre PR com os dumps.
+  Fora do build, sem fetch no gerador (armadilha #7). Já populado com os 2 fios existentes.
+- **Compositor guiado** (3 perguntas do ritual): publica sem backend, abrindo a Discussion no
+  GitHub (categoria Q&A, título = ID público) com corpo estruturado que o sync entende
+  (`Alternativa`, `O que a documentação não conta`, `Fonte oficial`). giscus segue como fio
+  ao vivo; a camada estática mostra os snapshots.
+- Reputação: `discussao/authors.json` mapeia handle → tier 1–4 + `passed` (curadoria por PR).
+- Versão **1.4.0**.

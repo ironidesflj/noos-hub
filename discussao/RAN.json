@@ -1,0 +1,17 @@
+{
+  "RAN-DBDEA-00001": {
+    "comments": [
+      {
+        "handle": "@ironidesflj",
+        "tier": 4,
+        "passed": true,
+        "option": "",
+        "body": "teste comentario",
+        "sourceUrl": "",
+        "accelerations": 0,
+        "accepted": false,
+        "createdAt": "2026-11-10T18:56:35Z"
+      }
+    ]
+  }
+}

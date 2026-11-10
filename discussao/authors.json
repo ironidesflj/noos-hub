@@ -1,0 +1,5 @@
+{
+  "_comentario": "Reputação é funcional: mapeia handle do GitHub para tier (1-4) e flags verificadas. Tier 4 = Nó da Noosfera (curador). Atualize por PR.",
+  "ironidesflj": { "tier": 4, "passed": true },
+  "giscus": { "tier": 1, "passed": false }
+}

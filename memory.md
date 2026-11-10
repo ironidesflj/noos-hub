@@ -81,3 +81,5 @@ aluno (`constitution.md`). Não repete o que já está em `current-state.md`,
 - **2026-11-10 (ativação):** app giscus instalado pelo mantenedor no repositório; `discussions.enabled` ligado — o bloco “Conversar sobre esta questão” passa a valer nas páginas canônicas (uma discussion por ID, PT/EN juntas).
 
 - **2026-11-10:** A Camada de Mielina v2 no ar (1.3.0): dual-column, matriz de distratores, síntese consolidada (estado vazio orientador), ritual `?ritual=passed`, identicons com tiers 1–4, filtros e giscus dinâmico. Dumps estáticos em `discussao/{PREFIX}.json` (contrato no README da pasta); QA cobre 4 células da matriz, síntese, avatar tier ≥3, flair aprovado, filtros e estado vazio.
+
+- **2026-11-10 (F2.2 parcial, 1.4.0):** sync do GitHub Discussions → `discussao/{PREFIX}.json` (script + workflow diário com PR), compositor guiado publicando Discussion estruturada via link do GitHub (sem backend), tiers/passed por `discussao/authors.json`. giscus permanece como fio ao vivo; a camada estática é o snapshot revisável. QA cobre compositor e script.

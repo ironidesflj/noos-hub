@@ -111,3 +111,8 @@ com os apps; o estado operacional fica em `current-state.md`.
 - Layout dual-column + matriz de distratores + síntese/wiki + ritual + reputação visual (identicon tiers 1–4) + filtros + fio giscus.
 - Spec canônica: `spec-discussao-questao.md`; contrato de dump: `discussao/README.md`.
 - Pendente para F2.2: sincronizar dumps a partir do GitHub Discussions (job periódico, fora do build) e histórico/diff de revisões real (o botão hoje é honesto: `vN · histórico em breve`).
+
+## Concluído 2026-11-10 (2) — F2.2 parcial
+
+- Sync GitHub Discussions → dumps + workflow diário; compositor guiado publicando Discussion estruturada; reputação por `discussao/authors.json`.
+- Pendente: síntese consolidada curada (hoje estado vazio até curadoria), histórico/diff real de revisões e promoção automática de "resposta aceita".

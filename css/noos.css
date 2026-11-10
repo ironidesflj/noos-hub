@@ -610,3 +610,13 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid 
 .distractor-bar > i { background: var(--muted); }
 .distractor-cell.is-answer .distractor-bar > i { background: var(--accent); }
 .distractor-cell.is-trap .distractor-bar > i { background: var(--signal); }
+.mielina-composer { display: grid; gap: 10px; }
+.mielina-field { display: grid; gap: 5px; font-size: 12px; color: var(--muted); }
+.mielina-field select, .mielina-field textarea, .mielina-field input {
+  width: 100%; box-sizing: border-box; padding: 9px 10px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--fg);
+  font: inherit; font-size: 13px; border-radius: 2px;
+}
+.mielina-field textarea { resize: vertical; min-height: 74px; }
+.mielina-composer-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.mielina-composer-status { font-size: 11px; color: var(--muted); }

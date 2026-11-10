@@ -1,0 +1,34 @@
+name: Sync discussões → dumps (F2.2)
+
+# Gera discussao/{PREFIX}.json a partir do GitHub Discussions e abre PR.
+# Nunca roda no build (o gerador lê somente arquivos locais).
+on:
+  schedule:
+    - cron: "23 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  discussions: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Sincronizar dumps
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/sync-discussao.mjs
+      - name: Abrir PR com os dumps
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/sync-discussao
+          title: "chore(discussao): sincronizar dumps do GitHub Discussions"
+          body: "Dumps estáticos da Camada de Mielina atualizados a partir do GitHub Discussions (F2.2). Revisar e mergear."
+          commit-message: "chore(discussao): sincronizar dumps"
+          add-paths: discussao/*.json
