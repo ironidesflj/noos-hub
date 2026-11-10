@@ -81,3 +81,53 @@
     });
   }
 })();
+
+/* ---- Compositor guiado (ritual "Passei na prova!") ----
+   Sem backend: monta a Discussion no GitHub (categoria Q&A) com corpo
+   estruturado, que o giscus renderiza e o sync de dumps captura depois. */
+(function () {
+  "use strict";
+  var composer = document.querySelector(".mielina-composer");
+  if (!composer) return;
+  var publish = composer.querySelector("[data-composer-publish]");
+  var status = composer.querySelector("[data-composer-status]");
+  var opt = composer.querySelector("[data-composer-opt]");
+  var body = composer.querySelector("[data-composer-body]");
+  var source = composer.querySelector("[data-composer-source]");
+  if (!publish || !body) return;
+
+  function say(msg) {
+    if (status) status.textContent = msg || "";
+  }
+
+  publish.addEventListener("click", function () {
+    var text = (body.value || "").trim();
+    if (text.length < 20) {
+      say(composer.getAttribute("data-msg-missing") || "Escreva a explicação.");
+      body.focus();
+      return;
+    }
+    var url = (source.value || "").trim();
+    if (url) {
+      var ok = false;
+      try { ok = new URL(url).protocol === "https:"; } catch (e) { ok = false; }
+      if (!ok) {
+        say(composer.getAttribute("data-msg-badurl") || "Fonte precisa ser https://");
+        source.focus();
+        return;
+      }
+    }
+    var term = composer.getAttribute("data-term") || "";
+    var repo = composer.getAttribute("data-repo") || "";
+    var cat = composer.getAttribute("data-category") || "q-a";
+    if (!term || !repo) return;
+    var md =
+      "**Alternativa que confundiu:** " + (opt ? opt.value : "Geral") + "\n\n" +
+      "**O que a documentação oficial não conta de primeira:**\n" + text + "\n\n" +
+      (url ? "**Fonte oficial:** " + url + "\n" : "");
+    var target = "https://github.com/" + repo + "/discussions/new?category=" + encodeURIComponent(cat) +
+      "&title=" + encodeURIComponent(term) + "&body=" + encodeURIComponent(md);
+    say(composer.getAttribute("data-msg-ready") || "Abrindo…");
+    window.open(target, "_blank", "noopener,noreferrer");
+  });
+})();
