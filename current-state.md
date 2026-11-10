@@ -1,52 +1,46 @@
 # Estado atual — Noos Hub
 
-Revisão documental: 06/11/2026 · versão do sistema: **1.2.0**.
+Revisão documental: **10/11/2026** · versão do sistema: **1.5.0**.
+
+> **Nota operacional (10/11/2026):** este checkout está **33 commits atrás de `origin/main`** e recebeu a implementação da Camada de Mielina v2 como mudanças não commitadas. Antes de publicar: reconciliar com `origin/main`, rodar `npm ci && npm run build && npm run qa` e só então commit/push (ver `memory.md`).
 
 ## Publicado no Hub
 
 - `noos.study` é o endereço principal. `www.noos.study` redireciona para ele; `noos-hub.vercel.app` é outra URL do mesmo projeto Vercel.
-- O Hub tem interface PT/EN e páginas estáticas de leitura para questões. O build consome `manifestos/*.jsonl`, valida cada linha pelo Axon `@ironidesflj/axon@0.2.2`, gera as páginas e atualiza o sitemap.
-- `RAN.jsonl`: 300 questões DBDEA do Ranvier. `SYN.jsonl`: 431 questões de estudo do Synapse. No último build local: **731 aceitas, 0 rejeitadas, 1.462 páginas canônicas e 731 redirecionamentos sem idioma**.
-- As páginas de questão publicam o gabarito como **texto da alternativa correta** (v12, decisões D1+D3), derivado de `snapshot.answer` (letra canônica A–D) e `snapshot.options`; a letra isolada não é publicada. O `npm run qa` tem assert de paridade página ↔ manifesto por questão e idioma, e o build falha com id/motivo se o gabarito for inválido.
-- Synapse e Ranvier estão acessíveis e em constante atualização. “Em produção” não descreve o estágio comunicado pelo mantenedor para nenhum dos dois.
-- O CI verifica placeholders, paridade PT/EN, referências locais, geração das páginas, sitemap e registro.
+- Interface PT/EN e páginas estáticas de leitura de questões. O build consome `manifestos/*.jsonl`, valida cada linha pelo Axon `@ironidesflj/axon@0.3.0` (devDependency com pin exato, nada do pacote no output), gera as páginas e atualiza o sitemap.
+- **1.031 questões publicadas:** `RAN.jsonl` 600 (Ranvier — DBDEA 300 + AZ-900 300) e `SYN.jsonl` 431 (Synapse — CTFL/CTAL-TA/CTAL-TM). No último build local: **1.031 aceitas, 0 rejeitadas, 2.062 páginas canônicas (PT+EN), 1.031 redirects sem idioma** e **sitemap com 1.033 entradas** (2 da base + 1.031 PT).
+- As páginas publicam o gabarito como **texto da alternativa correta** (v12, decisões D1+D3), derivado de `snapshot.answer` (letra A–D **ou** texto, resolvido pelo gerador) e `snapshot.options`; a letra isolada não é publicada. `npm run qa` tem assert de paridade página ↔ manifesto por questão e idioma.
+- **Questões retiradas seguem a política epitáfio (Axon 0.3.0):** página canônica mantida com aviso, sem bloco de gabarito, no sitemap; alias continua resolvendo.
+- **Headers de segurança:** CSP em `Content-Security-Policy-Report-Only` + `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` (ver `vercel.json`).
+- **CI:** placeholders, paridade PT/EN, referências locais, geração das páginas, `npm run qa` (**61 asserções**), sitemap e `sdd-lint` (registro ↔ rodapés PT/EN).
+- **Monitoramento:** `.github/workflows/monitor.yml` checa hub/apps a cada 15 min e abre/fecha issue em falha.
 
-## Coordenação com os apps
+## A Camada de Mielina v2 (F2.1 + F2.2 — Opção A)
 
-- O manifesto do Synapse está integrado ao Hub. Os links de comunidade no app seguem no PR #15 do Synapse; sua ativação deve ser coordenada naquele repositório.
-- O Ranvier já publica o manifesto. A URL canônica usada pelo botão do app depende de `NEXT_PUBLIC_NOOS_HUB_URL` no projeto Vercel do Ranvier; o repositório do Hub não controla essa configuração.
-- Os manifestos são ingeridos por **PR automático** (F2): o app dispara o workflow, o hub confere o SHA-256 e abre o PR; merge continua manual. Questões retiradas seguem a política epitáfio (Axon 0.3.0): página canônica mantida com aviso, sem gabarito, no sitemap.
+Página `/q/{ID}/` dual-column (≥1024px), questão sticky à esquerda e discussão à direita:
+
+- **Coluna da questão:** cabeçalho dentro de cartão com cantoneiras, botão **Citar ID**, alternativas em cartões clicáveis com âncoras de discussão (`✓` gabarito, `⚠️` pegadinha, `💬` debater), bloco de proveniência e **Gravidade Cross-App**.
+- **Matriz de dissecção (A–D):** distribuição das contribuições; gabarito em `--accent`, pegadinha mais debatida em `--signal`; clicar filtra.
+- **Síntese consolidada:** versão curada quando existe dump; caso contrário **baseline v1 automática** com o gabarito e a fonte oficial do manifesto; botão de **Diff inline** (`v(n-1) → v(n)`) com gate de reputação.
+- **Reputação/“Abraço da Esfera”:** identicon determinístico 5×5 + 4 níveis SVG; **tier derivado no sync** (reações, fontes, aprovação, respostas aceitas) com overrides em `discussao/authors.json`; botão **▲ Acelerar** com persistência local.
+- **Ritual “Passei na prova!”:** `?ritual=passed&trap=C`, flair e compositor guiado; **publicação otimista** do card + abertura da Discussion pré-preenchida no GitHub.
+- **Sem iframe do giscus (Opção A):** toda a UI é nativa. O **GitHub Discussions** (`ironidesflj/noos-hub`, categoria Q&A) é o back-end: o compositor publica com título = ID e corpo estruturado; o **sync diário** (`sync-discussao.yml`, 06:23 UTC) lê post raiz + comentários, calcula tiers, **preserva `synthesis`** e abre PR com `discussao/{PREFIX}.json`.
+- **Degradação graciosa:** sem JS, questão, gabarito, síntese e contribuições seguem legíveis; sem dump, estado orientador (nada é inventado).
+
+## Coordenação com apps
+
+- O Hub ingere manifestos por **PR automático (F2)**: `.github/workflows/ingest-manifest.yml` baixa o `manifest.jsonl` do app, confere o SHA-256 e abre PR idempotente; merge manual. Cópia manual continua como fallback. Token `HUB_SYNC_TOKEN` nos apps.
+- Ranvier publica o manifesto (DBDEA + AZ-900); a URL do hub usada pelo app depende de `NEXT_PUBLIC_NOOS_HUB_URL` no projeto Vercel do Ranvier — fora deste repositório.
+- Synapse publica 431 questões de estudo; links de comunidade no app são responsabilidade do repositório do Synapse.
+- Axon `0.3.0` publicado (`retired`/`isRetired`); ver `library.version` em `noos.registry.json`.
+
+## Verificação (10/11/2026)
+
+- `npm run qa` → **61/61 PASS** (fixture; inclui paridade PT/EN, cantoneiras, 4 níveis de avatar, diff, compositor e zero iframe do giscus).
+- `npm run build` → **1.031 aceitas / 0 rejeitadas**, 2.062 páginas canônicas, 1.031 redirects, sitemap com 1.033 entradas.
+- Layout verificado em 320 px, 640 px (200% zoom em 1280) e 1920 px sem overflow horizontal; sticky com scroll interno.
+- **Pendências conhecidas:** histórico de revisões real (o diff atual compara as duas últimas versões do dump), fluxo de curadoria da síntese, promoção automática de “resposta aceita”, CSP em enforce e reconciliação do checkout com `origin/main`.
 
 ## Limites
 
-O Hub não guarda progresso nem respostas e não hospeda provas jogáveis. O pacote Axon é dependência de build, sem código do pacote no navegador. A URL `vercel.app` não oferece redundância de hospedagem independente.
-
-
-## Adendo 09/nov/2026 (v13)
-
-- F2 implementado (`ingest-manifest.yml`) + política epitáfio (Axon 0.3.0) publicada; build 731 aceitas/0 rejeitadas, QA PASS, páginas com gabarito por texto (`7313f302…`).
-
-## Adendo 2026-11-10 — A Camada de Mielina v2 (discussão por questão)
-
-- Página `/q/{ID}/` agora é **dual-column** (≥1024px): questão sticky à esquerda; à direita a
-  **Camada de Mielina**: matriz de dissecção das alternativas, Síntese Consolidada (wiki
-  reversível em estado vazio orientador quando não há dump), filtros, contribuições dos pares
-  (identicon + tiers 1–4 do Abraço da Esfera) e o fio dinâmico no giscus.
-- Dados estáticos opcionais em `discussao/{PREFIX}.json` (contrato em `discussao/README.md`);
-  sem dump, nada é inventado — estado vazio com a referência oficial do manifesto.
-- Ritual "Passei na prova!" ativa com `?ritual=passed&trap=C` (JS progressivo; sem JS o
-  conteúdo continua legível). Filtros por alternativa, aprovados e fontes.
-- Guarda de layout: 320px sem overflow horizontal; sticky com scroll interno (kit pitfalls 8–9).
-- Versão do sistema: **1.3.0** (registry + rodapés PT/EN).
-
-## Adendo 2026-11-10 (2) — F2.2 parcial: sync do Discussions e compositor guiado
-
-- **Sync real dos fios**: `scripts/sync-discussao.mjs` lê o GitHub Discussions (GraphQL) e gera
-  `discussao/{PREFIX}.json`; workflow diário (`sync-discussao.yml`) abre PR com os dumps.
-  Fora do build, sem fetch no gerador (armadilha #7). Já populado com os 2 fios existentes.
-- **Compositor guiado** (3 perguntas do ritual): publica sem backend, abrindo a Discussion no
-  GitHub (categoria Q&A, título = ID público) com corpo estruturado que o sync entende
-  (`Alternativa`, `O que a documentação não conta`, `Fonte oficial`). giscus segue como fio
-  ao vivo; a camada estática mostra os snapshots.
-- Reputação: `discussao/authors.json` mapeia handle → tier 1–4 + `passed` (curadoria por PR).
-- Versão **1.4.0**.
+O Hub não guarda progresso nem respostas e não hospeda provas jogáveis. O pacote Axon é dependência de build, sem código no navegador. A URL `vercel.app` não oferece redundância de hospedagem independente. O GitHub Discussions é serviço externo: se estiver offline, a leitura estática e o último dump continuam servindo.

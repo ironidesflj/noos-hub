@@ -96,6 +96,10 @@
       <a href="/pt/#contato">Contato</a>
     </nav>
     <div class="head-right">
+      <button class="mielina-chip" type="button" data-tiers-toggle title="Ver como funcionam as Badges e o Abraço da Esfera">
+        <span style="color:var(--signal)">✦</span>
+        <span>Reputação &amp; Abraço da Esfera</span>
+      </button>
       <span class="lang-switch" role="group" aria-label="Idioma">
         <a data-lang="pt" href="/pt/q/{{ID}}/" aria-current="true">PT</a>
         <a data-lang="en" href="/en/q/{{ID}}/">EN</a>
@@ -119,48 +123,67 @@
         <a href="/pt/">Noos</a><span class="sep">/</span><a href="/pt/#familia">{{APP_NAME}}</a><span class="sep">/</span><span>{{ID}}</span>
       </nav>
 
-      <header class="q-head">
-        <div class="q-id-line">
-          <span class="mono">{{ID}}</span>
-          <span class="q-app"><i style="--c:{{APP_COLOR}}"></i>{{APP_NAME}}</span>
-        </div>
-        <p class="q-meta">
-          <span>Prova {{EXAM}}</span>
-          <span>Tópicos: {{TOPICS}}</span>
-          <span>Dificuldade: {{DIFFICULTY}}</span>
-          {{LANG_NOTE}}
-        </p>
-      </header>
+      {{RITUAL_BANNER}}
 
       <div class="q-grid">
-        <div class="q-col-problem q-body">
-        <p class="q-statement">{{STATEMENT}}</p>
-        <ol class="q-options" type="A">
-        {{OPTIONS}}
-        </ol>
-        {{RETIRED_BANNER}}
-        {{ANSWER_BLOCK}}
+        <div class="q-col-problem">
+          <div class="q-problem-card corner-box">
+            <span class="corner tl"></span><span class="corner tr"></span>
+            <span class="corner bl"></span><span class="corner br"></span>
 
-      <aside class="q-prov">
-        <h2>Proveniência</h2>
-        <dl>
-          <dt>Versão da questão</dt><dd>{{VERSION}}</dd>
-          <dt>Checksum</dt><dd class="mono q-checksum">{{CHECKSUM}}</dd>
-          <dt>IDs legadas</dt><dd class="mono">{{ALIASES}}</dd>
-          <dt>Fonte</dt><dd>Linha {{LINE}} de <a href="/manifestos/{{PREFIX}}.jsonl">manifestos/{{PREFIX}}.jsonl</a> — manifesto público do app emissor, ingerido no build deste site.</dd>
-        </dl>
-        <p class="sec-note mono">Esta página é leitura: sem seleção, sem cronômetro, sem resultado — estudar mora no app.</p>
-      </aside>
+            <header class="q-head q-head-card">
+              <div class="q-id-row">
+                <div class="q-id-left">
+                  <span class="q-id-code">{{ID}}</span>
+                  <button type="button" class="mielina-chip" data-copy-id="https://noos.study/pt/q/{{ID}}/" data-copy-done="✓ Copiado: /pt/q/{{ID}}/" style="padding:2px 8px">
+                    <span>📋 Citar ID</span>
+                  </button>
+                </div>
+                <span class="q-app"><i style="--c:{{APP_COLOR}}"></i>{{APP_NAME}} · {{EXAM}}</span>
+              </div>
+              <p class="q-meta" style="margin-top:10px;font-size:.8rem">
+                <span>Prova {{EXAM}}</span>
+                <span>Tópicos: {{TOPICS}}</span>
+                <span>Dificuldade: {{DIFFICULTY}}</span>
+                {{LANG_NOTE}}
+              </p>
+            </header>
 
-        {{APP_URL_BLOCK}}
+            <div class="q-body" style="margin-top:18px">
+              <p class="q-statement">{{STATEMENT}}</p>
+              <div class="q-options-head">
+                <span class="mono">Alternativas (Modo Leitura)</span>
+                <span style="font-size:11.5px;color:var(--muted)">Clique para filtrar a discussão →</span>
+              </div>
+              <ol class="q-options q-options-interactive" type="A">
+              {{OPTIONS}}
+              </ol>
+              {{RETIRED_BANNER}}
+              {{ANSWER_BLOCK}}
 
+              <aside class="q-prov" style="margin-top:26px;padding-top:18px">
+                <h2>Proveniência</h2>
+                <dl>
+                  <dt>Versão da questão</dt><dd>{{VERSION}}</dd>
+                  <dt>Checksum</dt><dd class="mono q-checksum">{{CHECKSUM}}</dd>
+                  <dt>IDs legadas</dt><dd class="mono">{{ALIASES}}</dd>
+                  <dt>Fonte</dt><dd>Linha {{LINE}} de <a href="/manifestos/{{PREFIX}}.jsonl">manifestos/{{PREFIX}}.jsonl</a> — manifesto público do app emissor, ingerido no build deste site.</dd>
+                </dl>
+                <p class="sec-note mono" style="margin-top:14px">Esta página é leitura: sem seleção, sem cronômetro, sem resultado — estudar mora no app.</p>
+              </aside>
+
+              {{APP_URL_BLOCK}}
+            </div>
+          </div>
+
+          {{GRAVITY_BLOCK}}
         </div>
 
         <section class="q-col-mielina" id="discussao" aria-labelledby="mielina-title">
+          {{TIERS_DRAWER}}
           {{DISCUSSION_HEAD}}
           {{DISCUSSION_MATRIX}}
           {{DISCUSSION_SYNTHESIS}}
-          {{RITUAL_BANNER}}
           {{DISCUSSION_COMPOSER}}
           {{DISCUSSION_FILTERS}}
           {{DISCUSSION_THREAD}}

@@ -336,8 +336,6 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid 
 }
 
 
-/* ===== A Camada de Mielina (v2) — discussão por questão ===== */
-
 /* ============================================================
    A Camada de Mielina (v2) — Estilos da Página de Questão & Discussão
    100% baseados em assets/noos-tokens.css · Zero dependências externas
@@ -346,149 +344,430 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid 
 .q-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 48px;
+  gap: 36px;
   align-items: start;
 }
 
 @media (min-width: 1024px) {
   .q-sec .wrap {
-    max-width: 1240px;
+    max-width: 1260px;
   }
   .q-grid {
     grid-template-columns: 5fr 7fr;
-    gap: 44px;
+    gap: 38px;
   }
   .q-col-problem {
     position: sticky;
-    top: 88px;
-    max-height: calc(100vh - 104px);
+    top: 84px;
+    max-height: calc(100vh - 100px);
     overflow-y: auto;
-    padding-right: 6px;
+    padding-right: 4px;
     scrollbar-width: thin;
   }
 }
 
-/* Alternativas com Âncora de Discussão */
-.q-options-interactive {
-  list-style: none;
-  margin: 24px 0 0;
-  padding: 0;
-  display: grid;
-  gap: 10px;
+.corner-box {
+  position: relative;
 }
-.q-opt-item {
-  display: grid;
-  grid-template-columns: 26px 1fr auto;
-  gap: 10px;
-  align-items: start;
-  padding: 11px 14px;
+
+.q-problem-card {
+  position: relative;
   border: 1px solid var(--border);
   background: var(--surface);
+  padding: 22px 22px 20px;
+  border-radius: 2px;
+}
+
+.q-head-card {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.q-id-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.q-id-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.q-id-code {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--fg);
+}
+
+/* Alternativas com Âncora de Discussão */
+.q-options-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 22px;
+  margin-bottom: 10px;
+}
+
+.q-options-interactive {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+
+.q-opt-item {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  gap: 10px;
+  align-items: start;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  background: var(--bg);
   border-radius: 2px;
   transition: border-color .15s, background .15s;
 }
+
+.q-opt-item:hover {
+  border-color: var(--border-strong);
+}
+
 .q-opt-item.is-filtered {
   border-color: var(--fg);
   background: var(--surface-2);
 }
+
 .q-opt-letter {
   font-family: var(--font-mono);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--muted);
   padding-top: 2px;
 }
+
+.q-opt-letter.is-answer {
+  color: var(--accent);
+}
+
+.q-opt-letter.is-trap {
+  color: var(--signal);
+}
+
+.q-opt-text {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--fg);
+}
+
 .q-opt-anchor {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   padding: 3px 8px;
   border: 1px solid var(--border);
-  background: var(--bg);
+  background: var(--surface);
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 11px;
   border-radius: 2px;
   cursor: pointer;
-  transition: border-color .15s, color .15s;
+  white-space: nowrap;
+  transition: border-color .15s, color .15s, background .15s;
 }
+
 .q-opt-anchor:hover {
   border-color: var(--fg);
   color: var(--fg);
 }
 
+.q-opt-anchor.is-answer {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.q-opt-anchor.is-trap {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.q-opt-anchor[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
 /* Barra de Gravidade Cross-App */
 .q-gravity {
-  margin-top: 28px;
-  padding: 14px 16px;
+  margin-top: 16px;
+  padding: 15px 18px;
   border: 1px solid var(--border);
   background: var(--surface);
   border-radius: 2px;
 }
+
+.q-gravity-desc {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
 .q-gravity-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   margin-top: 10px;
-  padding: 8px 10px;
+  padding: 9px 12px;
   background: var(--surface-2);
   border: 1px solid var(--border);
+  border-radius: 2px;
   text-decoration: none;
   font-family: var(--font-mono);
   font-size: 11.5px;
+  transition: border-color .15s;
 }
+
 .q-gravity-link:hover {
   border-color: var(--fg);
 }
 
+.q-gravity-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c, var(--accent));
+  display: inline-block;
+  flex: none;
+}
+
 /* Cabeçalho da Camada de Mielina & Matriz de Distratores */
+.q-col-mielina {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
 .mielina-box {
   position: relative;
   border: 1px solid var(--border);
   background: var(--surface);
-  padding: 22px;
+  padding: 20px 22px;
   border-radius: 2px;
+  margin: 0;
 }
+
 .mielina-box.pinned {
   border-color: var(--border-strong);
 }
+
+.mielina-head-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.mielina-kicker {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 5px;
+}
+
+.mielina-title {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.5vw, 28px);
+  font-weight: 300;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.mielina-title em {
+  font-style: italic;
+  font-weight: 300;
+}
+
+.mielina-scoreboard {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: 2px;
+  min-width: 168px;
+}
+
+.mielina-score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.mielina-score-num {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.mielina-score-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg);
+}
+
+.mielina-score-sub {
+  margin-top: 3px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.mielina-matrix-wrap {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.mielina-matrix-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
 .distractor-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
-  margin-top: 12px;
 }
+
 @media (max-width: 640px) {
   .distractor-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
 .distractor-cell {
-  padding: 9px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 11px;
   border: 1px solid var(--border);
   background: var(--surface-2);
   text-align: left;
   cursor: pointer;
   border-radius: 2px;
-  transition: border-color .15s;
+  transition: border-color .15s, background .15s;
 }
+
+.distractor-cell:hover {
+  border-color: var(--fg);
+}
+
 .distractor-cell.is-answer {
   border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 6%, var(--surface));
 }
+
 .distractor-cell.is-trap {
   border-color: var(--signal);
+  background: color-mix(in oklab, var(--signal) 8%, var(--surface));
 }
+
+.distractor-cell[aria-pressed="true"] {
+  outline: 2px solid var(--fg);
+  outline-offset: -2px;
+}
+
+.distractor-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.distractor-letter {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.distractor-cell.is-answer .distractor-letter {
+  color: var(--accent);
+}
+
+.distractor-cell.is-trap .distractor-letter {
+  color: var(--signal);
+}
+
+.distractor-pct {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.distractor-cell.is-answer .distractor-pct {
+  color: var(--accent);
+}
+
+.distractor-cell.is-trap .distractor-pct {
+  color: var(--signal);
+}
+
 .distractor-bar {
+  display: block;
+  width: 100%;
   height: 4px;
   background: var(--border);
-  margin-top: 6px;
+  margin-top: 4px;
   overflow: hidden;
 }
+
 .distractor-bar > i {
   display: block;
   height: 100%;
   background: var(--muted);
+}
+
+.distractor-cell.is-answer .distractor-bar > i {
+  background: var(--accent);
+}
+
+.distractor-cell.is-trap .distractor-bar > i {
+  background: var(--signal);
+}
+
+.distractor-tag {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.distractor-cell.is-answer .distractor-tag,
+.distractor-cell.is-trap .distractor-tag {
+  color: var(--fg);
 }
 
 /* Badges Funcionais e Chips */
@@ -504,12 +783,21 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid 
   font-size: 11px;
   border-radius: 2px;
   cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
 }
+
+.mielina-chip:hover {
+  border-color: var(--border-strong);
+  color: var(--fg);
+}
+
 .mielina-chip[aria-pressed="true"] {
   background: var(--fg);
   color: var(--bg);
   border-color: var(--fg);
+  font-weight: 500;
 }
+
 .badge-passed {
   display: inline-flex;
   align-items: center;
@@ -517,10 +805,12 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid 
   padding: 2px 7px;
   border: 1px solid var(--accent);
   color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
   font-family: var(--font-mono);
   font-size: 10.5px;
   border-radius: 2px;
 }
+
 .badge-trap {
   display: inline-flex;
   align-items: center;
@@ -528,10 +818,12 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid 
   padding: 2px 7px;
   border: 1px solid var(--signal);
   color: var(--signal);
+  background: color-mix(in oklab, var(--signal) 12%, transparent);
   font-family: var(--font-mono);
   font-size: 10.5px;
   border-radius: 2px;
 }
+
 .badge-role {
   display: inline-flex;
   align-items: center;
@@ -550,73 +842,415 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid 
   transform-origin: 32px 32px;
   transition: transform .5s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.mielina-card:hover .noos-avatar-orbits {
+
+.mielina-card:hover .noos-avatar-orbits,
+.tier-card:hover .noos-avatar-orbits {
   transform: rotate(10deg) scale(1.03);
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .mielina-card:hover .noos-avatar-orbits {
+  .mielina-card:hover .noos-avatar-orbits,
+  .tier-card:hover .noos-avatar-orbits {
     transform: none;
   }
 }
 
+/* Painel dos 4 Níveis do Abraço da Esfera */
+.mielina-tiers-drawer {
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  padding: 18px 20px;
+  border-radius: 2px;
+}
 
-/* ===== Mielina v2 — componentes próprios (sobre o CSS do kit) ===== */
-.q-col-mielina { min-width: 0; }
-.mielina-head { margin-bottom: 18px; }
-.mielina-kicker { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
-.mielina-title { font-family: var(--font-display); font-size: 28px; font-weight: 300; letter-spacing: -.02em; margin: 0; }
-.mielina-approved { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
-.mielina-approved .mono { color: var(--accent); }
-.mielina-section-title { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
-.mielina-hint { margin: 0 0 12px; font-size: 12px; color: var(--muted); }
-.mielina-box { margin: 0 0 18px; }
-.mielina-empty { margin: 0 0 12px; color: var(--muted); font-size: 14px; line-height: 1.55; }
-.mielina-summary { margin: 0 0 12px; font-size: 14px; line-height: 1.6; }
-.mielina-official { margin: 0 0 10px; font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
-.mielina-official .mono { display: block; margin-bottom: 4px; }
-.mielina-source { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
-.mielina-wiki-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); }
-.mielina-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
-.mielina-thread { display: grid; gap: 12px; }
-.mielina-card { padding: 14px 16px; border: 1px solid var(--border); background: var(--surface); border-radius: 2px; }
-.mielina-card-head { display: flex; align-items: flex-start; gap: 12px; }
-.mielina-card-id { flex: 1; min-width: 0; }
-.mielina-handle { display: block; font-size: 12px; font-weight: 600; overflow-wrap: anywhere; }
-.mielina-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
-.mielina-accel { color: var(--muted); font-size: 11px; white-space: nowrap; }
-.mielina-card-body { margin: 10px 0 8px; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
-.mielina-ritual { margin: 0 0 16px; padding: 14px 16px; border: 1px solid var(--accent); background: var(--surface); border-radius: 2px; }
-.mielina-ritual[hidden] { display: none; }
-.mielina-ritual p { margin: 0 0 10px; font-size: 13px; }
-.mielina-ritual .mielina-kicker { color: var(--accent); }
-.corner { position: absolute; width: 8px; height: 8px; border-color: var(--border-strong); border-style: solid; }
-.corner.tl { top: 4px; left: 4px; border-width: 1px 0 0 1px; }
-.corner.tr { top: 4px; right: 4px; border-width: 1px 1px 0 0; }
-.corner.bl { bottom: 4px; left: 4px; border-width: 0 0 1px 1px; }
-.corner.br { bottom: 4px; right: 4px; border-width: 0 1px 1px 0; }
-.mielina-dynamic { margin-top: 24px; }
-.mielina-dynamic .q-talk { margin-top: 0; }
+.mielina-tiers-drawer[hidden] {
+  display: none;
+}
+
+.mielina-tiers-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+@media (max-width: 680px) {
+  .mielina-tiers-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tier-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 2px;
+}
+
+.tier-card.is-hug {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 5%, var(--surface));
+}
+
+.tier-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+
+.tier-card-mid {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+.tier-card-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.tier-card-unlock {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--accent);
+}
+
+/* Síntese Consolidada Wiki */
+.mielina-wiki-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mielina-summary {
+  margin: 14px 0 12px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--fg);
+}
+
+.mielina-empty {
+  margin: 12px 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.mielina-official-anchor {
+  margin-top: 12px;
+  padding: 11px 14px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+}
+
+.mielina-source {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+
+.mielina-wiki-diff {
+  margin-top: 14px;
+  padding: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+
+.mielina-wiki-diff[hidden] {
+  display: none;
+}
+
+.diff-del {
+  padding: 5px 8px;
+  background: color-mix(in oklab, var(--signal) 14%, transparent);
+  color: var(--muted);
+  text-decoration: line-through;
+  margin-top: 6px;
+}
+
+.diff-add {
+  padding: 5px 8px;
+  background: color-mix(in oklab, var(--accent) 16%, transparent);
+  color: var(--fg);
+  margin-top: 4px;
+}
+
+/* Compositor Guiado */
+.mielina-composer {
+  display: grid;
+  gap: 12px;
+}
+
+.mielina-composer-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mielina-composer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .mielina-composer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mielina-field {
+  display: grid;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mielina-field select,
+.mielina-field textarea,
+.mielina-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 13px;
+  border-radius: 2px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.mielina-field select,
+.mielina-field input {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.mielina-field textarea {
+  resize: vertical;
+  min-height: 72px;
+  line-height: 1.55;
+}
+
+.mielina-composer-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.mielina-composer-foot .mielina-source-input {
+  flex: 1 1 240px;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border-radius: 2px;
+}
+
+.mielina-composer-status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+}
+
+/* Filtros e Thread Cards */
+.mielina-filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.mielina-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mielina-thread {
+  display: grid;
+  gap: 12px;
+}
+
+.mielina-card {
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 2px;
+  transition: border-color .15s;
+}
+
+.mielina-card.is-tier-4 {
+  border-color: var(--border-strong);
+}
+
+.mielina-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mielina-card-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mielina-avatar-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  flex: none;
+}
+
+.mielina-card-id {
+  min-width: 0;
+}
+
+.mielina-handle-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mielina-handle {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.mielina-author-meta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.mielina-card-body {
+  margin: 12px 0 10px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--fg);
+  overflow-wrap: anywhere;
+}
+
+.mielina-card-foot {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.mielina-upvote-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+}
+
+.mielina-upvote-btn:hover,
+.mielina-upvote-btn[data-voted="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mielina-ritual {
+  padding: 15px 18px;
+  border: 1px solid var(--accent);
+  background: var(--surface-2);
+  border-radius: 2px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.mielina-ritual[hidden] {
+  display: none;
+}
+
+.mielina-ritual-quote {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--fg);
+  margin: 2px 0 4px;
+}
+
+.mielina-ritual-sub {
+  font-size: 12.5px;
+  color: var(--muted);
+  max-width: 68ch;
+}
+
+.mielina-dynamic {
+  margin-top: 6px;
+}
+
+.mielina-dynamic .q-talk {
+  margin-top: 0;
+}
+
 @media (max-width: 1023px) {
-  .q-grid { gap: 28px; }
+  .q-grid {
+    gap: 28px;
+  }
 }
-.distractor-bar { display: block; }
-.distractor-cell { display: flex; flex-direction: column; gap: 4px; }
-.distractor-letter { font-size: 11px; color: var(--muted); }
-.distractor-pct { font-size: 18px; font-weight: 500; }
-.distractor-tag { font-size: 10px; color: var(--muted); line-height: 1.3; }
-.distractor-cell.is-answer .distractor-tag { color: var(--accent); }
-.distractor-cell.is-trap .distractor-tag { color: var(--signal); }
-.distractor-bar { margin-top: 6px; }
-.distractor-bar > i { background: var(--muted); }
-.distractor-cell.is-answer .distractor-bar > i { background: var(--accent); }
-.distractor-cell.is-trap .distractor-bar > i { background: var(--signal); }
-.mielina-composer { display: grid; gap: 10px; }
-.mielina-field { display: grid; gap: 5px; font-size: 12px; color: var(--muted); }
-.mielina-field select, .mielina-field textarea, .mielina-field input {
-  width: 100%; box-sizing: border-box; padding: 9px 10px;
-  border: 1px solid var(--border); background: var(--bg); color: var(--fg);
-  font: inherit; font-size: 13px; border-radius: 2px;
-}
-.mielina-field textarea { resize: vertical; min-height: 74px; }
-.mielina-composer-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.mielina-composer-status { font-size: 11px; color: var(--muted); }

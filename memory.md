@@ -1,85 +1,39 @@
 # Memória do projeto — Noos Hub (noos.study)
 
-**Atualizado:** 2026-11-06 · **base:** `main` @ 57d14ba
-**O que é:** a marca-mãe do ecossistema Noos — vitrine bilíngue PT/EN e páginas
-públicas de leitura `/q/{ID}`. Não é sexto app, não hospeda estudo, não guarda
-aluno (`constitution.md`). Não repete o que já está em `current-state.md`,
-`plan.md` e `noos.registry.json` — referencia.
+**Atualizado:** 2026-11-10 · **checkout:** `main` @ c418b7b + implementação F2.2 no working tree (não commitada; 33 commits atrás de `origin/main`).
+**O que é:** a marca-mãe do ecossistema Noos — vitrine bilíngue PT/EN e páginas públicas de leitura `/q/{ID}`. Não é sexto app, não hospeda estudo, não guarda aluno (`constitution.md`). Não repete o que já está em `current-state.md`, `plan.md` e `noos.registry.json` — referencia.
 
-## Estado verificado (2026-11-06, por comando)
+## Estado verificado (10/11/2026)
 
-- Sistema **v1.2.0** (`package.json`, `noos.registry.json`).
-- **731 questões publicadas:** `manifestos/RAN.jsonl` 300 (DBDEA) +
-  `manifestos/SYN.jsonl` 431. `npm run build` → 731 aceitas, 0 rejeitadas,
-  **1.462 páginas canônicas** (731 PT + 731 EN) e **731 redirects** sem idioma
-  (os manifestos reais não têm alias); `.gitignore` exclui as saídas.
-- `sitemap.xml` gerado = **733 entradas** (2 da base + 731 canônicas PT).
-- **Gabarito por texto (v12, D1+D3):** as páginas exibem "Resposta correta:
-  <texto>" / "Correct answer: <texto>" — texto de `snapshot.options[índice]`
-  da letra canônica A–D, nunca a letra isolada (incidente A/C). Build falha
-  com id/motivo se o gabarito for inválido; `--qa` tem assert de paridade
-  por record aceito e idioma, e as alternativas seguem na ordem canônica.
-- `npm run qa` → **35/35 PASS** (fixture da spec, não acende páginas no ar).
-- Axon `@ironidesflj/axon@0.2.2` como devDependency com pin exato; nada do
-  pacote no output servido (paridade PT/EN do rodapé lida do registro).
-- Rotas v10.2: canônica = arquivo estático; alias e forma sem idioma = página
-  de redirect (200 + meta refresh + canonical); desconhecida = `404.html`
-  estático. Sem função, sem rewrites.
-- Aplicativos no registro: Synapse e Ranvier "em constante atualização";
-  Myelin, Theta, Engram "no horizonte" (sem cartão falso).
-- CI: placeholders, paridade PT/EN, refs locais, geração das páginas, sitemap e
-  registro (`sdd-lint`) — ver `.github/workflows/`.
+- Sistema **v1.5.0** (`package.json`, `noos.registry.json`, rodapés PT/EN).
+- **1.031 questões publicadas:** `RAN.jsonl` 600 (DBDEA 300 + AZ-900 300) + `SYN.jsonl` 431. Build → 1.031 aceitas, 0 rejeitadas, **2.062 páginas canônicas** e **1.031 redirects**; `sitemap.xml` com **1.033 entradas** (2 base + 1.031 PT).
+- `npm run qa` → **61/61 PASS** (fixture; não acende páginas no ar).
+- Axon `@ironidesflj/axon@0.3.0` como devDependency com pin exato; nada do pacote no output servido.
+- **Camada de Mielina v2 (F2.1+F2.2, Opção A):** dual-column, matriz de dissecção, síntese baseline/curada + diff inline, reputação/identicon 1–4, filtros, ritual `?ritual=passed`, compositor guiado com card otimista. **Sem iframe do giscus**; GitHub Discussions é o back-end via compositor + sync diário (`sync-discussao.yml`, 06:23 UTC), que gera `discussao/{PREFIX}.json`, calcula tiers, preserva `synthesis` e abre PR. O build **nunca** faz fetch.
+- **Ingestão F2:** `ingest-manifest.yml` baixa manifesto do app, confere SHA-256 e abre PR; monitor a cada 15 min.
+- **Epitáfio:** Axon 0.3.0; questão retirada mantém página com aviso, sem gabarito, no sitemap.
+
+## Nota operacional (importante antes de publicar)
+
+Este checkout **não está sincronizado**: `HEAD` local = `c418b7b` (33 commits atrás de `origin/main`) e a implementação da Camada de Mielina está no working tree sem commit. Antes de qualquer deploy: `git fetch origin && git rebase/merge origin/main` (resolver conflitos), `npm ci && npm run build && npm run qa`, revisar `git diff` e só então commit/push. Não publicar direto deste working tree.
 
 ## Regras que não se quebram (`constitution.md`)
 
-- **Nunca:** hospedar prova jogável; guardar dado privado de estudo; emitir ID
-  (o hub é registro, não emissor); assinar "by Noos"; ser gargalo (funciona com
-  zero apps — zero manifestos = build verde e site inalterado); usar cor de app
-  como interface.
-- **Sempre:** devolver o usuário ao app; ingerir manifesto no build (nunca
-  consultar app em runtime; linha inválida rejeitada com log e build segue);
-  honrar ID publicada (alias eterno, nunca 404); publicar a fonte única em
-  `noos.registry.json`; bilíngue PT/EN de nascença; identidade em
-  `assets/noos-tokens.css` (apps importam, não redefinem `--bg/--fg/--accent`).
-- Alias é eterno e sem reciclagem; prefixo é a marca pública do app; só o app
-  dono emite o seu namespace (`SYN-*` só do Synapse, `RAN-*` só do Ranvier).
-- Mudança de constitution = RFC + `CHANGELOG`/registro com semver do sistema.
+- **Nunca:** hospedar prova jogável; guardar dado privado de estudo; emitir ID (o hub é registro, não emissor); assinar "by Noos"; ser gargalo (zero manifestos = build verde e site inalterado); usar cor de app como interface.
+- **Sempre:** devolver o usuário ao app; ingerir manifesto no build (nunca consultar app em runtime; linha inválida rejeitada com log e build segue); honrar ID publicada (alias eterno, nunca 404); publicar a fonte única em `noos.registry.json`; bilíngue PT/EN de nascença; identidade em `assets/noos-tokens.css`.
+- Alias é eterno e sem reciclagem; prefixo é a marca pública do app; só o app dono emite o seu namespace (`SYN-*` só do Synapse, `RAN-*` só do Ranvier).
+- Mudança de constitution = RFC + entrada com semver do sistema; versão do registry = versão nos rodapés (CI `sdd-lint`).
 
 ## Dívidas abertas
 
-- **Transporte e retenção dos manifestos** (F2 item 2): RAN/SYN ainda são
-  copiados para o repo; falta automação e política para ID retirada (epitáfio)
-  — `plan.md`.
-- **Discussões por questão** (F2 item 3): slot reservado na página, omitido.
-- **Badge/deep-link no app** (fatia 5 do guia do Axon): hub já serve as
-  páginas; ativação é do lado do app. PR #15 do Synapse (links de comunidade)
-  mora no repo do Synapse.
-- **Drift interno da spec:** `spec-pagina-de-questao.md` — seções "Rotas e
-  resolução"/"Geração" ainda descrevem `api/q.js` e 301/308, superadas pela
-  revisão v10.2 no fim do arquivo; unificar na próxima passada.
-- Adiado: CSP com hashes, self-host de fontes, CSS de impressão; Cloudflare
-  Pages como espelho; Next.js só se a F2 pedir interação real.
+- **Curadoria da síntese** (hoje baseline v1 automática + edição manual do dump) e **histórico de revisões real** (diff compara as duas últimas).
+- **Promoção automática de “resposta aceita”** e gates completos de reputação (tier já derivado no sync).
+- **CSP em enforce** (hoje Report-Only); workflow agendado pode ser desativado pelo GitHub após ~60 dias sem atividade.
+- **Specs reconciliadas (10/11):** `spec-pagina-de-questao.md` atualizada para a v10.2/v12 + item 6 (Mielina) e `spec-discussao-questao.md` marcada como implementada (Opção A); rotas antigas (`api/q.js`, 301/308 de função) agora têm nota de superação explícita.
 
 ## Próximo passo
 
-1. F2 item 2 — spec de ingestão + transporte automático (CI do app → hub) e
-   comportamento para ID retirada; só então remover a cópia manual.
-2. Antes de editar: `npm ci && npm run build && npm run qa` (cache:
-   `npm_config_cache="$PWD/.npm-cache"`) e conferir os números acima.
-3. Qualquer bump: `package.json` × `noos.registry.json` × rodapé iguais.
-
-- **CI:** o job `Integridade e paridade PT/EN` passou a rodar `npm run qa` — o assert de paridade gabarito × `options` (incidente A/C) agora é gate de PR, além do build.
-
-- **Monitoramento:** `.github/workflows/monitor.yml` checa a cada 15 min hub (registry, páginas, sitemap 733), Synapse (app + `/manifest.jsonl` 431 linhas) e Ranvier (`/api/health`); falha abre/atualiza issue "(Monitor: falha de disponibilidade)" e o GitHub notifica por e-mail; sucesso fecha.
-
-- **2026-11-09:** Axon pin 0.3.0; página `/q/{ID}` suporta `retired` (política epitáfio, MINOR): questão retirada mantém a página canônica com aviso e **sem gabarito interativo**; sitemap permanece. QA cobre ativa + retirada no fixture.
-
-- **2026-11-09:** CSP em **Report-Only** nos headers (`Content-Security-Policy-Report-Only`): coleta violações sem bloquear o site; quando estabilizar, vira enforce. Sem impacto nas páginas atuais.
-
-- **2026-11-10:** discussões por questão (giscus) implementadas como **opt-in**: config em `noos.registry.json` (`discussions`, repo/categoria Q&A do próprio hub), bloco só nas páginas canônicas com `data-term` = ID, CSP libera giscus.app. `enabled:false` até o app giscus ser instalado no repositório (uma ação no GitHub); ao ligar, o widget passa a valer nas 1031 páginas.
-
-- **2026-11-10 (ativação):** app giscus instalado pelo mantenedor no repositório; `discussions.enabled` ligado — o bloco “Conversar sobre esta questão” passa a valer nas páginas canônicas (uma discussion por ID, PT/EN juntas).
-
-- **2026-11-10:** A Camada de Mielina v2 no ar (1.3.0): dual-column, matriz de distratores, síntese consolidada (estado vazio orientador), ritual `?ritual=passed`, identicons com tiers 1–4, filtros e giscus dinâmico. Dumps estáticos em `discussao/{PREFIX}.json` (contrato no README da pasta); QA cobre 4 células da matriz, síntese, avatar tier ≥3, flair aprovado, filtros e estado vazio.
-
-- **2026-11-10 (F2.2 parcial, 1.4.0):** sync do GitHub Discussions → `discussao/{PREFIX}.json` (script + workflow diário com PR), compositor guiado publicando Discussion estruturada via link do GitHub (sem backend), tiers/passed por `discussao/authors.json`. giscus permanece como fio ao vivo; a camada estática é o snapshot revisável. QA cobre compositor e script.
+1. Reconciliar com `origin/main` (ver nota operacional) e publicar a versão 1.5.0.
+2. Rodar `npm ci && npm run build && npm run qa` (cache: `npm_config_cache="$PWD/.npm-cache"`).
+3. Curadoria: transformar contribuições reais em `synthesis` versionada e inaugurar a Camada de Mielina nas questões-âncora.
+4. Qualquer bump: `package.json` × `noos.registry.json` × rodapé PT/EN iguais.

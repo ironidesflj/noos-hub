@@ -1,6 +1,6 @@
 # spec-pagina-de-questao
 
-Especificação do hub (noos.study) · estado: **publicada na v10.2 — roteamento 100% estático (plano C)** · **v12 — gabarito por texto + assert de paridade** — conteúdo **no ar**: 731 questões (RAN 300 + SYN 431), 1.462 páginas canônicas, 731 redirects e sitemap com 733 entradas (números de `current-state.md`). Transporte automático dos manifestos segue pendente (F2 item 2).
+Especificação do hub (noos.study) · estado: **publicada na v10.2 — roteamento 100% estático (plano C)** · **v12 — gabarito por texto + assert de paridade** · **item 6 (Slot Discussão) implementado como A Camada de Mielina v2 (Opção A, sem iframe do giscus)** — conteúdo no ar: **1.031 questões** (RAN 600 + SYN 431), 2.062 páginas canônicas, 1.031 redirects e sitemap com 1.033 entradas (números de `current-state.md`). Transporte automático dos manifestos (F2) implementado.
 
 ## Problema
 
@@ -40,12 +40,18 @@ discutir.
 
 ## Rotas e resolução
 
+> **Nota de implementação (v10.2, plano C — vigente).** Não existe mais
+> `api/q.js`, função ou rewrite: canônica, alias e forma sem idioma são
+> **arquivos estáticos gerados no build**. As seções históricas deste
+> documento que ainda citam 301/308 de função/rewrite foram superadas pela
+> revisão v10.2 no fim do arquivo; a tabela abaixo é a atual.
+
 | Pedido | Resposta | Mecanismo |
 |---|---|---|
 | `/{pt\|en}/q/{ID canônica}` | **200** — página da questão | arquivo estático gerado no build (`{lang}/q/{ID}/index.html`); filesystem sempre vence |
-| `/{pt\|en}/q/{alias}` (ex. `GLI-…`) | **301** → canônica da mesma questão, mesmo idioma | `api/q.js` com o mapa de aliases gerado no build |
-| `/q/{ID}` (sem idioma) | **308** → `/pt/q/{ID}` (alias resolvida antes: salto único) | `api/q.js` |
-| `/{pt\|en}/q/{desconhecida}` | **404** com corpo equivalente ao `404.html` | `api/q.js` |
+| `/{pt\|en}/q/{alias}` (ex. `GLI-…`) | **200** — página de redirect estático (meta refresh 0 + `canonical` + `location.replace`) → canônica na mesma língua | `{lang}/q/{alias}/index.html` gerado no build (mapa de aliases) |
+| `/q/{ID}` (sem idioma) | **200** — redirect estático → `/pt/q/{ID}` (alias resolvida antes: salto único) | `q/{ID}/index.html` gerado no build |
+| `/{pt\|en}/q/{desconhecida}` | **404** estático do hub | `404.html` do output |
 
 - `vercel.json` ganha **apenas** `rewrites` de fallback (`/q/*` e
   `/{lang}/q/*` → `/api/q`); `cleanUrls`, `trailingSlash` e `headers`
@@ -96,8 +102,14 @@ Conteúdo, em ordem:
    `url` do namespace no registro (campo novo, opcional; sem o campo, o
    link não renderiza e a página segue válida). Todo caminho devolve ao
    app.
-6. **Slot Discussão** — seção reservada que renderiza somente quando o
-   registro ganhar a chave de ativação (item 3 da F2). Hoje: omitida.
+6. **Slot Discussão — A Camada de Mielina (implementado, 10/nov/2026).** A
+   página renderiza a discussão por questão descrita em
+   `spec-discussao-questao.md`: matriz de dissecção, síntese consolidada
+   (baseline v1 automática ou versão curada), reputação/identicon 1–4,
+   filtros, ritual “Passei na prova!” e compositor guiado. **Opção A:** sem
+   iframe do giscus; o GitHub Discussions é o back-end (compositor publica;
+   `scripts/sync-discussao.mjs` gera `discussao/{PREFIX}.json` periodicamente,
+   fora do build).
 
 Todo texto do manifesto é HTML-escapado (o snapshot é texto arbitrário).
 
@@ -120,7 +132,7 @@ Todo texto do manifesto é HTML-escapado (o snapshot é texto arbitrário).
 - Saídas geradas **não são commitadas** (`.gitignore`: `pt/q/`, `en/q/`,
   `api/q-data.mjs`, `sitemap.xml`).
 - Vercel: framework "Other", `buildCommand: node build/gera-questoes.mjs`,
-  output `./` (a raiz, como hoje); `api/q.js` vira função automaticamente.
+  output `./` (a raiz); **nenhuma função** — roteamento 100% estático (v10.2).
 - O hub ganha `package.json` (novo): `devDependencies` com o
   `@ironidesflj/axon` em pin exato + `scripts.build`. É a "fatia 1 do
   hub": dependência de build, zero runtime.
@@ -133,8 +145,9 @@ Todo texto do manifesto é HTML-escapado (o snapshot é texto arbitrário).
   404 do hub (a rota existe; o conteúdo acende com o primeiro manifesto).
 - Fixture de teste (o exemplo trabalhado do guia: `RAN-AZ900-00042` ↔
   `GLI-AZ900-00012`) → páginas PT e EN geradas sempre em par (build falha
-  se faltar uma); `curl -I` na alias → 301 para a canônica no mesmo
-  idioma; forma sem barra → 308.
+  se faltar uma); a alias abre uma página de redirect estático (200) com
+  `canonical`/`meta refresh` para a canônica no mesmo idioma; forma sem
+  barra resolve para a canônica PT.
 - Linha suja no fixture → build segue, log com linha/motivo, página
   correspondente ausente; checksum divergente → linha rejeitada.
 - Páginas geradas: escape correto, `<details>` fechado por padrão,
@@ -209,9 +222,7 @@ canônica. Divergência falha o QA com id e motivo. O fixture
 `RAN-AZ900-00042` foi canonicalizado (answer `B`, checksum recalculado)
 para exercitar o caminho letra → texto no QA.
 
-Verificação com os manifestos reais: 731 aceitas, 0 rejeitadas, 1.462
-páginas canônicas, 731 redirects, sitemap com 733 entradas; `npm run qa`
-35/35 PASS.
+Verificação com os manifestos reais: 1.031 aceitas, 0 rejeitadas, 2.062 páginas canônicas, 1.031 redirects, sitemap com 1.033 entradas; `npm run qa` 61/61 PASS.
 
 
 ## Epitáfio (v0.3, 2026-11-09)

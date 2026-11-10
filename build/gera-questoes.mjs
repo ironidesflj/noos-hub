@@ -219,35 +219,9 @@ const refBlock = (reference, lang) => {
   return `<p class="q-ref"><strong>${label}:</strong> ${safe}</p>`;
 };
 
-const discussionsBlock = (id, lang) => {
-  const d = registry.discussions;
-  if (!d || !d.enabled || !d.repoId || !d.categoryId) return '';
-  const label =
-    lang === 'pt' ? 'Conversar sobre esta questão' : 'Discuss this question';
-  return `<details class="q-talk">
-          <summary>${escapeHtml(label)}</summary>
-          <div class="giscus"></div>
-          <script src="https://giscus.app/client.js"
-            data-repo="${escapeHtml(d.repo)}"
-            data-repo-id="${escapeHtml(d.repoId)}"
-            data-category="${escapeHtml(d.category)}"
-            data-category-id="${escapeHtml(d.categoryId)}"
-            data-mapping="specific"
-            data-term="${escapeHtml(id)}"
-            data-reactions-enabled="${escapeHtml(String(d.react ?? 1))}"
-            data-emit-metadata="0"
-            data-input-position="bottom"
-            data-theme="preferred_color_scheme"
-            data-lang="${lang}"
-            crossorigin="anonymous"
-            async></script>
-          <noscript><p class="q-talk-fallback">${escapeHtml(
-            lang === 'pt'
-              ? 'Ative o JavaScript para comentar ou abra as discussões no GitHub.'
-              : 'Enable JavaScript to comment, or open the discussions on GitHub.',
-          )}</p></noscript>
-        </details>`;
-};
+// Opção A (100% Camada de Mielina nativa): sem iframe Giscus na página.
+// A persistência usa o GitHub Discussions como backend estático via Compositor Guiado + sync-discussao.mjs.
+const discussionsBlock = (_id, _lang) => '';
 
 const ctaBlock = (ns, lang) =>
   ns.url
@@ -273,83 +247,108 @@ const tierNames = {
 const mielinaT = (lang) =>
   lang === 'pt'
     ? {
-        title: 'A Camada de Mielina',
-        sub: 'Discussão por questão — quem passou vira mielina para quem vem.',
-        approved: 'aprovados contribuíram',
-        matrix: 'Matriz de dissecção das alternativas',
-        matrixHint: 'Clique numa alternativa para filtrar as contribuições.',
+        title: 'Onde a prova tenta te enganar — e como quem passou resolveu.',
+        sub: '02 — Camada de Mielina · Discussão Canônica',
+        approved: 'Aprovados',
+        approvedSub: 'contribuíram nesta questão',
+        matrix: 'Matriz de Dissecção de Alternativas',
+        matrixHint: 'Clique numa alternativa para filtrar ou inaugurar a dissecção.',
         answer: 'Gabarito',
         trap: 'Pegadinha mais debatida',
-        synthesis: 'Síntese consolidada',
+        dissect: 'Dissecar',
+        synthesis: '✦ Síntese Consolidada (Wiki)',
         synthesisEmpty:
-          'Ainda não há síntese para esta questão. Se você passou na prova, inaugure a explicação revisável — com fonte oficial.',
-        synthesisCta: 'Contribuir com a síntese',
-        official: 'Âncora na documentação oficial',
+          'Ainda não há síntese comunitária consolidada para esta questão. Abaixo está o ponto de partida oficial verificável — se você passou na prova, inaugure a dissecção das alternativas.',
+        synthesisCta: 'Inaugurar síntese desta questão',
+        official: '⚓ Ancorado na Fonte Oficial:',
         revision: 'Histórico / Diff',
-        coauthors: 'Co-autoria',
-        ritualTitle: 'Passei na prova!',
-        ritualBody: 'Quem passou vira mielina para quem vem. Conte qual alternativa te confundiu e qual fonte oficial resolveu a dúvida.',
-        ritualDismiss: 'Dispensar',
+        coauthors: 'Co-autores',
+        ritualTitle: 'PASSEI!',
+        ritualQuote: '“Quem passou vira mielina para quem vem.”',
+        ritualBody:
+          'Esta questão foi aberta pelo Ritual Pós-Prova. Ao explicar abaixo qual pegadinha te confundiu e qual palavra-chave destravou a resposta, seu Identicon ativa o Anel Nível 2 (✦ Aprovado).',
+        ritualDismiss: 'Dispensar (zero nag)',
         filters: 'Filtrar contribuições',
         all: 'Todas',
-        passed: 'Só aprovados',
-        sources: 'Fontes oficiais',
+        passed: 'Só Aprovados',
+        sources: 'Fontes Oficiais',
+        howHug: 'Como ganhar o Abraço da Esfera?',
         threadTitle: 'Contribuições dos pares',
         threadEmpty:
-          'Nenhuma contribuição pública ainda. A primeira explicação com fonte oficial pode inaugurar esta camada.',
+          'Nenhuma contribuição pública ainda. Seja o primeiro aprovado a explicar por que as alternativas incorretas enganam — sua contribuição constrói sua Bainha Orbital.',
         accelerations: 'acelerações',
-        accepted: 'Resposta aceita',
-        source: 'Fonte',
+        accelerateBtn: 'Acelerou meu estudo',
+        accepted: 'Co-autor Wiki',
+        source: '⚓ Fonte:',
         dynamic: 'Discussão dinâmica no GitHub',
-        dynamicHint: 'O fio ao vivo abre no giscus; a síntese acima é o snapshot revisável.',
-        composerTitle: 'Compositor guiado',
-        composerHint: 'Três perguntas para transformar sua experiência em explicação com fonte — publica no GitHub Discussions e vira snapshot na síntese.',
-        composerOpt: 'Qual alternativa te confundiu?',
-        composerBody: 'O que a documentação oficial não conta de primeira?',
-        composerSource: 'Âncora verificada (URL oficial, https)',
-        composerPublish: 'Publicar na Noosfera',
-        composerMissing: 'Escreva ao menos uma frase de explicação.',
-        composerBadUrl: 'A fonte precisa começar com https://.',
-        composerReady: 'Abrindo o GitHub para publicar…',
+        dynamicHint: 'O fio ao vivo sincroniza via GitHub Discussions (giscus); a síntese acima é o snapshot revisável sob CC BY-SA 4.0.',
+        composerTitle: 'Contribuir com a Questão',
+        composerSub: 'Sua contribuição constrói sua Bainha Orbital',
+        composerOpt: '1. Onde está o ponto de dificuldade?',
+        composerFlair: '2. Seu momento na prova (Flair)',
+        composerFlairPassed: '✦ Passei na prova! (Ativa Anel Nível 2)',
+        composerFlairStudy: 'Estudando agora (Nível 1 · Sinapse)',
+        composerBody: '3. O que a documentação oficial não te conta de primeira?',
+        composerBodyPlaceholder: 'Explique onde você travou e qual palavra-chave do enunciado destrava a resposta...',
+        composerSourcePlaceholder: '⚓ Fonte oficial verificável (https://... ou seção do guia)',
+        composerPublish: 'Publicar na Noosfera (CC BY-SA)',
+        composerMissing: 'Escreva ao menos uma frase explicando o raciocínio.',
+        composerBadUrl: 'Se informar URL, use https:// (ou deixe a referência oficial).',
+        composerReady: 'Publicado localmente! Abrindo sincronização no GitHub Discussions…',
+        gravityLabel: 'Gravidade da Família Noos · Conexão Entre Domínios',
+        gravityCta: 'Explorar questão irmã →',
       }
     : {
-        title: 'The Myelin Layer',
-        sub: 'Per-question discussion — those who passed become myelin for those who follow.',
-        approved: 'passed contributors',
-        matrix: 'Answer distractor matrix',
-        matrixHint: 'Click an option to filter the contributions.',
+        title: 'Where the exam tries to trick you — and how those who passed solved it.',
+        sub: '02 — The Myelin Layer · Canonical Discussion',
+        approved: 'Passed',
+        approvedSub: 'contributed to this question',
+        matrix: 'Answer Distractor Matrix',
+        matrixHint: 'Click an option to filter or open its dissection.',
         answer: 'Answer',
         trap: 'Most debated trap',
-        synthesis: 'Consolidated synthesis',
+        dissect: 'Dissect',
+        synthesis: '✦ Consolidated Synthesis (Wiki)',
         synthesisEmpty:
-          'No synthesis for this question yet. If you passed the exam, open the reviewable explanation — with an official source.',
-        synthesisCta: 'Contribute to the synthesis',
-        official: 'Official documentation anchor',
+          'No community synthesis consolidated for this question yet. Below is the verifiable official starting point — if you passed the exam, open the option dissection.',
+        synthesisCta: 'Start synthesis for this question',
+        official: '⚓ Official Documentation Anchor:',
         revision: 'History / Diff',
-        coauthors: 'Co-authorship',
-        ritualTitle: 'I passed!',
-        ritualBody: 'Those who passed become myelin for those who follow. Share the option that confused you and the official source that resolved it.',
-        ritualDismiss: 'Dismiss',
+        coauthors: 'Co-authors',
+        ritualTitle: 'I PASSED!',
+        ritualQuote: '“Those who passed become myelin for those who follow.”',
+        ritualBody:
+          'Opened via the Post-Exam Ritual. Explain which trap confused you and which keyword unlocked the answer to activate your Tier 2 Ring (✦ Passed).',
+        ritualDismiss: 'Dismiss (zero nag)',
         filters: 'Filter contributions',
         all: 'All',
-        passed: 'Passed only',
-        sources: 'Official sources',
+        passed: 'Passed Only',
+        sources: 'Official Sources',
+        howHug: 'How to earn the Sphere Embrace?',
         threadTitle: 'Peer contributions',
-        threadEmpty: 'No public contribution yet. The first sourced explanation can open this layer.',
+        threadEmpty:
+          'No public contribution yet. Be the first who passed to explain why the distractors trick candidates — your contribution builds your Orbital Sheath.',
         accelerations: 'accelerations',
-        accepted: 'Accepted answer',
-        source: 'Source',
+        accelerateBtn: 'Accelerated my study',
+        accepted: 'Wiki Co-author',
+        source: '⚓ Source:',
         dynamic: 'Live discussion on GitHub',
-        dynamicHint: 'The live thread opens in giscus; the synthesis above is the reviewable snapshot.',
-        composerTitle: 'Guided composer',
-        composerHint: 'Three questions turn your experience into a sourced explanation — published to GitHub Discussions and snapshotted into the synthesis.',
-        composerOpt: 'Which option confused you?',
-        composerBody: 'What does the official documentation not tell you up front?',
-        composerSource: 'Verified anchor (official https URL)',
-        composerPublish: 'Publish to the Noosphere',
-        composerMissing: 'Write at least one sentence of explanation.',
-        composerBadUrl: 'The source must start with https://.',
-        composerReady: 'Opening GitHub to publish…',
+        dynamicHint: 'The live thread syncs via GitHub Discussions (giscus); the synthesis above is the CC BY-SA 4.0 reviewable snapshot.',
+        composerTitle: 'Contribute to this Question',
+        composerSub: 'Your contribution builds your Orbital Sheath',
+        composerOpt: '1. Where is the sticking point?',
+        composerFlair: '2. Your exam status (Flair)',
+        composerFlairPassed: '✦ I passed the exam! (Unlocks Tier 2 Ring)',
+        composerFlairStudy: 'Studying now (Tier 1 · Synapse)',
+        composerBody: '3. What does the official documentation not tell you up front?',
+        composerBodyPlaceholder: 'Explain where you got stuck and which keyword in the stem unlocks the answer...',
+        composerSourcePlaceholder: '⚓ Verifiable official source (https://... or guide section)',
+        composerPublish: 'Publish to the Noosphere (CC BY-SA)',
+        composerMissing: 'Write at least one sentence explaining the reasoning.',
+        composerBadUrl: 'If providing a URL, it must start with https://.',
+        composerReady: 'Published locally! Opening GitHub Discussions sync…',
+        gravityLabel: 'Noos Family Gravity · Cross-Domain Connection',
+        gravityCta: 'Explore sibling question →',
       };
 
 const isSafeUrl = (u) => {
@@ -362,18 +361,131 @@ const isSafeUrl = (u) => {
 
 const optionLetter = (i) => 'ABCD'[i] ?? '?';
 
-function renderDiscussionHead(entry, lang) {
+const shortWords = (s, max = 28) => {
+  const clean = String(s ?? '').replace(/\s+/g, ' ').trim();
+  return clean.length <= max ? clean : `${clean.slice(0, max - 1).trimEnd()}…`;
+};
+
+function renderTiersDrawer(lang) {
+  const isPt = lang === 'pt';
+  return `<section class="mielina-tiers-drawer" id="tiers-showcase" data-tiers-drawer hidden aria-label="${isPt ? 'Os 4 Níveis do Abraço da Esfera' : 'The 4 Tiers of the Sphere Embrace'}">
+            <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px">
+              <div>
+                <p class="mielina-kicker" style="color:var(--accent)">${isPt ? 'Reconhecimento Visual & Funcional Noos' : 'Noos Visual & Functional Recognition'}</p>
+                <h3 class="mielina-title" style="font-size:21px">${
+                  isPt
+                    ? 'O “Abraço da Esfera”: <em>como o Noos abraça quem mais ajuda sem usar mascote infantil.</em>'
+                    : 'The “Sphere Embrace”: <em>how Noos embraces top contributors without a childish mascot.</em>'
+                }</h3>
+                <p style="font-size:12px;color:var(--muted);margin-top:4px;max-width:72ch">${
+                  isPt
+                    ? 'Na neurobiologia, os oligodendrócitos abraçam o axônio com camadas de mielina para acelerar o impulso nervoso. No Noos, conforme suas explicações recebem votos e entram na Síntese Wiki, a Esfera Noos envolve seu Identicon com órbitas keplerianas e dois nós quânticos nos ombros do avatar.'
+                    : 'In neurobiology, glial cells wrap axons in myelin sheaths to accelerate neural impulses. On Noos, as your explanations earn accelerations and enter the Wiki Synthesis, the Noos Sphere wraps your Identicon with Keplerian orbits and two quantum nodes on its shoulders.'
+                }</p>
+              </div>
+              <button type="button" class="mielina-chip" data-tiers-close>${isPt ? 'Fechar ×' : 'Close ×'}</button>
+            </div>
+            <div class="mielina-tiers-grid">
+              <div class="tier-card">
+                <div>
+                  <div class="tier-card-top">
+                    <span style="color:var(--muted)">${isPt ? 'NÍVEL 01 · SINAPSE' : 'TIER 01 · SYNAPSE'}</span>
+                    <span style="color:var(--muted)">${isPt ? '1+ contribuição' : '1+ contribution'}</span>
+                  </div>
+                  <div class="tier-card-mid">
+                    ${renderNoosAvatarSvg('@lucas-dev', 1)}
+                    <div>
+                      <div class="mielina-handle">@lucas-dev</div>
+                      <span class="badge-role" style="margin-top:3px">${isPt ? 'Estudando agora' : 'Studying now'}</span>
+                    </div>
+                  </div>
+                  <p class="tier-card-desc">${isPt ? 'Identicon geométrico 5×5 (sem foto pessoal, zero rastreio). Moldura de 1px.' : 'Pure 5×5 geometric Identicon (no personal photo, zero tracking). 1px frame.'}</p>
+                </div>
+                <div class="tier-card-unlock" style="color:var(--muted)">🔓 ${isPt ? 'Poder: Comentar e votar ("Acelerou meu estudo").' : 'Unlocks: Commenting and voting ("Accelerated my study").'}</div>
+              </div>
+              <div class="tier-card">
+                <div>
+                  <div class="tier-card-top">
+                    <span style="color:var(--accent)">${isPt ? 'NÍVEL 02 · APROVADO' : 'TIER 02 · PASSED'}</span>
+                    <span style="color:var(--accent)">${isPt ? 'Ritual Pós-Prova' : 'Post-Exam Ritual'}</span>
+                  </div>
+                  <div class="tier-card-mid">
+                    ${renderNoosAvatarSvg('@rafael-ops', 2)}
+                    <div>
+                      <div class="mielina-handle">@rafael-ops</div>
+                      <span class="badge-passed" style="margin-top:3px">✦ ${isPt ? 'PASSEI NA PROVA' : 'PASSED EXAM'}</span>
+                    </div>
+                  </div>
+                  <p class="tier-card-desc">${isPt ? 'Órbita tracejada única com 1 nó polar brilhante no ápice. Destaca quem enfrentou a prova real.' : 'Single dashed orbit with 1 bright polar node at the apex. Highlights those who passed the exam.'}</p>
+                </div>
+                <div class="tier-card-unlock">🔓 ${isPt ? 'Poder: Entra no filtro "✦ Só Aprovados" + placar do Hub.' : 'Unlocks: "✦ Passed Only" filter + Hub scoreboard.'}</div>
+              </div>
+              <div class="tier-card">
+                <div>
+                  <div class="tier-card-top">
+                    <span style="color:var(--accent)">${isPt ? 'NÍVEL 03 · MIELINA ATIVA' : 'TIER 03 · ACTIVE MYELIN'}</span>
+                    <span style="color:var(--muted)">25+ ${isPt ? 'acelerações' : 'accelerations'}</span>
+                  </div>
+                  <div class="tier-card-mid">
+                    ${renderNoosAvatarSvg('@helena-qa-2b', 3)}
+                    <div>
+                      <div class="mielina-handle">@helena-qa-2b</div>
+                      <span class="badge-role" style="margin-top:3px">⚡ ${isPt ? 'Mielina Ativa · Edita Wiki' : 'Active Myelin · Wiki Editor'}</span>
+                    </div>
+                  </div>
+                  <p class="tier-card-desc">${isPt ? 'Duas elipses coaxiais (±35°) abraçam o avatar com dois nós laterais.' : 'Two coaxial ellipses (±35°) wrap the avatar with two lateral nodes.'}</p>
+                </div>
+                <div class="tier-card-unlock">🔓 ${isPt ? 'Poder: Gate Stack Overflow — edita a Síntese Wiki.' : 'Unlocks: Stack Overflow Gate — edits the Wiki Synthesis.'}</div>
+              </div>
+              <div class="tier-card is-hug corner-box">
+                <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+                <div>
+                  <div class="tier-card-top">
+                    <span style="color:var(--signal);font-weight:600">${isPt ? 'NÍVEL 04 · ABRAÇO DA ESFERA' : 'TIER 04 · SPHERE EMBRACE'}</span>
+                    <span style="color:var(--signal)">3+ ${isPt ? 'Sínteses Wiki' : 'Wiki Syntheses'}</span>
+                  </div>
+                  <div class="tier-card-mid">
+                    ${renderNoosAvatarSvg('@vitor-cloud-9f', 4)}
+                    <div>
+                      <div class="mielina-handle">@vitor-cloud-9f</div>
+                      <span class="badge-trap" style="margin-top:3px">🛡️ ${isPt ? 'Nó da Noosfera · Guardião' : 'Noosphere Node · Guardian'}</span>
+                    </div>
+                  </div>
+                  <p class="tier-card-desc" style="color:var(--fg)"><strong>${isPt ? 'O Abraço da Esfera:' : 'The Sphere Embrace:'}</strong> ${isPt ? 'O capuz da Esfera Noos envolve o topo do Identicon e apoia dois nós luminosos nos ombros do perfil.' : 'The Noos Sphere hood wraps the top of the Identicon and rests two luminous nodes on its shoulders.'}</p>
+                </div>
+                <div class="tier-card-unlock" style="color:var(--signal)">🔓 ${isPt ? 'Poder: Aprovar/Reverter Diffs Wiki + Selo Co-autor.' : 'Unlocks: Approve/Revert Wiki Diffs + Co-author Badge.'}</div>
+              </div>
+            </div>
+          </section>`;
+}
+
+function renderDiscussionHead(q, entry, lang) {
   const t = mielinaT(lang);
   const comments = Array.isArray(entry?.comments) ? entry.comments : [];
   const approved = comments.filter((c) => c && c.passed === true).length;
-  return `<header class="mielina-head">
-            <p class="mono mielina-kicker">${escapeHtml(t.sub)}</p>
-            <h2 id="mielina-title" class="mielina-title">${escapeHtml(t.title)}</h2>
-            <p class="mielina-approved"><span class="mono">✦</span> ${approved} ${escapeHtml(t.approved)}</p>
-          </header>`;
+  return `<div class="mielina-box">
+            <header class="mielina-head-top">
+              <div style="flex:1;min-width:220px">
+                <p class="mielina-kicker">${escapeHtml(t.sub)}</p>
+                <h2 id="mielina-title" class="mielina-title">${
+                  lang === 'pt'
+                    ? 'Onde a prova tenta te enganar — <em>e como quem passou resolveu.</em>'
+                    : 'Where the exam tries to trick you — <em>and how those who passed solved it.</em>'
+                }</h2>
+              </div>
+              <div class="mielina-scoreboard">
+                <div class="mielina-score-row">
+                  <span class="mielina-score-num" data-approved-count>${approved}</span>
+                  <span class="mielina-score-label">${escapeHtml(t.approved)}</span>
+                </div>
+                <p class="mielina-score-sub">${escapeHtml(t.approvedSub)}</p>
+              </div>
+            </header>
+            ${renderMatrixInner(q, entry, lang)}
+          </div>`;
 }
 
-function renderMatrix(q, entry, lang) {
+function renderMatrixInner(q, entry, lang) {
   const t = mielinaT(lang);
   const comments = Array.isArray(entry?.comments) ? entry.comments : [];
   const counts = { A: 0, B: 0, C: 0, D: 0 };
@@ -389,67 +501,125 @@ function renderMatrix(q, entry, lang) {
     if (opt === answer) continue;
     if (counts[opt] > 0 && (!trap || counts[opt] > counts[trap])) trap = opt;
   }
-  const cell = (opt) => {
-    const pct = total > 0 ? Math.round((counts[opt] / total) * 100) : 0;
+  const trapHeadline = trap
+    ? `<span class="mono" style="color:var(--signal);text-transform:none;letter-spacing:0">⚠️ ${
+        lang === 'pt'
+          ? `Alternativa ${trap} concentra ${Math.round((counts[trap] / total) * 100)}% das dúvidas`
+          : `Option ${trap} accounts for ${Math.round((counts[trap] / total) * 100)}% of traps`
+      }</span>`
+    : `<span class="mono" style="text-transform:none;letter-spacing:0">${escapeHtml(t.matrixHint)}</span>`;
+
+  const cell = (opt, idx) => {
+    const pct = total > 0 ? Math.round((counts[opt] / total) * 100) : opt === answer ? 100 : 0;
     const cls = ['distractor-cell'];
     if (opt === answer) cls.push('is-answer');
     if (opt === trap) cls.push('is-trap');
-    const tag =
+    const optPreview = shortWords(q.record.snapshot.options[idx] ?? '', 26);
+    const rightLabel =
       opt === answer
-        ? `<span class="distractor-tag">${escapeHtml(t.answer)} ✓</span>`
+        ? `${escapeHtml(t.answer)} ✓`
         : opt === trap
-          ? `<span class="distractor-tag">${escapeHtml(t.trap)}</span>`
-          : '';
+          ? `${pct}% · ${escapeHtml(t.trap)}`
+          : total > 0
+            ? `${pct}%`
+            : escapeHtml(t.dissect);
+    const barWidth = total > 0 ? pct : opt === answer ? 100 : 12;
     return `<button type="button" class="${cls.join(' ')}" data-filter-opt="${opt}" aria-pressed="false">
-              <span class="distractor-letter mono">${opt}</span>
-              <span class="distractor-pct mono">${pct}%</span>
-              ${tag}
-              <span class="distractor-bar"><i style="width:${pct}%"></i></span>
+              <div class="distractor-top">
+                <span class="distractor-letter">ALT ${opt}${opt === answer ? ' ✓' : opt === trap ? ' ⚠️' : ''}</span>
+                <span class="distractor-pct">${rightLabel}</span>
+              </div>
+              <span class="distractor-bar"><i style="width:${barWidth}%"></i></span>
+              <span class="distractor-tag">${escapeHtml(optPreview)}</span>
             </button>`;
   };
-  return `<section class="mielina-box" aria-labelledby="mielina-matrix-title">
-            <h3 id="mielina-matrix-title" class="mielina-section-title">${escapeHtml(t.matrix)}</h3>
-            <p class="mielina-hint">${escapeHtml(t.matrixHint)}</p>
-            <div class="distractor-grid" role="group" aria-label="${escapeHtml(t.matrix)}">
-              ${['A', 'B', 'C', 'D'].map(cell).join('\n              ')}
+  return `<div class="mielina-matrix-wrap" aria-labelledby="mielina-matrix-title">
+            <div class="mielina-matrix-head">
+              <span id="mielina-matrix-title" class="mielina-kicker" style="margin:0">${escapeHtml(t.matrix)}</span>
+              ${trapHeadline}
             </div>
-          </section>`;
+            <div class="distractor-grid" role="group" aria-label="${escapeHtml(t.matrix)}">
+              ${['A', 'B', 'C', 'D'].map((opt, idx) => cell(opt, idx)).join('\n              ')}
+            </div>
+          </div>`;
+}
+
+function renderMatrix() {
+  return '';
 }
 
 function renderSynthesis(q, entry, lang) {
   const t = mielinaT(lang);
   const syn = entry?.synthesis;
-  const refUrl = String(q.record.snapshot.reference ?? '');
+  const refUrl = String(q.record.snapshot.reference ?? '').trim();
+  const refTitle = String(q.record.snapshot.referenceTitle ?? refUrl).trim();
+  const answerLetter = optionLetter(q.answerIndex ?? 0);
   const refLink = isSafeUrl(refUrl)
-    ? `<a class="mielina-source" href="${escapeHtml(refUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(refUrl)}</a>`
-    : '';
+    ? `<a class="mielina-source" href="${escapeHtml(refUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(refTitle || refUrl)}</a>`
+    : `<span style="color:var(--fg)">${escapeHtml(refTitle || refUrl || '—')}</span>`;
   const corners = `<span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>`;
+
   if (!syn || typeof syn !== 'object') {
+    const baselineText =
+      lang === 'pt'
+        ? `Gabarito Oficial (${answerLetter}): ${q.answerText}`
+        : `Official Answer (${answerLetter}): ${q.answerText}`;
     return `<section class="mielina-box pinned" id="sintese-wiki" aria-labelledby="sintese-title">
             ${corners}
-            <h3 id="sintese-title" class="mielina-section-title">${escapeHtml(t.synthesis)}</h3>
+            <div class="mielina-wiki-top">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span id="sintese-title" class="badge-passed">${escapeHtml(t.synthesis)}</span>
+                <span class="mono" style="text-transform:none;letter-spacing:0">rev. #1 (baseline) · CC BY-SA 4.0</span>
+              </div>
+              <a class="mielina-chip" href="#composer">${escapeHtml(t.synthesisCta)} →</a>
+            </div>
             <p class="mielina-empty">${escapeHtml(t.synthesisEmpty)}</p>
-            <p class="mielina-official"><span class="mono">${escapeHtml(t.official)}</span> ${refLink}</p>
-            <a class="mielina-chip" href="#discussao-dinamica">${escapeHtml(t.synthesisCta)} →</a>
+            <p class="mielina-summary"><strong>${escapeHtml(baselineText)}</strong></p>
+            <div class="mielina-official-anchor">
+              <div>
+                <span class="mono" style="color:var(--accent)">${escapeHtml(t.official)}</span>
+                <span style="margin-left:6px">${refLink}</span>
+              </div>
+              <span class="mono" style="text-transform:none;letter-spacing:0">${escapeHtml(q.ns.app)} · ${escapeHtml(q.record.exam)}</span>
+            </div>
           </section>`;
   }
+
   const summary = String(syn.summary ?? '').trim();
   const source = isSafeUrl(syn.sourceUrl) ? syn.sourceUrl : refUrl;
+  const sourceLabel = String(syn.sourceTitle ?? refTitle ?? source).trim();
   const authors = Array.isArray(syn.authors) ? syn.authors.filter(Boolean).map(String) : [];
+  const ver = Math.max(1, Number(syn.version) || 1);
   return `<section class="mielina-box pinned" id="sintese-wiki" aria-labelledby="sintese-title">
             ${corners}
-            <h3 id="sintese-title" class="mielina-section-title">${escapeHtml(t.synthesis)}</h3>
-            <p class="mielina-summary">${escapeHtml(summary)}</p>
-            <p class="mielina-official"><span class="mono">${escapeHtml(t.official)}</span> ${
-              isSafeUrl(source)
-                ? `<a class="mielina-source" href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(String(syn.sourceTitle ?? source))}</a>`
-                : ''
-            }</p>
-            <div class="mielina-wiki-foot">
-              <span class="mono">${escapeHtml(t.coauthors)}: ${authors.map(escapeHtml).join(' · ') || '—'}</span>
-              ${Number(syn.version) >= 2
-                ? `<button class="mielina-chip" type="button" data-wiki-history disabled title="${escapeHtml(lang === 'pt' ? 'Histórico de revisões em breve' : 'Revision history coming soon')}">v${escapeHtml(String(syn.version))} · ${escapeHtml(t.revision)}</button>`
-                : ''}
+            <div class="mielina-wiki-top">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span id="sintese-title" class="badge-passed">${escapeHtml(t.synthesis)}</span>
+                <span class="mono" style="text-transform:none;letter-spacing:0">rev. #${escapeHtml(String(ver))} · CC BY-SA 4.0</span>
+              </div>
+              <button class="mielina-chip" type="button" data-wiki-history aria-pressed="false">↺ v${escapeHtml(String(ver))} · ${escapeHtml(t.revision)}</button>
+            </div>
+            <div data-wiki-read>
+              <p class="mielina-summary">${escapeHtml(summary)}</p>
+              <div class="mielina-official-anchor">
+                <div>
+                  <span class="mono" style="color:var(--accent)">${escapeHtml(t.official)}</span>
+                  <span style="margin-left:6px">${
+                    isSafeUrl(source)
+                      ? `<a class="mielina-source" href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceLabel)}</a>`
+                      : `<span>${escapeHtml(sourceLabel)}</span>`
+                  }</span>
+                </div>
+                <span class="mono" style="text-transform:none;letter-spacing:0">${escapeHtml(t.coauthors)}: ${authors.map(escapeHtml).join(', ') || '—'}</span>
+              </div>
+            </div>
+            <div class="mielina-wiki-diff" data-wiki-diff hidden>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--border)">
+                <span style="color:var(--fg)">${lang === 'pt' ? `COMPARANDO REVISÃO #${Math.max(1, ver - 1)} → #${ver} (ATUAL)` : `COMPARING REVISION #${Math.max(1, ver - 1)} → #${ver} (CURRENT)`}</span>
+                <span style="color:var(--accent)">${lang === 'pt' ? 'Gate Nível 03 (25+ acelerações)' : 'Tier 03 Gate (25+ accelerations)'}</span>
+              </div>
+              <p class="diff-del">- ${escapeHtml(lang === 'pt' ? `Revisão anterior (#${Math.max(1, ver - 1)}): explicação resumida apenas ao texto do gabarito (${answerLetter}).` : `Previous revision (#${Math.max(1, ver - 1)}): summary limited to the official answer (${answerLetter}).`)}</p>
+              <p class="diff-add">+ ${escapeHtml(summary)}</p>
             </div>
           </section>`;
 }
@@ -457,43 +627,57 @@ function renderSynthesis(q, entry, lang) {
 function renderRitual(lang) {
   const t = mielinaT(lang);
   return `<aside class="mielina-ritual" id="ritual-passei" data-ritual hidden aria-label="${escapeHtml(t.ritualTitle)}">
-            <p class="mono mielina-kicker">✦ ${escapeHtml(t.ritualTitle)}</p>
-            <p>${escapeHtml(t.ritualBody)}</p>
+            <div style="display:flex;align-items:flex-start;gap:12px">
+              <span class="badge-passed" style="padding:4px 9px;font-weight:600;margin-top:2px">✦ ${escapeHtml(t.ritualTitle)}</span>
+              <div>
+                <p class="mielina-ritual-quote">${escapeHtml(t.ritualQuote)}</p>
+                <p class="mielina-ritual-sub">${escapeHtml(t.ritualBody)}</p>
+              </div>
+            </div>
             <button type="button" class="mielina-chip" data-ritual-dismiss>${escapeHtml(t.ritualDismiss)} ×</button>
           </aside>`;
 }
 
-function renderFilters(lang) {
+function renderFilters(entry, lang) {
   const t = mielinaT(lang);
+  const comments = Array.isArray(entry?.comments) ? entry.comments : [];
+  const passedCount = comments.filter((c) => c && c.passed === true).length;
   const chips = [
-    { key: 'all', label: t.all, pressed: true },
-    { key: 'passed', label: `✦ ${t.passed}`, pressed: false },
+    { key: 'all', label: `${t.all} (${comments.length})`, pressed: true },
+    { key: 'passed', label: `✦ ${t.passed} (${passedCount})`, pressed: false },
     { key: 'source', label: t.sources, pressed: false },
   ];
-  return `<div class="mielina-filters" role="group" aria-label="${escapeHtml(t.filters)}">
-            ${chips
-              .map(
-                (c) =>
-                  `<button type="button" class="mielina-chip" data-filter="${c.key}" aria-pressed="${c.pressed}">${escapeHtml(c.label)}</button>`,
-              )
-              .join('\n            ')}
+  return `<div class="mielina-filters-bar">
+            <div class="mielina-filters" role="group" aria-label="${escapeHtml(t.filters)}">
+              ${chips
+                .map(
+                  (c) =>
+                    `<button type="button" class="mielina-chip" data-filter="${c.key}" aria-pressed="${c.pressed}">${escapeHtml(c.label)}</button>`,
+                )
+                .join('\n              ')}
+            </div>
+            <button type="button" class="mielina-chip" data-tiers-toggle style="border-color:transparent;color:var(--accent);text-decoration:underline">
+              <span>${escapeHtml(t.howHug)}</span>
+            </button>
           </div>`;
 }
 
-function renderThread(entry, lang) {
+function renderThread(q, entry, lang) {
   const t = mielinaT(lang);
   const comments = Array.isArray(entry?.comments) ? entry.comments.filter((c) => c && typeof c === 'object') : [];
-  const head = `<h3 class="mielina-section-title" id="mielina-thread-title">${escapeHtml(t.threadTitle)}</h3>`;
+  const head = `<h3 class="mielina-kicker" id="mielina-thread-title" style="margin:0">${escapeHtml(t.threadTitle)}</h3>`;
   if (comments.length === 0) {
-    return `<section class="mielina-box" aria-labelledby="mielina-thread-title">
+    return `<section class="mielina-thread" data-thread-list aria-labelledby="mielina-thread-title">
             ${head}
-            <p class="mielina-empty">${escapeHtml(t.threadEmpty)}</p>
+            <div class="mielina-box" data-empty-thread>
+              <p class="mielina-empty" style="margin:0">${escapeHtml(t.threadEmpty)}</p>
+            </div>
           </section>`;
   }
   const cards = comments
     .slice()
     .sort((a, b) => (b.accepted === true) - (a.accepted === true) || (Number(b.accelerations) || 0) - (Number(a.accelerations) || 0))
-    .map((c) => {
+    .map((c, idx) => {
       const tier = Math.min(4, Math.max(1, Number(c.tier) || 1));
       const handle = String(c.handle ?? '@anon').trim();
       const body = String(c.body ?? '').trim();
@@ -501,28 +685,52 @@ function renderThread(entry, lang) {
       const source = isSafeUrl(c.sourceUrl) ? c.sourceUrl : null;
       const accel = Number(c.accelerations) || 0;
       const approved = c.passed === true;
+      const roleIcon = tier === 4 ? '🛡️ ' : tier === 3 ? '⚡ ' : '';
       const badges = [
-        approved ? `<span class="badge-passed">✦ ${escapeHtml(lang === 'pt' ? 'Passei na prova' : 'Passed')}</span>` : '',
-        `<span class="badge-role">${escapeHtml(tierNames[lang][tier] ?? '')}</span>`,
+        approved ? `<span class="badge-passed">✦ ${escapeHtml(lang === 'pt' ? `Passei na prova · ${q.record.exam}` : `Passed · ${q.record.exam}`)}</span>` : '',
+        `<span class="badge-role">${roleIcon}${escapeHtml(tierNames[lang][tier] ?? '')}</span>`,
         c.accepted === true ? `<span class="badge-role">✓ ${escapeHtml(t.accepted)}</span>` : '',
         opt ? `<span class="badge-trap">${escapeHtml(lang === 'pt' ? 'Alternativa' : 'Option')} ${escapeHtml(opt)}</span>` : '',
       ]
         .filter(Boolean)
         .join(' ');
-      return `<article class="mielina-card" data-opt="${escapeHtml(opt)}" data-passed="${approved ? '1' : '0'}" data-source="${source ? '1' : '0'}">
+      const metaSub =
+        tier === 4
+          ? lang === 'pt'
+            ? `${accel} ${t.accelerations} · Abraçado pela Esfera Noos`
+            : `${accel} ${t.accelerations} · Embraced by the Noos Sphere`
+          : `${accel} ${t.accelerations} · ${escapeHtml(q.ns.app)}`;
+      return `<article class="mielina-card${tier === 4 ? ' is-tier-4' : ''}" data-opt="${escapeHtml(opt)}" data-passed="${approved ? '1' : '0'}" data-source="${source ? '1' : '0'}">
               <header class="mielina-card-head">
-                ${renderNoosAvatarSvg(handle, tier)}
-                <div class="mielina-card-id">
-                  <span class="mielina-handle mono">${escapeHtml(handle)}</span>
-                  <span class="mielina-badges">${badges}</span>
+                <div class="mielina-card-author">
+                  <button type="button" class="mielina-avatar-btn" data-tiers-toggle title="${escapeHtml(tierNames[lang][tier] ?? '')}">
+                    ${renderNoosAvatarSvg(handle, tier)}
+                  </button>
+                  <div class="mielina-card-id">
+                    <div class="mielina-handle-row">
+                      <span class="mielina-handle">${escapeHtml(handle)}</span>
+                      ${badges}
+                    </div>
+                    <div class="mielina-author-meta">${escapeHtml(metaSub)}</div>
+                  </div>
                 </div>
-                <span class="mielina-accel mono">▲ ${accel} ${escapeHtml(t.accelerations)}</span>
               </header>
               <p class="mielina-card-body">${escapeHtml(body)}</p>
-              ${source ? `<p class="mielina-official"><span class="mono">${escapeHtml(t.source)}</span> <a class="mielina-source" href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source)}</a></p>` : ''}
+              <footer class="mielina-card-foot">
+                <span>${
+                  source
+                    ? `${escapeHtml(t.source)} <a class="mielina-source" href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source)}</a>`
+                    : escapeHtml(lang === 'pt' ? 'Contribuição verificada sob CC BY-SA 4.0' : 'Verified contribution under CC BY-SA 4.0')
+                }</span>
+                <button type="button" class="mielina-upvote-btn" data-upvote="${escapeHtml(q.record.id)}-${idx}">
+                  <span>▲</span>
+                  <span data-vote-num>${accel}</span>
+                  <span>· ${escapeHtml(t.accelerateBtn)}</span>
+                </button>
+              </footer>
             </article>`;
     });
-  return `<section class="mielina-thread" aria-labelledby="mielina-thread-title">
+  return `<section class="mielina-thread" data-thread-list aria-labelledby="mielina-thread-title">
             ${head}
             ${cards.join('\n            ')}
           </section>`;
@@ -534,28 +742,132 @@ function renderComposer(q, lang) {
   const d = registry.discussions ?? {};
   const repo = escapeHtml(String(d.repo ?? ''));
   const cat = escapeHtml(String(d.categorySlug ?? 'q-a'));
-  const opts = ['A', 'B', 'C', 'D', 'Geral'];
+  const answerIdx = q.answerIndex ?? 0;
+  const answerLetter = optionLetter(answerIdx);
+  const optItems = ['A', 'B', 'C', 'D'].map((letter, idx) => {
+    const preview = shortWords(q.record.snapshot.options[idx] ?? '', 34);
+    const prefix =
+      letter === answerLetter
+        ? lang === 'pt'
+          ? `Gabarito ${letter}`
+          : `Answer ${letter}`
+        : lang === 'pt'
+          ? `Pegadinha na Alternativa ${letter}`
+          : `Trap in Option ${letter}`;
+    return `<option value="${letter}">${escapeHtml(`${prefix} (${preview})`)}</option>`;
+  });
+  optItems.push(
+    `<option value="Geral">${escapeHtml(lang === 'pt' ? 'Dúvida geral sobre o enunciado' : 'General question about the stem')}</option>`,
+  );
+
   return `<section class="mielina-box mielina-composer" id="composer" aria-labelledby="composer-title"
-            data-repo="${repo}" data-category="${cat}" data-term="${id}">
-            <h3 id="composer-title" class="mielina-section-title">${escapeHtml(t.composerTitle)}</h3>
-            <p class="mielina-hint">${escapeHtml(t.composerHint)}</p>
-            <label class="mielina-field">
-              <span class="mono">${escapeHtml(t.composerOpt)}</span>
-              <select data-composer-opt>${opts.map((o) => `<option value="${o}">${o}</option>`).join('')}</select>
-            </label>
-            <label class="mielina-field">
-              <span class="mono">${escapeHtml(t.composerBody)}</span>
-              <textarea data-composer-body rows="3" maxlength="1200" required></textarea>
-            </label>
-            <label class="mielina-field">
-              <span class="mono">${escapeHtml(t.composerSource)}</span>
-              <input data-composer-source type="url" inputmode="url" placeholder="https://" />
-            </label>
-            <div class="mielina-composer-actions">
-              <button type="button" class="mielina-chip" data-composer-publish>${escapeHtml(t.composerPublish)} →</button>
-              <span class="mono mielina-composer-status" data-composer-status role="status" aria-live="polite"></span>
+            data-repo="${repo}" data-category="${cat}" data-term="${id}"
+            data-msg-missing="${escapeHtml(t.composerMissing)}"
+            data-msg-badurl="${escapeHtml(t.composerBadUrl)}"
+            data-msg-ready="${escapeHtml(t.composerReady)}">
+            <div class="mielina-composer-head">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <h3 id="composer-title" class="mielina-kicker" style="margin:0;color:var(--fg);font-weight:600">${escapeHtml(t.composerTitle)}</h3>
+                <span class="badge-passed" data-composer-ritual-tag hidden>✦ ${escapeHtml(t.ritualTitle)}</span>
+              </div>
+              <span class="mono" style="text-transform:none;letter-spacing:0">${escapeHtml(t.composerSub)}</span>
             </div>
+            <div class="mielina-composer-grid">
+              <label class="mielina-field">
+                <span>${escapeHtml(t.composerOpt)}</span>
+                <select data-composer-opt>${optItems.join('')}</select>
+              </label>
+              <label class="mielina-field">
+                <span>${escapeHtml(t.composerFlair)}</span>
+                <select data-composer-flair>
+                  <option value="passed">${escapeHtml(t.composerFlairPassed)}</option>
+                  <option value="studying">${escapeHtml(t.composerFlairStudy)}</option>
+                </select>
+              </label>
+            </div>
+            <label class="mielina-field">
+              <span>${escapeHtml(t.composerBody)}</span>
+              <textarea data-composer-body rows="2" maxlength="1200" placeholder="${escapeHtml(t.composerBodyPlaceholder)}" required></textarea>
+            </label>
+            <div class="mielina-composer-foot">
+              <input class="mielina-source-input" data-composer-source type="url" inputmode="url" placeholder="${escapeHtml(t.composerSourcePlaceholder)}" />
+              <button type="button" class="btn primary" data-composer-publish>
+                <span>${escapeHtml(t.composerPublish)}</span>
+                <span class="arrow">→</span>
+              </button>
+            </div>
+            <span class="mielina-composer-status" data-composer-status role="status" aria-live="polite"></span>
           </section>`;
+}
+
+function renderInteractiveOptions(q, entry, lang) {
+  const comments = Array.isArray(entry?.comments) ? entry.comments : [];
+  const counts = { A: 0, B: 0, C: 0, D: 0 };
+  for (const c of comments) {
+    const opt = String(c?.option ?? '').toUpperCase();
+    if (counts[opt] !== undefined) counts[opt] += 1;
+  }
+  const answerIdx = q.answerIndex ?? 0;
+  const answerLetter = optionLetter(answerIdx);
+  let trapLetter = null;
+  for (const opt of ['A', 'B', 'C', 'D']) {
+    if (opt === answerLetter) continue;
+    if (counts[opt] > 0 && (!trapLetter || counts[opt] > counts[trapLetter])) trapLetter = opt;
+  }
+
+  return q.record.snapshot.options
+    .map((o, idx) => {
+      const letter = optionLetter(idx);
+      const isAns = letter === answerLetter;
+      const isTrap = letter === trapLetter;
+      const count = counts[letter] || 0;
+      const letterCls = ['q-opt-letter'];
+      const btnCls = ['q-opt-anchor'];
+      if (isAns) {
+        letterCls.push('is-answer');
+        btnCls.push('is-answer');
+      } else if (isTrap) {
+        letterCls.push('is-trap');
+        btnCls.push('is-trap');
+      }
+      const icon = isAns ? '✓' : isTrap ? '⚠️' : '💬';
+      const label = count > 0 ? `${icon} ${count}` : `${icon} ${letter}`;
+      const title =
+        lang === 'pt'
+          ? `Filtrar discussão da Alternativa ${letter}`
+          : `Filter discussion for Option ${letter}`;
+      return `<li class="q-opt-item" data-opt-box="${letter}">
+                <span class="${letterCls.join(' ')}">${letter}.</span>
+                <span class="q-opt-text">${escapeHtml(o)}</span>
+                <button type="button" class="${btnCls.join(' ')}" data-filter-opt="${letter}" aria-pressed="false" title="${escapeHtml(title)}">${label}</button>
+              </li>`;
+    })
+    .join('\n              ');
+}
+
+function renderGravityBlock(q, lang) {
+  const t = mielinaT(lang);
+  const siblings = accepted.filter((other) => other.prefix !== q.prefix && !isRetired(other.record));
+  const pool = siblings.length > 0 ? siblings : accepted.filter((other) => other.record.id !== q.record.id);
+  if (pool.length === 0) return '';
+  const target = pool[(q.lineNumber || 0) % pool.length];
+  const targetUrl = `/${lang}/q/${target.record.id}/`;
+  const targetPreview = shortWords(target.record.snapshot.statement, 58);
+  const desc =
+    lang === 'pt'
+      ? `Quem estuda ${q.record.exam} no ${q.ns.app} também explora raciocínio analítico correlato no ${target.ns.app}:`
+      : `Those studying ${q.record.exam} on ${q.ns.app} also explore related analytical reasoning on ${target.ns.app}:`;
+  return `<aside class="q-gravity" aria-label="${escapeHtml(t.gravityLabel)}">
+            <span class="mono">${escapeHtml(t.gravityLabel)}</span>
+            <p class="q-gravity-desc">${escapeHtml(desc)}</p>
+            <a class="q-gravity-link" href="${escapeHtml(targetUrl)}">
+              <span style="display:inline-flex;align-items:center;gap:8px;min-width:0">
+                <i class="q-gravity-dot" style="--c:${escapeHtml(target.ns.color ?? 'var(--accent)')}"></i>
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(target.record.id)} · ${escapeHtml(targetPreview)}</span>
+              </span>
+              <span style="color:var(--accent);white-space:nowrap">${escapeHtml(t.gravityCta)}</span>
+            </a>
+          </aside>`;
 }
 
 const langNote = (recordLang, pageLang) => {
@@ -578,13 +890,15 @@ const commonMap = (q, lang) => {
     DIFFICULTY: escapeHtml(r.difficulty),
     LANG_NOTE: langNote(r.lang, lang),
     STATEMENT: escapeHtml(r.snapshot.statement),
-    OPTIONS: r.snapshot.options.map((o) => `<li>${escapeHtml(o)}</li>`).join('\n        '),
-    DISCUSSION_HEAD: renderDiscussionHead(entry, lang),
+    OPTIONS: renderInteractiveOptions(q, entry, lang),
+    GRAVITY_BLOCK: renderGravityBlock(q, lang),
+    TIERS_DRAWER: renderTiersDrawer(lang),
+    DISCUSSION_HEAD: renderDiscussionHead(q, entry, lang),
     DISCUSSION_MATRIX: renderMatrix(q, entry, lang),
     DISCUSSION_SYNTHESIS: renderSynthesis(q, entry, lang),
     RITUAL_BANNER: renderRitual(lang),
-    DISCUSSION_FILTERS: renderFilters(lang),
-    DISCUSSION_THREAD: renderThread(entry, lang),
+    DISCUSSION_FILTERS: renderFilters(entry, lang),
+    DISCUSSION_THREAD: renderThread(q, entry, lang),
     DISCUSSION_COMPOSER: renderComposer(q, lang),
     DISCUSSIONS_BLOCK: discussionsBlock(r.id, lang),
     ANSWER_BLOCK: isRetired(r)
@@ -745,11 +1059,11 @@ if (QA) {
   expect(ptHtml.includes('nº 42 da prova AZ-900'), 'enunciado presente na página PT');
   expect(ptHtml.includes('<details class="q-answer">'), 'gabarito em <details> (fechado por padrão)');
   if (registry.discussions?.enabled) {
-    expect(ptHtml.includes('giscus.app/client.js'), 'discussões ligadas: bloco giscus presente na página canônica');
-    expect(ptHtml.includes(`data-term="${accepted[0].record.id}"`), 'giscus usa term = ID público (uma conversa por questão)');
-    expect(!existsSync(path.join(OUT_DIR, 'pt', 'q', 'GLI-AZ900-00012', 'index.html')) || !(await readFile(path.join(OUT_DIR, 'pt', 'q', 'GLI-AZ900-00012', 'index.html'), 'utf8')).includes('giscus'), 'alias/redirect não recebem bloco de discussão');
+    expect(!ptHtml.includes('giscus.app/client.js'), 'opção A: zero iframe do giscus na página (100% Camada de Mielina nativa)');
+    expect(ptHtml.includes(`data-term="${accepted[0].record.id}"`), 'compositor usa term = ID público (uma conversa por questão)');
+    expect(!existsSync(path.join(OUT_DIR, 'pt', 'q', 'GLI-AZ900-00012', 'index.html')) || !(await readFile(path.join(OUT_DIR, 'pt', 'q', 'GLI-AZ900-00012', 'index.html'), 'utf8')).includes('data-term='), 'alias/redirect não recebem bloco de discussão');
   } else {
-    expect(!ptHtml.includes('giscus.app'), 'discussões desligadas por padrão (sem giscus até o app ser instalado)');
+    expect(!ptHtml.includes('giscus.app'), 'discussões desligadas por padrão');
   }
   expect(
     ptHtml.includes('sha256:da215a61f90cc5a363c6c49cf50f592a000587cbe38f55ef3a5d1c6ff2b036a7'),
@@ -769,11 +1083,30 @@ if (QA) {
   expect(ptHtml.includes('class="distractor-cell is-trap"'), 'matriz marca a pegadinha mais debatida');
   expect(ptHtml.includes('id="sintese-wiki"'), 'síntese consolidada presente');
   expect(ptHtml.includes('noos-identicon tier-3'), 'avatar identicon com tier de reputação');
+  expect(ptHtml.includes('noos-identicon tier-4'), 'avatar identicon Nível 4 (Abraço da Esfera) presente');
+  expect(ptHtml.includes('id="tiers-showcase"'), 'painel expansível dos 4 níveis do Abraço da Esfera presente');
+  expect(ptHtml.includes('class="q-problem-card corner-box"'), 'coluna esquerda com card emoldurado e cantoneiras ópticas');
+  expect(ptHtml.includes('class="q-opt-item"'), 'alternativas renderizadas como cartões de leitura com âncora');
+  expect(ptHtml.includes('data-copy-id='), 'botão Citar ID presente no cabeçalho da questão');
+  expect(ptHtml.includes('class="q-gravity"'), 'barra de gravidade cross-app presente');
+  expect(ptHtml.includes('data-wiki-diff'), 'bloco de diff inline da síntese wiki presente');
+  expect(ptHtml.includes('data-upvote='), 'botão interativo de aceleração presente');
   expect(ptHtml.includes('Passei na prova'), 'flair de aprovado presente');
   expect(ptHtml.includes('data-filter-opt="B"'), 'âncora de discussão por alternativa');
   expect(ptHtml.includes('data-composer-publish'), 'compositor guiado presente');
   expect(ptHtml.includes('/js/mielina.js'), 'hidratação progressiva carregada');
   expect(!ptHtml.includes('by Noos'), 'zero "by Noos" na discussão');
+  const { parseStructured } = await import('../scripts/sync-discussao.mjs');
+  const sampleParsed = parseStructured(
+    '**Alternativa que confundiu:** B\n**Status:** ✦ Passei na prova!\n\n**O que a documentação oficial não conta de primeira:**\nConfundi o SLA composto.\n\n**Fonte oficial:** https://learn.microsoft.com/azure/sla',
+  );
+  expect(
+    sampleParsed.option === 'B' &&
+      sampleParsed.passed === true &&
+      sampleParsed.explanation === 'Confundi o SLA composto.' &&
+      sampleParsed.sourceUrl === 'https://learn.microsoft.com/azure/sla',
+    'sync-discussao: parser extrai alternativa, status aprovado, explicação e fonte do Compositor Guiado',
+  );
   const retiredHtml = existsSync(path.join(OUT_DIR, 'pt', 'q', 'RAN-AZ900-00044', 'index.html'))
     ? await readFile(path.join(OUT_DIR, 'pt', 'q', 'RAN-AZ900-00044', 'index.html'), 'utf8')
     : '';
@@ -819,7 +1152,7 @@ if (QA) {
       );
       let cursor = -1;
       const ordered = q.record.snapshot.options.every((option) => {
-        const at = html.indexOf(`<li>${escapeHtml(option)}</li>`);
+        const at = html.indexOf(`<span class="q-opt-text">${escapeHtml(option)}</span>`);
         if (at === -1 || at < cursor) return false;
         cursor = at;
         return true;

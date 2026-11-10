@@ -1,7 +1,14 @@
-# discussao/ — dumps estáticos da Camada de Mielina (F2.1)
+# discussao/ — dumps estáticos da Camada de Mielina (F2.2)
 
-Contrato opcional lido pelo `build/gera-questoes.mjs` **sem rede** (pitfall #7 do kit):
-um arquivo por prefixo (`discussao/RAN.json`, `discussao/SYN.json`), chaveado pelo ID público.
+Contrato lido pelo `build/gera-questoes.mjs` **sem rede** (o gerador nunca faz
+fetch). Arquivos por prefixo (`discussao/RAN.json`, `discussao/SYN.json`),
+chaveados pelo ID público.
+
+**Origem:** os dumps são gerados por `scripts/sync-discussao.mjs` a partir do
+GitHub Discussions (`ironidesflj/noos-hub`, categoria Q&A; título = ID público):
+o script lê o **post raiz + comentários**, parseia o corpo estruturado do
+Compositor Guiado e escreve o JSON. O workflow `sync-discussao.yml` roda
+diariamente (06:23 UTC) e abre PR. O build **não** acessa a rede.
 
 ```json
 {
@@ -22,18 +29,23 @@ um arquivo por prefixo (`discussao/RAN.json`, `discussao/SYN.json`), chaveado pe
         "body": "Explicação com fonte…",
         "sourceUrl": "https://learn.microsoft.com/…",
         "accelerations": 27,
-        "accepted": true
+        "accepted": true,
+        "createdAt": "2026-11-10T18:56:35Z"
       }
     ]
   }
 }
 ```
 
-- **Todo texto é não confiável**: o gerador passa por `escapeHtml()`; o cliente
-  hidrata só atributos e `textContent` (pitfall #11).
-- `sourceUrl` só é renderizado se o protocolo for **https:**.
-- `tier` 1–4 segue os gates de reputação da `spec-discussao-questao.md` §4.
-- Sem dump para um ID: a página mostra o **estado vazio orientador** com a referência
-  oficial do manifesto e convida a primeira contribuição (nada é inventado).
-- O fio dinâmico continua no **giscus** (`#discussao-dinamica`); este arquivo é o
-  snapshot estático revisável (indexável), não substitui a conversa ao vivo.
+- `synthesis` é **curadoria** e o sync **preserva** o bloco existente; sem
+  síntese curada, o gerador publica a **baseline v1 automática** (gabarito +
+  fonte oficial do manifesto).
+- `tier` 1–4 é derivado no sync (reações, fontes, respostas aceitas,
+  aprovação) com overrides em `discussao/authors.json`; segue os gates da
+  `spec-discussao-questao.md` §4.
+- **Todo texto é não confiável:** o gerador passa por `escapeHtml()` e o
+  cliente só usa `textContent`; `sourceUrl` só é renderizado se `https:`.
+- Sem dump para um ID: estado orientador com a referência oficial do
+  manifesto — nada é inventado.
+- **Sem giscus:** o fio ao vivo é o GitHub Discussions; a página é a UI
+  nativa (Opção A) e o dump é o snapshot estático revisável/indexável.

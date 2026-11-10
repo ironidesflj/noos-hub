@@ -1,7 +1,7 @@
 {
   "name": "noos-hub",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.5.0",
   "type": "module",
   "description": "noos.study — a marca-mãe do ecossistema Noos. Site estático + build das páginas /q/{ID} (spec-pagina-de-questao.md). O Axon é devDependency de build com pin exato — nada dele embarca no output servido.",
   "scripts": {
