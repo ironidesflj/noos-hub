@@ -75,3 +75,5 @@ aluno (`constitution.md`). Não repete o que já está em `current-state.md`,
 - **2026-11-09:** Axon pin 0.3.0; página `/q/{ID}` suporta `retired` (política epitáfio, MINOR): questão retirada mantém a página canônica com aviso e **sem gabarito interativo**; sitemap permanece. QA cobre ativa + retirada no fixture.
 
 - **2026-11-09:** CSP em **Report-Only** nos headers (`Content-Security-Policy-Report-Only`): coleta violações sem bloquear o site; quando estabilizar, vira enforce. Sem impacto nas páginas atuais.
+
+- **2026-11-10:** discussões por questão (giscus) implementadas como **opt-in**: config em `noos.registry.json` (`discussions`, repo/categoria Q&A do próprio hub), bloco só nas páginas canônicas com `data-term` = ID, CSP libera giscus.app. `enabled:false` até o app giscus ser instalado no repositório (uma ação no GitHub); ao ligar, o widget passa a valer nas 1031 páginas.

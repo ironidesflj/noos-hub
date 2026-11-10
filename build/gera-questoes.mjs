@@ -201,6 +201,36 @@ const refBlock = (reference, lang) =>
     ? `<p class="q-ref"><strong>${lang === 'pt' ? 'Referência' : 'Reference'}:</strong> ${escapeHtml(reference)}</p>`
     : '';
 
+const discussionsBlock = (id, lang) => {
+  const d = registry.discussions;
+  if (!d || !d.enabled || !d.repoId || !d.categoryId) return '';
+  const label =
+    lang === 'pt' ? 'Conversar sobre esta questão' : 'Discuss this question';
+  return `<details class="q-talk">
+          <summary>${escapeHtml(label)}</summary>
+          <div class="giscus"></div>
+          <script src="https://giscus.app/client.js"
+            data-repo="${escapeHtml(d.repo)}"
+            data-repo-id="${escapeHtml(d.repoId)}"
+            data-category="${escapeHtml(d.category)}"
+            data-category-id="${escapeHtml(d.categoryId)}"
+            data-mapping="specific"
+            data-term="${escapeHtml(id)}"
+            data-reactions-enabled="${escapeHtml(String(d.react ?? 1))}"
+            data-emit-metadata="0"
+            data-input-position="bottom"
+            data-theme="preferred_color_scheme"
+            data-lang="${lang}"
+            crossorigin="anonymous"
+            async></script>
+          <noscript><p class="q-talk-fallback">${escapeHtml(
+            lang === 'pt'
+              ? 'Ative o JavaScript para comentar ou abra as discussões no GitHub.'
+              : 'Enable JavaScript to comment, or open the discussions on GitHub.',
+          )}</p></noscript>
+        </details>`;
+};
+
 const ctaBlock = (ns, lang) =>
   ns.url
     ? `<div class="q-cta"><a class="btn primary" href="${escapeHtml(ns.url)}" target="_blank" rel="noopener">${lang === 'pt' ? `Treinar esta prova no ${escapeHtml(ns.app)}` : `Train this exam on ${escapeHtml(ns.app)}`} <span class="arrow">→</span></a></div>`
@@ -226,6 +256,7 @@ const commonMap = (q, lang) => {
     LANG_NOTE: langNote(r.lang, lang),
     STATEMENT: escapeHtml(r.snapshot.statement),
     OPTIONS: r.snapshot.options.map((o) => `<li>${escapeHtml(o)}</li>`).join('\n        '),
+    DISCUSSIONS_BLOCK: discussionsBlock(r.id, lang),
     ANSWER_BLOCK: isRetired(r)
       ? ''
       : `<details class="q-answer">
@@ -383,6 +414,7 @@ if (QA) {
   // escape e conteúdo
   expect(ptHtml.includes('nº 42 da prova AZ-900'), 'enunciado presente na página PT');
   expect(ptHtml.includes('<details class="q-answer">'), 'gabarito em <details> (fechado por padrão)');
+  expect(!ptHtml.includes('giscus.app'), 'discussões desligadas por padrão (sem giscus até o app ser instalado)');
   expect(
     ptHtml.includes('sha256:da215a61f90cc5a363c6c49cf50f592a000587cbe38f55ef3a5d1c6ff2b036a7'),
     'checksum completo na proveniência',
