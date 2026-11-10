@@ -18,7 +18,11 @@ diariamente (06:23 UTC) e abre PR. O build **não** acessa a rede.
       "sourceUrl": "https://learn.microsoft.com/…",
       "sourceTitle": "Fonte oficial",
       "authors": ["@handle-1", "@handle-2"],
-      "version": 3
+      "version": 3,
+      "revisions": [
+        { "version": 1, "summary": "Baseline…", "sourceUrl": "https://…", "authors": ["@baseline"], "updatedAt": "2026-11-10" },
+        { "version": 3, "summary": "Texto consolidado atual…", "sourceUrl": "https://…", "authors": ["@a", "@b"], "updatedAt": "2026-11-11" }
+      ]
     },
     "comments": [
       {
@@ -40,6 +44,13 @@ diariamente (06:23 UTC) e abre PR. O build **não** acessa a rede.
 - `synthesis` é **curadoria** e o sync **preserva** o bloco existente; sem
   síntese curada, o gerador publica a **baseline v1 automática** (gabarito +
   fonte oficial do manifesto).
+- `synthesis.revisions[]` é o **histórico real**: com ≥2 revisões o gerador
+  mostra o diff `#n-1 → #n` com o texto anterior; sem histórico, declara
+  “histórico a partir da próxima curadoria”. O sync **preserva** o array.
+- **Curadoria (manual, por PR):** atualize `summary`, `sourceUrl`,
+  `sourceTitle`, `authors`, `version` e **anexe** uma entrada em `revisions[]`
+  (version = nova versão). O build valida o contrato e renderiza o diff; o
+  gate de reversão auditável (Nível 4) ainda é um fluxo a definir.
 - `tier` 1–4 é derivado no sync (reações, fontes, respostas aceitas,
   aprovação) com overrides em `discussao/authors.json`; segue os gates da
   `spec-discussao-questao.md` §4.

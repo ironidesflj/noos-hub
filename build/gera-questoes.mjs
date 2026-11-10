@@ -590,6 +590,30 @@ function renderSynthesis(q, entry, lang) {
   const sourceLabel = String(syn.sourceTitle ?? refTitle ?? source).trim();
   const authors = Array.isArray(syn.authors) ? syn.authors.filter(Boolean).map(String) : [];
   const ver = Math.max(1, Number(syn.version) || 1);
+  /* Histórico REAL de revisões (schema: syn.revisions[] com version+summary+fonte).
+     Só renderiza Diff quando existem pelo menos duas revisões arquivadas —
+     nunca inventa "revisão anterior". Dumps antigos sem revisions mostram o
+     estado honesto "histórico a partir da próxima curadoria". */
+  const revisions = (Array.isArray(syn.revisions) ? syn.revisions : [])
+    .filter((r) => r && typeof r === 'object' && typeof r.summary === 'string' && r.summary.trim())
+    .slice()
+    .sort((a, b) => (Number(a.version) || 0) - (Number(b.version) || 0));
+  const prevRev = revisions.length >= 2 ? revisions[revisions.length - 2] : null;
+  const prevVer = prevRev ? Math.max(1, Number(prevRev.version) || 1) : null;
+  const historyChip = prevRev
+    ? `<button class="mielina-chip" type="button" data-wiki-history aria-pressed="false">↺ v${escapeHtml(String(ver))} · ${escapeHtml(t.revision)}</button>`
+    : `<span class="mono" style="text-transform:none;letter-spacing:0">rev. #${escapeHtml(String(ver))} · ${escapeHtml(lang === 'pt' ? 'histórico a partir da próxima curadoria' : 'history from the next curation')}</span>`;
+  const diffBlock = prevRev
+    ? `<div class="mielina-wiki-diff" data-wiki-diff hidden>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--border)">
+                <span style="color:var(--fg)">${lang === 'pt' ? `COMPARANDO REVISÃO #${prevVer} → #${ver} (ATUAL)` : `COMPARING REVISION #${prevVer} → #${ver} (CURRENT)`}</span>
+                <span style="color:var(--accent)">${lang === 'pt' ? 'Gate Nível 03 (25+ acelerações)' : 'Tier 03 Gate (25+ accelerations)'}</span>
+              </div>
+              <p class="diff-del">- ${escapeHtml(String(prevRev.summary))}</p>
+              <p class="diff-add">+ ${escapeHtml(summary)}</p>
+              ${isSafeUrl(prevRev.sourceUrl) ? `<p class="mielina-official"><span class="mono">${escapeHtml(t.source)} (rev. #${prevVer})</span> <a class="mielina-source" href="${escapeHtml(prevRev.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(String(prevRev.sourceTitle || prevRev.sourceUrl))}</a></p>` : ''}
+            </div>`
+    : '';
   return `<section class="mielina-box pinned" id="sintese-wiki" aria-labelledby="sintese-title">
             ${corners}
             <div class="mielina-wiki-top">
@@ -597,7 +621,7 @@ function renderSynthesis(q, entry, lang) {
                 <span id="sintese-title" class="badge-passed">${escapeHtml(t.synthesis)}</span>
                 <span class="mono" style="text-transform:none;letter-spacing:0">rev. #${escapeHtml(String(ver))} · CC BY-SA 4.0</span>
               </div>
-              <button class="mielina-chip" type="button" data-wiki-history aria-pressed="false">↺ v${escapeHtml(String(ver))} · ${escapeHtml(t.revision)}</button>
+              ${historyChip}
             </div>
             <div data-wiki-read>
               <p class="mielina-summary">${escapeHtml(summary)}</p>
@@ -613,14 +637,7 @@ function renderSynthesis(q, entry, lang) {
                 <span class="mono" style="text-transform:none;letter-spacing:0">${escapeHtml(t.coauthors)}: ${authors.map(escapeHtml).join(', ') || '—'}</span>
               </div>
             </div>
-            <div class="mielina-wiki-diff" data-wiki-diff hidden>
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--border)">
-                <span style="color:var(--fg)">${lang === 'pt' ? `COMPARANDO REVISÃO #${Math.max(1, ver - 1)} → #${ver} (ATUAL)` : `COMPARING REVISION #${Math.max(1, ver - 1)} → #${ver} (CURRENT)`}</span>
-                <span style="color:var(--accent)">${lang === 'pt' ? 'Gate Nível 03 (25+ acelerações)' : 'Tier 03 Gate (25+ accelerations)'}</span>
-              </div>
-              <p class="diff-del">- ${escapeHtml(lang === 'pt' ? `Revisão anterior (#${Math.max(1, ver - 1)}): explicação resumida apenas ao texto do gabarito (${answerLetter}).` : `Previous revision (#${Math.max(1, ver - 1)}): summary limited to the official answer (${answerLetter}).`)}</p>
-              <p class="diff-add">+ ${escapeHtml(summary)}</p>
-            </div>
+            ${diffBlock}
           </section>`;
 }
 
@@ -1093,6 +1110,8 @@ if (QA) {
   expect(ptHtml.includes('data-upvote='), 'botão interativo de aceleração presente');
   expect(ptHtml.includes('Passei na prova'), 'flair de aprovado presente');
   expect(ptHtml.includes('data-filter-opt="B"'), 'âncora de discussão por alternativa');
+  expect(ptHtml.includes('data-wiki-diff'), 'diff de histórico real presente quando há revisões arquivadas');
+  expect(ptHtml.includes('Síntese inicial: unicidade'), 'diff mostra a revisão anterior real, não síntese fabricada');
   expect(ptHtml.includes('data-composer-publish'), 'compositor guiado presente');
   expect(ptHtml.includes('/js/mielina.js'), 'hidratação progressiva carregada');
   expect(!ptHtml.includes('by Noos'), 'zero "by Noos" na discussão');
