@@ -38,8 +38,17 @@ com os apps; o estado operacional fica em `current-state.md`.
   síntese, avatares, diff, compositor, zero giscus).
 - **Números do último build local:** 1.031 aceitas (RAN 600 + SYN 431),
   2.062 páginas canônicas, 1.031 redirects, sitemap 1.033.
-- **Versão do sistema 1.5.0** (registry + rodapés PT/EN) e
-  `library.version` 0.3.0; `package.json` alinhado a 1.5.0.
+- **Versão do sistema 1.6.0** (registry + rodapés PT/EN) e
+  `library.version` 0.3.0; `package.json` alinhado a 1.6.0.
+
+## Feito — 2026-11-10 (2) · hardening e histórico real
+
+- **CSP em enforce:** `Content-Security-Policy` sem `unsafe-inline` para scripts
+  e sem `giscus.app`; scripts inline externalizados (`theme-boot`, `lang-redirect`,
+  `redirect`); testado localmente com 0 violações em home/questão/redirect/404.
+- **Histórico real de síntese:** `synthesis.revisions[]` com diff `#n-1 → #n`
+  usando o texto anterior real; dumps sem histórico mostram estado honesto.
+- **QA 61 asserções** mantido; build 1.031/2.062/1.031; versão **1.6.0**.
 
 ## Pendente
 
@@ -49,11 +58,13 @@ com os apps; o estado operacional fica em `current-state.md`.
 - **Curadoria da síntese:** fluxo editorial para transformar contribuições
   aprovadas em versão consolidada (hoje o dump permite síntese manual, e o
   baseline v1 cobre o resto).
-- **Histórico de revisões real:** o diff atual compara as duas últimas versões;
-  falta dump de revisões anteriores e reversão auditável.
+- **Histórico de revisões:** mecanismo implementado (`synthesis.revisions[]`,
+  diff real quando há ≥2 revisões); falta a **curadoria preencher** os dumps
+  atuais e definir a reversão auditável (gate Nível 4).
 - **Promoção automática de “resposta aceita”** e gates de reputação completos
   (o tier já é derivado; falta vínculo com resposta aceita).
-- **CSP em enforce** (hoje Report-Only); monitor do GitHub (workflow agendado é
+- **Self-host das Google Fonts** (a CSP enforce libera `fonts.googleapis.com`/
+  `fonts.gstatic.com` por enquanto); monitor do GitHub (workflow agendado é
   desativado após ~60 dias sem atividade); avaliar Next.js só se a F2 pedir
   mais interação.
 

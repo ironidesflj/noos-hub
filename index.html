@@ -24,26 +24,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Instrument+Sans:ital,wght@0,400..600;1,400&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..500;1,6..72,200..400&amp;display=swap" rel="stylesheet">
-<script>
-/* Política de idioma (Carta do Projeto, cap. 7):
-   o idioma do dispositivo manda; o inglês é o fallback universal;
-   a troca manual é sempre visível e persiste (localStorage 'noos-lang'). */
-(function(){
-  var target='en';
-  try{
-    var saved=localStorage.getItem('noos-lang');
-    if(saved==='pt'||saved==='en'){target=saved;}
-    else{
-      var nav=(navigator.languages&&navigator.languages[0])||navigator.language||'en';
-      target=String(nav).toLowerCase().indexOf('pt')===0?'pt':'en';
-    }
-  }catch(e){}
-  location.replace(target+'/');
-})();
-</script>
-<script>
-(function(){try{var t=localStorage.getItem('noos-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
-</script>
+<script src="/js/lang-redirect.js"></script>
+<script src="/js/theme-boot.js"></script>
 <link rel="stylesheet" href="/css/noos.css" />
 </head>
 <body>

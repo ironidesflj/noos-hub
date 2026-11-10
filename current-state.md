@@ -1,6 +1,6 @@
 # Estado atual — Noos Hub
 
-Revisão documental: **10/11/2026** · versão do sistema: **1.5.0**.
+Revisão documental: **10/11/2026** · versão do sistema: **1.6.0**.
 
 > **Nota operacional (10/11/2026):** este checkout está **33 commits atrás de `origin/main`** e recebeu a implementação da Camada de Mielina v2 como mudanças não commitadas. Antes de publicar: reconciliar com `origin/main`, rodar `npm ci && npm run build && npm run qa` e só então commit/push (ver `memory.md`).
 
@@ -11,7 +11,7 @@ Revisão documental: **10/11/2026** · versão do sistema: **1.5.0**.
 - **1.031 questões publicadas:** `RAN.jsonl` 600 (Ranvier — DBDEA 300 + AZ-900 300) e `SYN.jsonl` 431 (Synapse — CTFL/CTAL-TA/CTAL-TM). No último build local: **1.031 aceitas, 0 rejeitadas, 2.062 páginas canônicas (PT+EN), 1.031 redirects sem idioma** e **sitemap com 1.033 entradas** (2 da base + 1.031 PT).
 - As páginas publicam o gabarito como **texto da alternativa correta** (v12, decisões D1+D3), derivado de `snapshot.answer` (letra A–D **ou** texto, resolvido pelo gerador) e `snapshot.options`; a letra isolada não é publicada. `npm run qa` tem assert de paridade página ↔ manifesto por questão e idioma.
 - **Questões retiradas seguem a política epitáfio (Axon 0.3.0):** página canônica mantida com aviso, sem bloco de gabarito, no sitemap; alias continua resolvendo.
-- **Headers de segurança:** CSP em `Content-Security-Policy-Report-Only` + `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` (ver `vercel.json`).
+- **Headers de segurança:** CSP em **enforce** (`Content-Security-Policy`, sem `unsafe-inline` para scripts e sem domínios do giscus; Google Fonts liberado em `style-src`/`font-src` até o self-host) + `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` (ver `vercel.json`).
 - **CI:** placeholders, paridade PT/EN, referências locais, geração das páginas, `npm run qa` (**61 asserções**), sitemap e `sdd-lint` (registro ↔ rodapés PT/EN).
 - **Monitoramento:** `.github/workflows/monitor.yml` checa hub/apps a cada 15 min e abre/fecha issue em falha.
 
@@ -21,7 +21,7 @@ Página `/q/{ID}/` dual-column (≥1024px), questão sticky à esquerda e discus
 
 - **Coluna da questão:** cabeçalho dentro de cartão com cantoneiras, botão **Citar ID**, alternativas em cartões clicáveis com âncoras de discussão (`✓` gabarito, `⚠️` pegadinha, `💬` debater), bloco de proveniência e **Gravidade Cross-App**.
 - **Matriz de dissecção (A–D):** distribuição das contribuições; gabarito em `--accent`, pegadinha mais debatida em `--signal`; clicar filtra.
-- **Síntese consolidada:** versão curada quando existe dump; caso contrário **baseline v1 automática** com o gabarito e a fonte oficial do manifesto; botão de **Diff inline** (`v(n-1) → v(n)`) com gate de reputação.
+- **Síntese consolidada:** versão curada quando existe dump; caso contrário **baseline v1 automática** com o gabarito e a fonte oficial do manifesto. O dump aceita `synthesis.revisions[]`; quando há ≥2 revisões arquivadas, o botão **Diff** mostra o **histórico real** (`#n-1 → #n`) com o texto anterior e a fonte da revisão; sem histórico arquivado, a página informa “histórico a partir da próxima curadoria” (nunca inventa revisão).
 - **Reputação/“Abraço da Esfera”:** identicon determinístico 5×5 + 4 níveis SVG; **tier derivado no sync** (reações, fontes, aprovação, respostas aceitas) com overrides em `discussao/authors.json`; botão **▲ Acelerar** com persistência local.
 - **Ritual “Passei na prova!”:** `?ritual=passed&trap=C`, flair e compositor guiado; **publicação otimista** do card + abertura da Discussion pré-preenchida no GitHub.
 - **Sem iframe do giscus (Opção A):** toda a UI é nativa. O **GitHub Discussions** (`ironidesflj/noos-hub`, categoria Q&A) é o back-end: o compositor publica com título = ID e corpo estruturado; o **sync diário** (`sync-discussao.yml`, 06:23 UTC) lê post raiz + comentários, calcula tiers, **preserva `synthesis`** e abre PR com `discussao/{PREFIX}.json`.
@@ -39,7 +39,8 @@ Página `/q/{ID}/` dual-column (≥1024px), questão sticky à esquerda e discus
 - `npm run qa` → **61/61 PASS** (fixture; inclui paridade PT/EN, cantoneiras, 4 níveis de avatar, diff, compositor e zero iframe do giscus).
 - `npm run build` → **1.031 aceitas / 0 rejeitadas**, 2.062 páginas canônicas, 1.031 redirects, sitemap com 1.033 entradas.
 - Layout verificado em 320 px, 640 px (200% zoom em 1280) e 1920 px sem overflow horizontal; sticky com scroll interno.
-- **Pendências conhecidas:** histórico de revisões real (o diff atual compara as duas últimas versões do dump), fluxo de curadoria da síntese, promoção automática de “resposta aceita”, CSP em enforce e reconciliação do checkout com `origin/main`.
+- **CSP enforce testado localmente** com servidor enviando o header: 0 violações em home, questão, redirect e 404; tema e filtros funcionando; scripts inline eliminados (`js/theme-boot.js`, `js/lang-redirect.js`, `js/redirect.js`).
+- **Pendências conhecidas:** curadoria editorial das sínteses (o schema de `revisions` está pronto, mas os dumps atuais ainda não têm histórico arquivado), promoção automática de “resposta aceita”, self-host das Google Fonts (hoje liberadas na CSP) e testes de CSP no preview. Cruzamento de reputação com upvote local segue em estudo (documentado no `plan.md`).
 
 ## Limites
 

@@ -4,8 +4,44 @@
       "summary": "A ID pública precisa ser única, estável e legível por humanos. O formato canônico é RAN-{EXAM}-{SEQ} com cinco dígitos; a sequência nunca é reciclada e um alias antigo continua redirecionando para a canônica.",
       "sourceUrl": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org",
       "sourceTitle": "Microsoft Learn — resource organization",
-      "authors": ["@vitor-cloud-9f", "@cintia-v8f"],
-      "version": 3
+      "authors": [
+        "@vitor-cloud-9f",
+        "@cintia-v8f"
+      ],
+      "version": 3,
+      "revisions": [
+        {
+          "version": 1,
+          "summary": "Gabarito Oficial (B): a alternativa canônica é RAN-AZ900-00042 (baseline automática).",
+          "sourceUrl": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org",
+          "sourceTitle": "Microsoft Learn — resource organization",
+          "authors": [
+            "@noos-baseline"
+          ],
+          "updatedAt": "2026-11-10"
+        },
+        {
+          "version": 2,
+          "summary": "Síntese inicial: unicidade + estabilidade do ID, sem reciclagem de sequência.",
+          "sourceUrl": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org",
+          "sourceTitle": "Microsoft Learn — resource organization",
+          "authors": [
+            "@vitor-cloud-9f"
+          ],
+          "updatedAt": "2026-11-10"
+        },
+        {
+          "version": 3,
+          "summary": "A ID pública precisa ser única, estável e legível por humanos. O formato canônico é RAN-{EXAM}-{SEQ} com cinco dígitos; a sequência nunca é reciclada e um alias antigo continua redirecionando para a canônica.",
+          "sourceUrl": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org",
+          "sourceTitle": "Microsoft Learn — resource organization",
+          "authors": [
+            "@vitor-cloud-9f",
+            "@cintia-v8f"
+          ],
+          "updatedAt": "2026-11-10"
+        }
+      ]
     },
     "comments": [
       {

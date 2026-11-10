@@ -30,6 +30,14 @@ O endereço `noos-hub.vercel.app` oferece uma URL alternativa do mesmo deploy. E
 - Antes de publicar mudanças da Camada de Mielina, confira `npm run qa`
   (inclui zero iframe do giscus) e o build completo.
 
+## Headers/CSP
+
+A CSP está em **enforce** (`Content-Security-Policy`) desde a 1.6.0: sem
+`unsafe-inline` para scripts e sem `giscus.app`. Scripts inline foram
+externalizados (`/js/theme-boot.js`, `/js/lang-redirect.js`, `/js/redirect.js`).
+Google Fonts segue liberado em `style-src`/`font-src` até o self-host. Antes de
+alterar templates, rode o build e teste com um servidor enviando o header.
+
 ## Versão do sistema
 
 Qualquer bump de versão deve atualizar **os três juntos**:

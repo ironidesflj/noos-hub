@@ -5,7 +5,7 @@
 
 ## Estado verificado (10/11/2026)
 
-- Sistema **v1.5.0** (`package.json`, `noos.registry.json`, rodapés PT/EN).
+- Sistema **v1.6.0** (`package.json`, `noos.registry.json`, rodapés PT/EN).
 - **1.031 questões publicadas:** `RAN.jsonl` 600 (DBDEA 300 + AZ-900 300) + `SYN.jsonl` 431. Build → 1.031 aceitas, 0 rejeitadas, **2.062 páginas canônicas** e **1.031 redirects**; `sitemap.xml` com **1.033 entradas** (2 base + 1.031 PT).
 - `npm run qa` → **61/61 PASS** (fixture; não acende páginas no ar).
 - Axon `@ironidesflj/axon@0.3.0` como devDependency com pin exato; nada do pacote no output servido.
@@ -28,7 +28,9 @@ Este checkout **não está sincronizado**: `HEAD` local = `c418b7b` (33 commits 
 
 - **Curadoria da síntese** (hoje baseline v1 automática + edição manual do dump) e **histórico de revisões real** (diff compara as duas últimas).
 - **Promoção automática de “resposta aceita”** e gates completos de reputação (tier já derivado no sync).
-- **CSP em enforce** (hoje Report-Only); workflow agendado pode ser desativado pelo GitHub após ~60 dias sem atividade.
+- **Self-host das Google Fonts** (CSP enforce libera os domínios do Google até lá); workflow agendado pode ser desativado pelo GitHub após ~60 dias sem atividade.
+- **Reputação/upvote:** `▲ Acelerar` é local e não entra no tier (que deriva de reações do GitHub); decisão de produto pendente — proposta de manter a UI e separar os contadores (não desfazer a Mielina v2).
+- **Hardening/histórico (10/11, 1.6.0):** CSP enforce com scripts inline externalizados; `synthesis.revisions[]` renderiza diff real quando há ≥2 revisões; QA 61; documentação atualizada.
 - **Specs reconciliadas (10/11):** `spec-pagina-de-questao.md` atualizada para a v10.2/v12 + item 6 (Mielina) e `spec-discussao-questao.md` marcada como implementada (Opção A); rotas antigas (`api/q.js`, 301/308 de função) agora têm nota de superação explícita.
 
 ## Próximo passo

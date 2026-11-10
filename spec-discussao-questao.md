@@ -63,7 +63,13 @@ Esta especificação resolve os quatro problemas com o conceito **"A Camada de M
 - Estrutura interna obrigatória:
   1. **Resumo de 10 segundos:** Por que o gabarito está certo e por que os distratores estão errados.
   2. **Âncora na Documentação Oficial (Inegociável 5):** Bloco com filete esquerdo `3px solid var(--accent)` apontando para a URL oficial (`learn.microsoft.com`, `istqb.org`, `docs.databricks.com`, etc.).
-  3. **Rodapé de Co-autoria e Histórico Diff:** Lista os handles dos co-autores e oferece um botão `↺ Histórico / Diff` que alterna para a visualização de revisões (`v3 → v4`), permitindo reversão por usuários com Gate de Reputação Nível 4.
+  3. **Rodapé de Co-autoria e Histórico Diff:** Lista os handles dos co-autores.
+   O dump pode arquivar `synthesis.revisions[]` (`{version, summary, sourceUrl,
+   sourceTitle, authors, updatedAt}`); com ≥2 revisões o botão `↺ Histórico /
+   Diff` mostra o **texto real da revisão anterior** (`#n-1 → #n`). Sem
+   histórico arquivado, a página declara “histórico a partir da próxima
+   curadoria” (nunca inventa uma revisão). A reversão auditável com Gate Nível 4
+   continua pendente de definição de fluxo (ver §6).
 
 ### 3.4 O Ritual *"Passei na Prova!"* (Mielinização Pós-Exame)
 - Quando a página `/q/{ID}/` é aberta com `?ritual=passed` (ou `?ritual=passed&trap=C&step=1of3`), um banner discreto no topo da discussão é ativado:
@@ -138,7 +144,8 @@ automática** (gabarito + fonte oficial do manifesto) e **diff inline**; upvote
 persistente em `localStorage`; card otimista ao publicar; filtros cruzados;
 QA com **61 asserções** (zero iframe giscus incluído).
 
-**Pendências desta spec:** histórico de revisões completo (o diff atual compara
-as duas últimas versões), fluxo editorial de curadoria da síntese e promoção
-automática de “resposta aceita”.
+**Pendências desta spec:** curadoria editorial preencher `revisions[]` nos
+dumps existentes; fluxo de reversão auditável (Gate Nível 4); promoção
+automática de “resposta aceita”. A CSP das páginas está em **enforce** desde a
+1.6.0 (scripts inline externalizados; Google Fonts liberado até o self-host).
 
