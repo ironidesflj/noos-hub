@@ -105,3 +105,9 @@ com os apps; o estado operacional fica em `current-state.md`.
 - Emissão de ID — o hub registra e valida; nunca emite.
 - Especificação dos apps e do pacote Axon — moram nos repositórios deles
   (o hub consome o contrato, não o define).
+
+## Concluído 2026-11-10 — A Camada de Mielina v2 (F2.1)
+
+- Layout dual-column + matriz de distratores + síntese/wiki + ritual + reputação visual (identicon tiers 1–4) + filtros + fio giscus.
+- Spec canônica: `spec-discussao-questao.md`; contrato de dump: `discussao/README.md`.
+- Pendente para F2.2: sincronizar dumps a partir do GitHub Discussions (job periódico, fora do build) e histórico/diff de revisões real (o botão hoje é honesto: `vN · histórico em breve`).

@@ -35,6 +35,8 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseManifest, verifyChecksum, validateId, isRetired } from '@ironidesflj/axon';
+import { renderNoosAvatarSvg } from './lib/noos-avatar.mjs';
+import { loadDiscussao } from './lib/discussao.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const QA = process.argv.includes('--qa');
@@ -154,16 +156,27 @@ log(
 // vez de publicar uma página com gabarito silenciosamente errado.
 
 const ANSWER_LETTERS = 'ABCD';
+/** Aceita letra ("B") OU o texto exato de uma alternativa (fixtures antigas). */
+const resolveAnswerIndex = (options, answer) => {
+  const trimmed = String(answer ?? '').trim();
+  if (/^[A-Z]$/i.test(trimmed)) {
+    const idx = trimmed.toUpperCase().charCodeAt(0) - 65;
+    if (idx >= 0 && idx < options.length) return idx;
+  }
+  return options.findIndex((o) => String(o).trim() === trimmed);
+};
 const answerErrors = [];
 for (const q of accepted) {
-  const letter = q.record.snapshot.answer;
-  const index = typeof letter === 'string' ? ANSWER_LETTERS.indexOf(letter) : -1;
+  const answer = q.record.snapshot.answer;
+  const index = resolveAnswerIndex(q.record.snapshot.options, answer);
   if (index === -1) {
     answerErrors.push(
-      `${q.record.id}: snapshot.answer ${JSON.stringify(letter)} não é uma letra canônica A–D`,
+      `${q.record.id}: snapshot.answer ${JSON.stringify(answer)} não é letra A–D nem o texto de uma alternativa`,
     );
     continue;
   }
+  q.answerIndex = index;
+  q.answerLetter = ANSWER_LETTERS[index];
   const answerText = q.record.snapshot.options[index];
   if (typeof answerText !== 'string' || answerText.trim() === '') {
     answerErrors.push(
@@ -196,10 +209,15 @@ for (const dir of ['pt/q', 'en/q', 'q']) {
 const ogDescription = (statement) =>
   escapeHtml(`${statement.replace(/\s+/g, ' ').trim().slice(0, 197)}…`);
 
-const refBlock = (reference, lang) =>
-  reference
-    ? `<p class="q-ref"><strong>${lang === 'pt' ? 'Referência' : 'Reference'}:</strong> ${escapeHtml(reference)}</p>`
-    : '';
+const refBlock = (reference, lang) => {
+  if (!reference) return '';
+  const label = lang === 'pt' ? 'Referência' : 'Reference';
+  const safe = escapeHtml(reference);
+  if (/^https?:\/\//i.test(reference)) {
+    return `<p class="q-ref"><strong>${label}:</strong> <a href="${safe}" target="_blank" rel="noopener noreferrer">${safe}</a></p>`;
+  }
+  return `<p class="q-ref"><strong>${label}:</strong> ${safe}</p>`;
+};
 
 const discussionsBlock = (id, lang) => {
   const d = registry.discussions;
@@ -236,6 +254,262 @@ const ctaBlock = (ns, lang) =>
     ? `<div class="q-cta"><a class="btn primary" href="${escapeHtml(ns.url)}" target="_blank" rel="noopener">${lang === 'pt' ? `Treinar esta prova no ${escapeHtml(ns.app)}` : `Train this exam on ${escapeHtml(ns.app)}`} <span class="arrow">→</span></a></div>`
     : '';
 
+// ---------- A Camada de Mielina (discussão por questão) ----------
+// Dados de discussão vêm de discussao/{PREFIX}.json (F2.1, dump estático).
+// Sem dump: estado vazio orientador (regra estado-vazio) — nunca inventamos
+// comentário/estatística em página real.
+
+const discussaoCache = new Map();
+function discussionFor(prefix) {
+  if (!discussaoCache.has(prefix)) discussaoCache.set(prefix, loadDiscussao(ROOT, prefix, QA));
+  return discussaoCache.get(prefix);
+}
+
+const tierNames = {
+  pt: { 1: 'Sinapse', 2: 'Aprovado', 3: 'Mielina ativa', 4: 'Nó da Noosfera' },
+  en: { 1: 'Synapse', 2: 'Passed', 3: 'Active myelin', 4: 'Noosphere node' },
+};
+
+const mielinaT = (lang) =>
+  lang === 'pt'
+    ? {
+        title: 'A Camada de Mielina',
+        sub: 'Discussão por questão — quem passou vira mielina para quem vem.',
+        approved: 'aprovados contribuíram',
+        matrix: 'Matriz de dissecção das alternativas',
+        matrixHint: 'Clique numa alternativa para filtrar as contribuições.',
+        answer: 'Gabarito',
+        trap: 'Pegadinha mais debatida',
+        synthesis: 'Síntese consolidada',
+        synthesisEmpty:
+          'Ainda não há síntese para esta questão. Se você passou na prova, inaugure a explicação revisável — com fonte oficial.',
+        synthesisCta: 'Contribuir com a síntese',
+        official: 'Âncora na documentação oficial',
+        revision: 'Histórico / Diff',
+        coauthors: 'Co-autoria',
+        ritualTitle: 'Passei na prova!',
+        ritualBody: 'Quem passou vira mielina para quem vem. Conte qual alternativa te confundiu e qual fonte oficial resolveu a dúvida.',
+        ritualDismiss: 'Dispensar',
+        filters: 'Filtrar contribuições',
+        all: 'Todas',
+        passed: 'Só aprovados',
+        sources: 'Fontes oficiais',
+        threadTitle: 'Contribuições dos pares',
+        threadEmpty:
+          'Nenhuma contribuição pública ainda. A primeira explicação com fonte oficial pode inaugurar esta camada.',
+        accelerations: 'acelerações',
+        accepted: 'Resposta aceita',
+        source: 'Fonte',
+        dynamic: 'Discussão dinâmica no GitHub',
+        dynamicHint: 'O fio ao vivo abre no giscus; a síntese acima é o snapshot revisável.',
+      }
+    : {
+        title: 'The Myelin Layer',
+        sub: 'Per-question discussion — those who passed become myelin for those who follow.',
+        approved: 'passed contributors',
+        matrix: 'Answer distractor matrix',
+        matrixHint: 'Click an option to filter the contributions.',
+        answer: 'Answer',
+        trap: 'Most debated trap',
+        synthesis: 'Consolidated synthesis',
+        synthesisEmpty:
+          'No synthesis for this question yet. If you passed the exam, open the reviewable explanation — with an official source.',
+        synthesisCta: 'Contribute to the synthesis',
+        official: 'Official documentation anchor',
+        revision: 'History / Diff',
+        coauthors: 'Co-authorship',
+        ritualTitle: 'I passed!',
+        ritualBody: 'Those who passed become myelin for those who follow. Share the option that confused you and the official source that resolved it.',
+        ritualDismiss: 'Dismiss',
+        filters: 'Filter contributions',
+        all: 'All',
+        passed: 'Passed only',
+        sources: 'Official sources',
+        threadTitle: 'Peer contributions',
+        threadEmpty: 'No public contribution yet. The first sourced explanation can open this layer.',
+        accelerations: 'accelerations',
+        accepted: 'Accepted answer',
+        source: 'Source',
+        dynamic: 'Live discussion on GitHub',
+        dynamicHint: 'The live thread opens in giscus; the synthesis above is the reviewable snapshot.',
+      };
+
+const isSafeUrl = (u) => {
+  try {
+    return new URL(String(u)).protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
+const optionLetter = (i) => 'ABCD'[i] ?? '?';
+
+function renderDiscussionHead(entry, lang) {
+  const t = mielinaT(lang);
+  const comments = Array.isArray(entry?.comments) ? entry.comments : [];
+  const approved = comments.filter((c) => c && c.passed === true).length;
+  return `<header class="mielina-head">
+            <p class="mono mielina-kicker">${escapeHtml(t.sub)}</p>
+            <h2 id="mielina-title" class="mielina-title">${escapeHtml(t.title)}</h2>
+            <p class="mielina-approved"><span class="mono">✦</span> ${approved} ${escapeHtml(t.approved)}</p>
+          </header>`;
+}
+
+function renderMatrix(q, entry, lang) {
+  const t = mielinaT(lang);
+  const comments = Array.isArray(entry?.comments) ? entry.comments : [];
+  const counts = { A: 0, B: 0, C: 0, D: 0 };
+  for (const c of comments) {
+    const opt = String(c?.option ?? '').toUpperCase();
+    if (counts[opt] !== undefined) counts[opt] += 1;
+  }
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const answerIdx = q.answerIndex ?? 0;
+  const answer = optionLetter(answerIdx);
+  let trap = null;
+  for (const opt of ['A', 'B', 'C', 'D']) {
+    if (opt === answer) continue;
+    if (counts[opt] > 0 && (!trap || counts[opt] > counts[trap])) trap = opt;
+  }
+  const cell = (opt) => {
+    const pct = total > 0 ? Math.round((counts[opt] / total) * 100) : 0;
+    const cls = ['distractor-cell'];
+    if (opt === answer) cls.push('is-answer');
+    if (opt === trap) cls.push('is-trap');
+    const tag =
+      opt === answer
+        ? `<span class="distractor-tag">${escapeHtml(t.answer)} ✓</span>`
+        : opt === trap
+          ? `<span class="distractor-tag">${escapeHtml(t.trap)}</span>`
+          : '';
+    return `<button type="button" class="${cls.join(' ')}" data-filter-opt="${opt}" aria-pressed="false">
+              <span class="distractor-letter mono">${opt}</span>
+              <span class="distractor-pct mono">${pct}%</span>
+              ${tag}
+              <span class="distractor-bar"><i style="width:${pct}%"></i></span>
+            </button>`;
+  };
+  return `<section class="mielina-box" aria-labelledby="mielina-matrix-title">
+            <h3 id="mielina-matrix-title" class="mielina-section-title">${escapeHtml(t.matrix)}</h3>
+            <p class="mielina-hint">${escapeHtml(t.matrixHint)}</p>
+            <div class="distractor-grid" role="group" aria-label="${escapeHtml(t.matrix)}">
+              ${['A', 'B', 'C', 'D'].map(cell).join('\n              ')}
+            </div>
+          </section>`;
+}
+
+function renderSynthesis(q, entry, lang) {
+  const t = mielinaT(lang);
+  const syn = entry?.synthesis;
+  const refUrl = String(q.record.snapshot.reference ?? '');
+  const refLink = isSafeUrl(refUrl)
+    ? `<a class="mielina-source" href="${escapeHtml(refUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(refUrl)}</a>`
+    : '';
+  const corners = `<span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>`;
+  if (!syn || typeof syn !== 'object') {
+    return `<section class="mielina-box pinned" id="sintese-wiki" aria-labelledby="sintese-title">
+            ${corners}
+            <h3 id="sintese-title" class="mielina-section-title">${escapeHtml(t.synthesis)}</h3>
+            <p class="mielina-empty">${escapeHtml(t.synthesisEmpty)}</p>
+            <p class="mielina-official"><span class="mono">${escapeHtml(t.official)}</span> ${refLink}</p>
+            <a class="mielina-chip" href="#discussao-dinamica">${escapeHtml(t.synthesisCta)} →</a>
+          </section>`;
+  }
+  const summary = String(syn.summary ?? '').trim();
+  const source = isSafeUrl(syn.sourceUrl) ? syn.sourceUrl : refUrl;
+  const authors = Array.isArray(syn.authors) ? syn.authors.filter(Boolean).map(String) : [];
+  return `<section class="mielina-box pinned" id="sintese-wiki" aria-labelledby="sintese-title">
+            ${corners}
+            <h3 id="sintese-title" class="mielina-section-title">${escapeHtml(t.synthesis)}</h3>
+            <p class="mielina-summary">${escapeHtml(summary)}</p>
+            <p class="mielina-official"><span class="mono">${escapeHtml(t.official)}</span> ${
+              isSafeUrl(source)
+                ? `<a class="mielina-source" href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(String(syn.sourceTitle ?? source))}</a>`
+                : ''
+            }</p>
+            <div class="mielina-wiki-foot">
+              <span class="mono">${escapeHtml(t.coauthors)}: ${authors.map(escapeHtml).join(' · ') || '—'}</span>
+              ${Number(syn.version) >= 2
+                ? `<button class="mielina-chip" type="button" data-wiki-history disabled title="${escapeHtml(lang === 'pt' ? 'Histórico de revisões em breve' : 'Revision history coming soon')}">v${escapeHtml(String(syn.version))} · ${escapeHtml(t.revision)}</button>`
+                : ''}
+            </div>
+          </section>`;
+}
+
+function renderRitual(lang) {
+  const t = mielinaT(lang);
+  return `<aside class="mielina-ritual" id="ritual-passei" data-ritual hidden aria-label="${escapeHtml(t.ritualTitle)}">
+            <p class="mono mielina-kicker">✦ ${escapeHtml(t.ritualTitle)}</p>
+            <p>${escapeHtml(t.ritualBody)}</p>
+            <button type="button" class="mielina-chip" data-ritual-dismiss>${escapeHtml(t.ritualDismiss)} ×</button>
+          </aside>`;
+}
+
+function renderFilters(lang) {
+  const t = mielinaT(lang);
+  const chips = [
+    { key: 'all', label: t.all, pressed: true },
+    { key: 'passed', label: `✦ ${t.passed}`, pressed: false },
+    { key: 'source', label: t.sources, pressed: false },
+  ];
+  return `<div class="mielina-filters" role="group" aria-label="${escapeHtml(t.filters)}">
+            ${chips
+              .map(
+                (c) =>
+                  `<button type="button" class="mielina-chip" data-filter="${c.key}" aria-pressed="${c.pressed}">${escapeHtml(c.label)}</button>`,
+              )
+              .join('\n            ')}
+          </div>`;
+}
+
+function renderThread(entry, lang) {
+  const t = mielinaT(lang);
+  const comments = Array.isArray(entry?.comments) ? entry.comments.filter((c) => c && typeof c === 'object') : [];
+  const head = `<h3 class="mielina-section-title" id="mielina-thread-title">${escapeHtml(t.threadTitle)}</h3>`;
+  if (comments.length === 0) {
+    return `<section class="mielina-box" aria-labelledby="mielina-thread-title">
+            ${head}
+            <p class="mielina-empty">${escapeHtml(t.threadEmpty)}</p>
+          </section>`;
+  }
+  const cards = comments
+    .slice()
+    .sort((a, b) => (b.accepted === true) - (a.accepted === true) || (Number(b.accelerations) || 0) - (Number(a.accelerations) || 0))
+    .map((c) => {
+      const tier = Math.min(4, Math.max(1, Number(c.tier) || 1));
+      const handle = String(c.handle ?? '@anon').trim();
+      const body = String(c.body ?? '').trim();
+      const opt = String(c.option ?? '').toUpperCase();
+      const source = isSafeUrl(c.sourceUrl) ? c.sourceUrl : null;
+      const accel = Number(c.accelerations) || 0;
+      const approved = c.passed === true;
+      const badges = [
+        approved ? `<span class="badge-passed">✦ ${escapeHtml(lang === 'pt' ? 'Passei na prova' : 'Passed')}</span>` : '',
+        `<span class="badge-role">${escapeHtml(tierNames[lang][tier] ?? '')}</span>`,
+        c.accepted === true ? `<span class="badge-role">✓ ${escapeHtml(t.accepted)}</span>` : '',
+        opt ? `<span class="badge-trap">${escapeHtml(lang === 'pt' ? 'Alternativa' : 'Option')} ${escapeHtml(opt)}</span>` : '',
+      ]
+        .filter(Boolean)
+        .join(' ');
+      return `<article class="mielina-card" data-opt="${escapeHtml(opt)}" data-passed="${approved ? '1' : '0'}" data-source="${source ? '1' : '0'}">
+              <header class="mielina-card-head">
+                ${renderNoosAvatarSvg(handle, tier)}
+                <div class="mielina-card-id">
+                  <span class="mielina-handle mono">${escapeHtml(handle)}</span>
+                  <span class="mielina-badges">${badges}</span>
+                </div>
+                <span class="mielina-accel mono">▲ ${accel} ${escapeHtml(t.accelerations)}</span>
+              </header>
+              <p class="mielina-card-body">${escapeHtml(body)}</p>
+              ${source ? `<p class="mielina-official"><span class="mono">${escapeHtml(t.source)}</span> <a class="mielina-source" href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source)}</a></p>` : ''}
+            </article>`;
+    });
+  return `<section class="mielina-thread" aria-labelledby="mielina-thread-title">
+            ${head}
+            ${cards.join('\n            ')}
+          </section>`;
+}
+
 const langNote = (recordLang, pageLang) => {
   if (pageLang === 'pt' && !/^pt\b/i.test(recordLang))
     return `<span class="q-lang-note">A questão está em ${escapeHtml(recordLang)}.</span>`;
@@ -246,6 +520,7 @@ const langNote = (recordLang, pageLang) => {
 
 const commonMap = (q, lang) => {
   const r = q.record;
+  const entry = discussionFor(q.prefix).byId.get(r.id) ?? null;
   return {
     ID: escapeHtml(r.id),
     APP_NAME: escapeHtml(q.ns.app),
@@ -256,6 +531,12 @@ const commonMap = (q, lang) => {
     LANG_NOTE: langNote(r.lang, lang),
     STATEMENT: escapeHtml(r.snapshot.statement),
     OPTIONS: r.snapshot.options.map((o) => `<li>${escapeHtml(o)}</li>`).join('\n        '),
+    DISCUSSION_HEAD: renderDiscussionHead(entry, lang),
+    DISCUSSION_MATRIX: renderMatrix(q, entry, lang),
+    DISCUSSION_SYNTHESIS: renderSynthesis(q, entry, lang),
+    RITUAL_BANNER: renderRitual(lang),
+    DISCUSSION_FILTERS: renderFilters(lang),
+    DISCUSSION_THREAD: renderThread(entry, lang),
     DISCUSSIONS_BLOCK: discussionsBlock(r.id, lang),
     ANSWER_BLOCK: isRetired(r)
       ? ''
@@ -432,6 +713,25 @@ if (QA) {
   expect(enHtml.includes('Train this exam on Ranvier'), 'volta ao app presente na EN');
   expect(enHtml.includes(`Noos system v${registry.version}`), 'rodapé EN = versão do registry');
   expect(enHtml.includes('This question is in pt-BR.'), 'nota de idioma da questão na página EN');
+  // ---- A Camada de Mielina (v2) — estrutura e dados do fixture ----
+  expect(ptHtml.includes('class="q-grid"'), 'layout dual-column presente');
+  expect((ptHtml.match(/class="distractor-cell/g) || []).length === 4, 'matriz de dissecção: 4 células');
+  expect(ptHtml.includes('class="distractor-cell is-answer"'), 'matriz marca a alternativa do gabarito');
+  expect(ptHtml.includes('class="distractor-cell is-trap"'), 'matriz marca a pegadinha mais debatida');
+  expect(ptHtml.includes('id="sintese-wiki"'), 'síntese consolidada presente');
+  expect(ptHtml.includes('noos-identicon tier-3'), 'avatar identicon com tier de reputação');
+  expect(ptHtml.includes('Passei na prova'), 'flair de aprovado presente');
+  expect(ptHtml.includes('data-filter-opt="B"'), 'âncora de discussão por alternativa');
+  expect(!ptHtml.includes('by Noos'), 'zero "by Noos" na discussão');
+  const retiredHtml = existsSync(path.join(OUT_DIR, 'pt', 'q', 'RAN-AZ900-00044', 'index.html'))
+    ? await readFile(path.join(OUT_DIR, 'pt', 'q', 'RAN-AZ900-00044', 'index.html'), 'utf8')
+    : '';
+  expect(retiredHtml.includes('class="mielina-empty"'), 'estado vazio orientador em questão sem discussão');
+  const aliasHtml = existsSync(path.join(OUT_DIR, 'pt', 'q', 'GLI-AZ900-00012', 'index.html'))
+    ? await readFile(path.join(OUT_DIR, 'pt', 'q', 'GLI-AZ900-00012', 'index.html'), 'utf8')
+    : '';
+  expect(!aliasHtml.includes('mielina-card'), 'alias não recebe a camada de discussão');
+
 
   // D3 (v12): assert de PARIDADE — para CADA record aceito e CADA idioma, a
   // página mostra o TEXTO de options[índice] (nunca a letra isolada como

@@ -1,0 +1,42 @@
+{
+  "RAN-AZ900-00042": {
+    "synthesis": {
+      "summary": "A ID pública precisa ser única, estável e legível por humanos. O formato canônico é RAN-{EXAM}-{SEQ} com cinco dígitos; a sequência nunca é reciclada e um alias antigo continua redirecionando para a canônica.",
+      "sourceUrl": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org",
+      "sourceTitle": "Microsoft Learn — resource organization",
+      "authors": ["@vitor-cloud-9f", "@cintia-v8f"],
+      "version": 3
+    },
+    "comments": [
+      {
+        "handle": "@vitor-cloud-9f",
+        "tier": 3,
+        "passed": true,
+        "option": "B",
+        "body": "O discriminante é a estabilidade: o ID canônico nunca muda, mesmo se o texto da questão for revisado. A alternativa C confunde porque parece mais curta, mas reciclar sequência quebra links já publicados.",
+        "sourceUrl": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org",
+        "accelerations": 27,
+        "accepted": true
+      },
+      {
+        "handle": "@cintia-v8f",
+        "tier": 4,
+        "passed": true,
+        "option": "C",
+        "body": "Eu errei marcando C no simulado. O gabarito mostra que o ID antigo continua como alias — a página nova não invalida a URL que já circulou.",
+        "sourceUrl": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org",
+        "accelerations": 18,
+        "accepted": false
+      },
+      {
+        "handle": "@anon-7q",
+        "tier": 1,
+        "passed": false,
+        "option": "A",
+        "body": "Achei que a letra A era a correta porque o exemplo mostra só o prefixo, mas a explicação da síntese resolveu.",
+        "accelerations": 2,
+        "accepted": false
+      }
+    ]
+  }
+}
