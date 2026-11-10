@@ -60,13 +60,12 @@
  },
  "discussions": {
   "provider": "giscus",
-  "enabled": false,
+  "enabled": true,
   "repo": "ironidesflj/noos-hub",
   "repoId": "R_kgDOVVHVoQ",
   "category": "Q&A",
   "categoryId": "DIC_kwDOVVHVoc4DK0Fu",
   "mapping": "specific",
-  "react": "1",
-  "note": "Ativar (enabled=true) depois de instalar o app giscus (https://github.com/apps/giscus) neste repositório. Enquanto não instalado, o widget mostraria erro; por isso fica desligado por padrão."
+  "react": "1"
  }
 }

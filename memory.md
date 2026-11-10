@@ -77,3 +77,5 @@ aluno (`constitution.md`). Não repete o que já está em `current-state.md`,
 - **2026-11-09:** CSP em **Report-Only** nos headers (`Content-Security-Policy-Report-Only`): coleta violações sem bloquear o site; quando estabilizar, vira enforce. Sem impacto nas páginas atuais.
 
 - **2026-11-10:** discussões por questão (giscus) implementadas como **opt-in**: config em `noos.registry.json` (`discussions`, repo/categoria Q&A do próprio hub), bloco só nas páginas canônicas com `data-term` = ID, CSP libera giscus.app. `enabled:false` até o app giscus ser instalado no repositório (uma ação no GitHub); ao ligar, o widget passa a valer nas 1031 páginas.
+
+- **2026-11-10 (ativação):** app giscus instalado pelo mantenedor no repositório; `discussions.enabled` ligado — o bloco “Conversar sobre esta questão” passa a valer nas páginas canônicas (uma discussion por ID, PT/EN juntas).
