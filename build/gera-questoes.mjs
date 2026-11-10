@@ -414,7 +414,13 @@ if (QA) {
   // escape e conteúdo
   expect(ptHtml.includes('nº 42 da prova AZ-900'), 'enunciado presente na página PT');
   expect(ptHtml.includes('<details class="q-answer">'), 'gabarito em <details> (fechado por padrão)');
-  expect(!ptHtml.includes('giscus.app'), 'discussões desligadas por padrão (sem giscus até o app ser instalado)');
+  if (registry.discussions?.enabled) {
+    expect(ptHtml.includes('giscus.app/client.js'), 'discussões ligadas: bloco giscus presente na página canônica');
+    expect(ptHtml.includes(`data-term="${accepted[0].record.id}"`), 'giscus usa term = ID público (uma conversa por questão)');
+    expect(!existsSync(path.join(OUT_DIR, 'pt', 'q', 'GLI-AZ900-00012', 'index.html')) || !(await readFile(path.join(OUT_DIR, 'pt', 'q', 'GLI-AZ900-00012', 'index.html'), 'utf8')).includes('giscus'), 'alias/redirect não recebem bloco de discussão');
+  } else {
+    expect(!ptHtml.includes('giscus.app'), 'discussões desligadas por padrão (sem giscus até o app ser instalado)');
+  }
   expect(
     ptHtml.includes('sha256:da215a61f90cc5a363c6c49cf50f592a000587cbe38f55ef3a5d1c6ff2b036a7'),
     'checksum completo na proveniência',
