@@ -806,10 +806,11 @@ function renderThread(q, entry, lang) {
                       )}: <a class="mielina-source" href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source)}</a>`
                     : escapeHtml(lang === 'pt' ? 'Contribuição da comunidade · CC BY-SA 4.0' : 'Community contribution · CC BY-SA 4.0')
                 }</span>
-                <button type="button" class="mielina-upvote-btn" data-upvote="1" data-subject-id="${escapeHtml(String(c.subjectId || ''))}" data-count="${accel}" data-voted="${c.viewerSupported === true ? 'true' : 'false'}" aria-busy="false">
+                <button type="button" class="mielina-upvote-btn" data-upvote="1" data-author-id="${escapeHtml(String(c.authorId || ''))}" data-subject-id="${escapeHtml(String(c.subjectId || ''))}" data-count="${accel}" data-voted="${c.viewerSupported === true ? 'true' : 'false'}" aria-busy="false">
                   <span>▲</span>
                   <span data-vote-num>${accel}</span>
                   <span>· ${escapeHtml(t.accelerateBtn)}</span>
+                  <span data-vote-status role="status" aria-live="polite"></span>
                 </button>
               </footer>
             </article>`;
