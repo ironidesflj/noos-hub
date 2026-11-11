@@ -7,7 +7,7 @@ O repositório GitHub `ironidesflj/noos-hub` é a fonte do projeto. A branch `ma
 ```bash
 npm ci
 npm run build   # 1.031 questões → 2.062 páginas + 1.031 redirects + sitemap
-npm run qa      # 61 asserções (fixture; não acende páginas no ar)
+npm run qa      # 68 asserções (fixture; não acende páginas no ar)
 ```
 
 Confira o diff, faça commit e push na `main`. Depois, confirme que o deploy terminou e abra `https://noos.study/pt/`, `https://noos.study/en/` e uma página de questão de cada manifesto. O build valida os manifestos e gera as páginas e o sitemap. Falhas de build impedem a publicação de um novo deploy.
@@ -23,7 +23,7 @@ O endereço `noos-hub.vercel.app` oferece uma URL alternativa do mesmo deploy. E
 
 - A UI é nativa; o **GitHub Discussions** (`ironidesflj/noos-hub`, categoria
   Q&A) é o back-end. O compositor da página abre a Discussion com título = ID.
-- O job **Sync discussões → dumps** (`.github/workflows/sync-discussao.yml`, diário 06:23 UTC)
+- O job **Sync discussões → dumps** (`.github/workflows/sync-discussao.yml`, horário `23 * * * *`)
   abre PR com `discussao/{PREFIX}.json`. Merge manual.
 - Manual: `GITHUB_TOKEN=... node scripts/sync-discussao.mjs` (fora do build).
 - Nunca coloque fetch de rede no `build/gera-questoes.mjs`.
@@ -47,6 +47,8 @@ Qualquer bump de versão deve atualizar **os três juntos**:
 
 
 ## GitHub App / APIs da Mielina (v2.0.0)
+
+Passo a passo completo: [`docs/configurar-mielina.md`](docs/configurar-mielina.md).
 
 As APIs em `api/mielina/*` usam OAuth de GitHub App (state+PKCE, cookie cifrado).
 Configure na Vercel (Production/Preview) — nomes exatos em `.env.example`:
