@@ -14,9 +14,12 @@ function mielinaMe(force) {
   if (MielinaMe.value && !force) return Promise.resolve(MielinaMe.value);
   if (MielinaMe.pending && !force) return MielinaMe.pending;
   MielinaMe.pending = fetch("/api/mielina/me", { credentials: "same-origin" })
-    .then(function (r) { return r.ok ? r.json() : { authenticated: false }; })
+    .then(function (r) {
+      if (r.ok) return r.json();
+      return { authenticated: false, unavailable: true, status: r.status };
+    })
     .then(function (me) { MielinaMe.value = me; MielinaMe.pending = null; return me; })
-    .catch(function () { MielinaMe.pending = null; return { authenticated: false }; });
+    .catch(function () { MielinaMe.pending = null; return { authenticated: false, unavailable: true }; });
   return MielinaMe.pending;
 }
 function mielinaJsonHeaders(extra) {
@@ -225,6 +228,11 @@ function mielinaLogin() {
       var desired = btn.getAttribute("data-voted") !== "true";
       try {
         var me = await mielinaMe();
+        if (me.unavailable) {
+          btn.title = "Participação autenticada indisponível: configure as variáveis MIELINA_* na Vercel.";
+          btn.setAttribute("aria-busy", "false");
+          return;
+        }
         if (!me.authenticated) { mielinaLogin(); return; }
         var res = await fetch("/api/mielina/support", {
           method: "POST",
@@ -266,6 +274,7 @@ function mielinaLogin() {
       curationLoaded = true;
       mielinaMe(true)
         .then(function (me) {
+          if (me && me.unavailable) return; // sem API configurada: mantém leitura estática
           if (!me || !me.authenticated) { mielinaLogin(); return; }
           var isCurator = me.isCurator === true;
           var tier = Number(me.tier) || 1;
@@ -497,6 +506,7 @@ function mielinaLogin() {
     var apiOk = false;
     try {
       var me = await mielinaMe();
+      if (me.unavailable) throw new Error("api-unavailable"); // cai no fallback GitHub Discussions
       if (!me.authenticated) { mielinaLogin(); return; }
       var res = await fetch("/api/mielina/comment", {
         method: "POST",
