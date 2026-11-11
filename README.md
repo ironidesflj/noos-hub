@@ -9,7 +9,7 @@
 - O Axon (`@ironidesflj/axon@0.3.0`) é usado **apenas no build** para validar os manifestos; o Hub não depende dele no navegador.
 - **A Camada de Mielina v3** (2.0.0): páginas dual-column com matriz de dissecção, síntese consolidada (baseline automática v1 + versões curadas), reputação/identicon em 4 níveis, filtros, ritual “Passei na prova!” e compositor guiado. A discussão é **100% UI nativa** (sem iframe do giscus); o **GitHub Discussions** é o back-end. Leitura estática com snapshot datado; escrita via `/api/mielina/*` (GitHub App OAuth) e sync horário gera `discussao/{PREFIX}.json`.
 - O domínio principal é `noos.study`; `www.noos.study` redireciona para ele. A implantação é feita pela Vercel a partir da branch `main`.
-- Versão do sistema: **2.0.0** (fonte em `noos.registry.json`, replicada no rodapé PT/EN e verificada pelo CI).
+- Versão do sistema: **2.0.0** — 63 testes Node + QA 68 asserções (fonte em `noos.registry.json`, replicada no rodapé PT/EN e verificada pelo CI).
 
 O estado verificado e as pendências ficam em [current-state.md](current-state.md) e [plan.md](plan.md). A [constitution.md](constitution.md) define as regras permanentes; [spec-pagina-de-questao.md](spec-pagina-de-questao.md) descreve as páginas de questões e [spec-discussao-questao.md](spec-discussao-questao.md) a Camada de Mielina. O contrato dos dumps está em [discussao/README.md](discussao/README.md). O [noos.registry.json](noos.registry.json) é a fonte dos prefixos, status e versão do sistema.
 

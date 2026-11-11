@@ -48,14 +48,17 @@ Qualquer bump de versão deve atualizar **os três juntos**:
 
 ## GitHub App / APIs da Mielina (v2.0.0)
 
-As APIs em `api/mielina/*` usam um GitHub App instalado em `ironidesflj/noos-hub`
-(OAuth state+PKCE, cookie cifrado). Configure na Vercel (Production/Preview):
+As APIs em `api/mielina/*` usam OAuth de GitHub App (state+PKCE, cookie cifrado).
+Configure na Vercel (Production/Preview) — nomes exatos em `.env.example`:
 
-- `GITHUB_APP_ID`
-- `GITHUB_APP_PRIVATE_KEY` (PEM, com quebras de linha escapadas)
-- `GITHUB_APP_CLIENT_ID`
-- `GITHUB_APP_CLIENT_SECRET`
+- `MIELINA_GITHUB_CLIENT_ID` (público)
+- `MIELINA_GITHUB_CLIENT_SECRET` (nunca commitar)
 - `MIELINA_SESSION_SECRET` (32+ bytes aleatórios; rotacionar invalida sessões)
+- `MIELINA_BASE_URL=https://noos.study`
+- `MIELINA_DISPATCH_TOKEN` (PAT fine-grained com `contents: write` para disparar
+  `repository_dispatch`; alternativa: `MIELINA_GITHUB_TOKEN`)
+- opcionais: `MIELINA_ALLOWED_ORIGINS` (previews), `MIELINA_REPO`,
+  `MIELINA_DISCUSSION_CATEGORY_ID`, `MIELINA_RAW_BASE`
 
 Sem essas variáveis as APIs respondem falha fechada (503/401) e a leitura
 estática continua funcionando. O workflow `curadoria-sintese.yml` usa o token

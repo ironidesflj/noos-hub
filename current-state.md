@@ -37,7 +37,7 @@ Página `/q/{ID}/` dual-column (≥1024px), questão sticky à esquerda e discus
 
 ## Verificação (10/11/2026)
 
-- `npm run qa` → **PASS** (68 asserções no gerador) (fixture; inclui paridade PT/EN, cantoneiras, 4 níveis de avatar, diff, compositor e zero iframe do giscus).
+- `npm run qa` → **PASS** (68 asserções no gerador); `node --test` → **63/63** (política, sync, lib/API, curadoria) (fixture; inclui paridade PT/EN, cantoneiras, 4 níveis de avatar, diff, compositor e zero iframe do giscus).
 - `npm run build` → **1.031 aceitas / 0 rejeitadas**, 2.062 páginas canônicas, 1.031 redirects, sitemap com 1.033 entradas.
 - Layout verificado em 320 px, 640 px (200% zoom em 1280) e 1920 px sem overflow horizontal; sticky com scroll interno.
 - **CSP enforce testado localmente** com servidor enviando o header: 0 violações em home, questão, redirect e 404; tema e filtros funcionando; scripts inline eliminados (`js/theme-boot.js`, `js/lang-redirect.js`, `js/redirect.js`).
