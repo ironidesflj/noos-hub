@@ -821,3 +821,14 @@ test("POST /logout limpa cookies com CSRF", async () => {
   assert.match(cookies, /mielina_session=;/);
   assert.match(cookies, /Max-Age=0/);
 });
+
+test("support rejeita auto-apoio antes de escrever reação no GitHub", async () => {
+  seedSupportWorld();
+  const before = structuredClone(world.reactions);
+  const { req } = authReq({
+    session: sessionFor({ authorId: world.nodes.DC_1.author.id }),
+    body: { subjectId: "DC_1", desiredState: true, questionId: Q },
+  });
+  await expectHttpError(supportHandle(req, makeRes(), deps()), "SELF_SUPPORT", 403);
+  assert.deepEqual(world.reactions, before);
+});

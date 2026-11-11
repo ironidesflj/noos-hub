@@ -114,6 +114,10 @@ export async function handle(req, res, deps = defaultDeps()) {
   const before = await readState(gh, value.subjectId);
   const info = assertSubjectBelongsTo(gh, before.info, value.questionId);
 
+  if (value.desiredState && String(info.authorId) === String(session.authorId)) {
+    throw new HttpError(403, "SELF_SUPPORT", "Você não pode acelerar sua própria contribuição.");
+  }
+
   if (value.desiredState) {
     await addReactionTolerant(gh, value.subjectId);
   } else {

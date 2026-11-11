@@ -246,10 +246,15 @@ async function mielinaFetchJson(url, options, timeoutMs) {
   function bindVote(btn) {
     var subjectId = btn.getAttribute("data-subject-id");
     if (!subjectId) return;
+    var status = btn.querySelector("[data-vote-status]");
+    var isEn = document.documentElement.lang.indexOf("en") === 0;
+    var selfMessage = isEn ? "You cannot support your own contribution." : "Você não pode acelerar sua própria contribuição.";
+    function sayVote(message) { if (status) status.textContent = message; }
     var busy = false;
     btn.addEventListener("click", async function () {
       if (busy) return;
       busy = true;
+      sayVote("");
       btn.setAttribute("aria-busy", "true");
       var desired = btn.getAttribute("data-voted") !== "true";
       try {
@@ -260,6 +265,10 @@ async function mielinaFetchJson(url, options, timeoutMs) {
           return;
         }
         if (!me.authenticated) { mielinaLogin(); return; }
+        if (me.authorId && me.authorId === btn.getAttribute("data-author-id")) {
+          sayVote(selfMessage);
+          return;
+        }
         var res = await mielinaFetchJson(
           "/api/mielina/support",
           {
@@ -270,10 +279,15 @@ async function mielinaFetchJson(url, options, timeoutMs) {
           MIELINA_SUPPORT_TIMEOUT_MS
         );
         if (res.status === 401) { mielinaLogin(); return; }
+        if (!res.ok && res.data && res.data.error === "SELF_SUPPORT") {
+          sayVote(selfMessage);
+          return;
+        }
         if (!res.ok) throw new Error("support " + res.status);
         if (!res.data || typeof res.data.count !== "number") throw new Error("support sem contagem");
         setVoteUi(btn, res.data.count, res.data.viewerSupported === true);
       } catch (e) {
+        sayVote(isEn ? "Could not confirm your support. Try again." : "Não foi possível confirmar o apoio. Tente novamente.");
         // Timeout/erro: reconciliação autoritativa via GET; nunca soma local fantasma.
         try {
           var r = await mielinaFetchJson(
