@@ -1,62 +1,92 @@
-# discussao/ — dumps estáticos da Camada de Mielina (F2.2)
+# discussao/ — snapshots da Camada de Mielina (F2.2 / v3)
 
-Contrato lido pelo `build/gera-questoes.mjs` **sem rede** (o gerador nunca faz
-fetch). Arquivos por prefixo (`discussao/RAN.json`, `discussao/SYN.json`),
-chaveados pelo ID público.
+Contrato lido pelo `build/gera-questoes.mjs` **sem rede**. Arquivos por prefixo
+(`discussao/RAN.json`, `discussao/SYN.json`), chaveados pelo ID público.
 
-**Origem:** os dumps são gerados por `scripts/sync-discussao.mjs` a partir do
-GitHub Discussions (`ironidesflj/noos-hub`, categoria Q&A; título = ID público):
-o script lê o **post raiz + comentários**, parseia o corpo estruturado do
-Compositor Guiado e escreve o JSON. O workflow `sync-discussao.yml` roda
-diariamente (06:23 UTC) e abre PR. O build **não** acessa a rede.
+**Origem:** `scripts/sync-discussao.mjs` (workflow horário) lê o GitHub
+Discussions via GraphQL com paginação completa e grava o snapshot abaixo.
+**All-or-nothing:** qualquer falha na coleta aborta sem tocar nos JSONs.
+`syncedAt` é a data de apuração exibida na página.
+
+## Schema (v3)
 
 ```json
 {
-  "RAN-AZ900-00042": {
+  "RAN-AZ900-00001": {
+    "discussionId": "D_kwDO…",
+    "discussionNumber": 14,
+    "discussionUrl": "https://github.com/ironidesflj/noos-hub/discussions/14",
+    "legacyDiscussionIds": [],
+    "syncedAt": "2026-11-11T13:00:00Z",
+    "approvedPassersCount": 2,
     "synthesis": {
-      "summary": "Resumo de 10 segundos…",
-      "sourceUrl": "https://learn.microsoft.com/…",
-      "sourceTitle": "Fonte oficial",
-      "authors": ["@handle-1", "@handle-2"],
       "version": 3,
+      "body": "Texto consolidado atual…",
+      "sourceUrl": "https://learn.microsoft.com/…",
+      "sourceOfficial": true,
+      "contributors": [{ "authorId": "U_…", "handle": "@marina" }],
       "revisions": [
-        { "version": 1, "summary": "Baseline…", "sourceUrl": "https://…", "authors": ["@baseline"], "updatedAt": "2026-11-10" },
-        { "version": 3, "summary": "Texto consolidado atual…", "sourceUrl": "https://…", "authors": ["@a", "@b"], "updatedAt": "2026-11-11" }
+        {
+          "version": 1,
+          "body": "Síntese inicial…",
+          "sourceUrl": "https://learn.microsoft.com/…",
+          "proposerId": "U_…",
+          "proposerHandle": "@marina",
+          "approverId": "U_…",
+          "approverHandle": "@ironidesflj",
+          "contentHash": "sha256:…",
+          "createdAt": "2026-11-01T10:00:00Z",
+          "originCommentId": "DC_…"
+        }
+      ],
+      "pendingProposals": [
+        {
+          "proposalId": "DC_…",
+          "baseVersion": 3,
+          "proposerId": "U_…",
+          "proposerHandle": "@marina",
+          "body": "Proposta…",
+          "sourceUrl": "https://…",
+          "contentHash": "sha256:…",
+          "createdAt": "2026-11-11T12:30:00Z"
+        }
       ]
     },
     "comments": [
       {
-        "handle": "@handle-1",
+        "subjectId": "DC_…",
+        "subjectType": "DiscussionComment",
+        "discussionId": "D_…",
+        "url": "https://github.com/ironidesflj/noos-hub/discussions/14#discussioncomment-101",
+        "authorId": "U_…",
+        "handle": "@marina",
         "tier": 3,
-        "passed": true,
+        "passedSelfDeclared": true,
         "option": "B",
-        "body": "Explicação com fonte…",
-        "sourceUrl": "https://learn.microsoft.com/…",
-        "accelerations": 27,
-        "accepted": true,
-        "createdAt": "2026-11-10T18:56:35Z"
+        "body": "A pegadinha está em…",
+        "sourceUrl": "https://…",
+        "sourceOfficial": true,
+        "accelerations": 28,
+        "createdAt": "2026-11-08T14:20:00Z",
+        "updatedAt": "2026-11-08T14:20:00Z",
+        "isRoot": false
       }
     ]
   }
 }
 ```
 
-- `synthesis` é **curadoria** e o sync **preserva** o bloco existente; sem
-  síntese curada, o gerador publica a **baseline v1 automática** (gabarito +
-  fonte oficial do manifesto).
-- `synthesis.revisions[]` é o **histórico real**: com ≥2 revisões o gerador
-  mostra o diff `#n-1 → #n` com o texto anterior; sem histórico, declara
-  “histórico a partir da próxima curadoria”. O sync **preserva** o array.
-- **Curadoria (manual, por PR):** atualize `summary`, `sourceUrl`,
-  `sourceTitle`, `authors`, `version` e **anexe** uma entrada em `revisions[]`
-  (version = nova versão). O build valida o contrato e renderiza o diff; o
-  gate de reversão auditável (Nível 4) ainda é um fluxo a definir.
-- `tier` 1–4 é derivado no sync (reações, fontes, respostas aceitas,
-  aprovação) com overrides em `discussao/authors.json`; segue os gates da
-  `spec-discussao-questao.md` §4.
-- **Todo texto é não confiável:** o gerador passa por `escapeHtml()` e o
-  cliente só usa `textContent`; `sourceUrl` só é renderizado se `https:`.
-- Sem dump para um ID: estado orientador com a referência oficial do
-  manifesto — nada é inventado.
-- **Sem giscus:** o fio ao vivo é o GitHub Discussions; a página é a UI
-  nativa (Opção A) e o dump é o snapshot estático revisável/indexável.
+- `subjectId`/`authorId` são IDs permanentes do GitHub; **nunca** índices.
+- `accelerations` = união de contas humanas em ROCKET/THUMBS_UP/HEART
+  (bots e auto-apoio excluídos).
+- `synthesis` é **curadoria**; o sync **preserva** o bloco inteiro
+  (`revisions`, `pendingProposals`) e nunca o reescreve.
+- Sem síntese curada, o gerador publica a **baseline v1 automática** (gabarito
+  + fonte oficial do manifesto).
+- `discussao/reputation.json`: reputação por `authorId` (tiers/métricas) e
+  `curators` explícitos; `discussao/official-sources.json`: allowlist de fontes.
+- **Higiene:** comentários demonstrativos/sem procedência existem somente em
+  `build/fixtures/discussao.json` (modo `--qa`); produção só recebe o que tem
+  `subjectId`/`url` reais do GitHub.
+- **Sem giscus:** a UI é nativa; a leitura é o snapshot e a escrita é a API
+  `/api/mielina/*` (GitHub App OAuth).

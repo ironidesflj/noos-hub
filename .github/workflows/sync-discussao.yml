@@ -4,7 +4,7 @@ name: Sync discussões → dumps (F2.2)
 # Nunca roda no build (o gerador lê somente arquivos locais).
 on:
   schedule:
-    - cron: "23 6 * * *"
+    - cron: "23 * * * *"
   workflow_dispatch:
 
 permissions:

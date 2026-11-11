@@ -44,3 +44,29 @@ Qualquer bump de versão deve atualizar **os três juntos**:
 `noos.registry.json` (`version`), rodapé `pt/index.html` e rodapé
 `en/index.html`; o CI (`sdd-lint`) falha se divergirem. Mantenha
 `package.json` alinhado ao registry.
+
+
+## GitHub App / APIs da Mielina (v2.0.0)
+
+As APIs em `api/mielina/*` usam OAuth de GitHub App (state+PKCE, cookie cifrado).
+Configure na Vercel (Production/Preview) — nomes exatos em `.env.example`:
+
+- `MIELINA_GITHUB_CLIENT_ID` (público)
+- `MIELINA_GITHUB_CLIENT_SECRET` (nunca commitar)
+- `MIELINA_SESSION_SECRET` (32+ bytes aleatórios; rotacionar invalida sessões)
+- `MIELINA_BASE_URL=https://noos.study`
+- `MIELINA_DISPATCH_TOKEN` (PAT fine-grained com `contents: write` para disparar
+  `repository_dispatch`; alternativa: `MIELINA_GITHUB_TOKEN`)
+- opcionais: `MIELINA_ALLOWED_ORIGINS` (previews), `MIELINA_REPO`,
+  `MIELINA_DISCUSSION_CATEGORY_ID`, `MIELINA_RAW_BASE`
+
+Sem essas variáveis as APIs respondem falha fechada (503/401) e a leitura
+estática continua funcionando. O workflow `curadoria-sintese.yml` usa o token
+do próprio GitHub Actions (sem segredo extra) e é disparado por
+`repository_dispatch` após aprovação/reversão.
+
+## Sync da Mielina
+
+`sync-discussao.yml` roda **de hora em hora** (`23 * * * *`) e é all-or-nothing:
+qualquer falha de GraphQL aborta sem alterar `discussao/*.json`. Para rodar
+manualmente: `GITHUB_TOKEN=... node scripts/sync-discussao.mjs` (nunca no build).

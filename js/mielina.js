@@ -5,6 +5,29 @@
  */
 (function () {
   "use strict";
+
+
+/* Identidade/CSRF: o cookie de sessão é HttpOnly; o token CSRF vem de /me e é
+   guardado só em memória (nunca localStorage). Toda escrita usa X-Mielina-CSRF. */
+var MielinaMe = { value: null, pending: null };
+function mielinaMe(force) {
+  if (MielinaMe.value && !force) return Promise.resolve(MielinaMe.value);
+  if (MielinaMe.pending && !force) return MielinaMe.pending;
+  MielinaMe.pending = fetch("/api/mielina/me", { credentials: "same-origin" })
+    .then(function (r) { return r.ok ? r.json() : { authenticated: false }; })
+    .then(function (me) { MielinaMe.value = me; MielinaMe.pending = null; return me; })
+    .catch(function () { MielinaMe.pending = null; return { authenticated: false }; });
+  return MielinaMe.pending;
+}
+function mielinaJsonHeaders(extra) {
+  var headers = { "content-type": "application/json" };
+  if (MielinaMe.value && MielinaMe.value.csrfToken) headers["X-Mielina-CSRF"] = MielinaMe.value.csrfToken;
+  if (extra) Object.keys(extra).forEach(function (k) { headers[k] = extra[k]; });
+  return headers;
+}
+function mielinaLogin() {
+  window.location.href = "/api/mielina/auth/login?returnTo=" + encodeURIComponent(window.location.pathname + window.location.hash);
+}
   var root = document.querySelector(".q-col-mielina");
   if (!root) return;
 
@@ -165,32 +188,202 @@
     });
   }
 
-  // 5. Upvote interativo ("▲ Acelerou meu estudo") com persistência local
-  function bindUpvote(btn) {
-    var key = "noos-vote-" + (btn.getAttribute("data-upvote") || "");
-    var numEl = btn.querySelector("[data-vote-num]");
+  // 5. Upvote real via API (1 conta = 1 apoio; sem localStorage)
+  function clearLegacyVotes() {
     try {
-      if (localStorage.getItem(key) === "1" && numEl) {
-        btn.setAttribute("data-voted", "true");
-        numEl.textContent = String((parseInt(numEl.textContent, 10) || 0) + 1);
-      }
-    } catch (e) {}
+      localStorage.removeItem("noos_upvotes_v1");
+      Object.keys(localStorage)
+        .filter((k) => k.indexOf("noos-vote-") === 0)
+        .forEach((k) => localStorage.removeItem(k));
+    } catch (e) {
+      /* storage bloqueado */
+    }
+  }
+  clearLegacyVotes();
 
-    btn.addEventListener("click", function () {
-      if (btn.getAttribute("data-voted") === "true") return;
-      btn.setAttribute("data-voted", "true");
-      if (numEl) {
-        numEl.textContent = String((parseInt(numEl.textContent, 10) || 0) + 1);
-      }
-      try {
-        localStorage.setItem(key, "1");
-      } catch (e) {}
-    });
+  function questionId() {
+    var syn = document.querySelector("[data-question-id]");
+    if (syn) return syn.getAttribute("data-question-id") || "";
+    var comp = document.querySelector(".mielina-composer");
+    return comp ? comp.getAttribute("data-term") || "" : "";
   }
 
-  Array.prototype.slice
-    .call(root.querySelectorAll("[data-upvote]"))
-    .forEach(bindUpvote);
+  function setVoteUi(btn, count, supported) {
+    var num = btn.querySelector("[data-vote-num]");
+    if (num && typeof count === "number") num.textContent = String(count);
+    btn.setAttribute("data-voted", supported ? "true" : "false");
+  }
+
+  function bindVote(btn) {
+    var subjectId = btn.getAttribute("data-subject-id");
+    if (!subjectId) return;
+    var busy = false;
+    btn.addEventListener("click", async function () {
+      if (busy) return;
+      busy = true;
+      btn.setAttribute("aria-busy", "true");
+      var desired = btn.getAttribute("data-voted") !== "true";
+      try {
+        var me = await mielinaMe();
+        if (!me.authenticated) { mielinaLogin(); return; }
+        var res = await fetch("/api/mielina/support", {
+          method: "POST",
+          headers: mielinaJsonHeaders(),
+          body: JSON.stringify({ subjectId: subjectId, desiredState: desired, questionId: questionId() }),
+        });
+        if (res.status === 401) { mielinaLogin(); return; }
+        if (!res.ok) throw new Error("support " + res.status);
+        var data = await res.json();
+        setVoteUi(btn, Number(data.count), data.viewerSupported === true);
+      } catch (e) {
+        // Reconciliação: nunca soma local fantasma.
+        try {
+          var r = await fetch("/api/mielina/support?subjectId=" + encodeURIComponent(subjectId));
+          if (r.ok) {
+            var d = await r.json();
+            setVoteUi(btn, Number(d.count), d.viewerSupported === true);
+          }
+        } catch (e2) {
+          /* sem rede: mantém estado anterior */
+        }
+      } finally {
+        busy = false;
+        btn.setAttribute("aria-busy", "false");
+      }
+    });
+  }
+  Array.prototype.slice.call(root.querySelectorAll("[data-upvote]")).forEach(bindVote);
+
+  // 6. Curadoria inline: só aparece com sessão/tier confirmados pela API.
+  /* Curadoria é ON-DEMAND: nenhuma chamada de API no carregamento.
+     O botão só consulta a sessão/tier quando o visitante decide participar. */
+  var synEl = document.querySelector("#sintese-wiki");
+  if (synEl) {
+    var curationBtn = synEl.querySelector("[data-curation-open]");
+    var curationLoaded = false;
+    function loadCuration() {
+      if (curationLoaded) return;
+      curationLoaded = true;
+      mielinaMe(true)
+        .then(function (me) {
+          if (!me || !me.authenticated) { mielinaLogin(); return; }
+          var isCurator = me.isCurator === true;
+          var tier = Number(me.tier) || 1;
+          if (tier < 3 && !isCurator) return;
+          var propose = synEl.querySelector("[data-propose-panel]");
+          if (propose) propose.hidden = false;
+          var list = synEl.querySelector("[data-revision-list]");
+          if (list) list.hidden = false;
+          if (tier >= 4 || isCurator) {
+            synEl.querySelectorAll("[data-approve-proposal]").forEach(function (b) { b.hidden = false; });
+          }
+        })
+        .catch(function () { curationLoaded = false; });
+    }
+    if (curationBtn) curationBtn.addEventListener("click", loadCuration);
+
+    var proposalList = synEl.querySelector("[data-proposals-list]");
+    if (proposalList) {
+      var approveBtns = synEl.querySelectorAll("[data-approve-proposal]");
+      approveBtns.forEach(function (btn) {
+        btn.addEventListener("click", async function () {
+          btn.setAttribute("aria-busy", "true");
+          try {
+            var me = await mielinaMe();
+            if (!me.authenticated) { mielinaLogin(); return; }
+            var res = await fetch("/api/mielina/synthesis/approve", {
+              method: "POST",
+              headers: mielinaJsonHeaders(),
+              body: JSON.stringify({
+                questionId: questionId(),
+                proposalId: btn.getAttribute("data-approve-proposal"),
+                baseVersion: Number(btn.getAttribute("data-base-version")),
+                contentHash: btn.getAttribute("data-content-hash"),
+              }),
+            });
+            if (res.status === 403) throw new Error("forbidden");
+            if (!res.ok) throw new Error("approve " + res.status);
+            window.location.reload();
+          } catch (e) {
+            btn.setAttribute("aria-busy", "false");
+          }
+        });
+      });
+      var restoreBtns = synEl.querySelectorAll("[data-revision-restore]");
+      restoreBtns.forEach(function (btn) {
+        btn.addEventListener("click", async function () {
+          var reason = window.prompt(
+            (document.documentElement.lang || "pt").indexOf("pt") === 0
+              ? "Motivo da restauração (auditável):"
+              : "Restore reason (auditable):"
+          );
+          if (!reason || reason.trim().length < 10) return;
+          btn.setAttribute("aria-busy", "true");
+          try {
+            var me = await mielinaMe();
+            if (!me.authenticated) { mielinaLogin(); return; }
+            var res = await fetch("/api/mielina/synthesis/revert", {
+              method: "POST",
+              headers: mielinaJsonHeaders(),
+              body: JSON.stringify({
+                questionId: questionId(),
+                baseVersion: Number(btn.getAttribute("data-base-version")),
+                targetVersion: Number(btn.getAttribute("data-revision-restore")),
+                reason: reason,
+              }),
+            });
+            if (!res.ok) throw new Error("revert " + res.status);
+            window.location.reload();
+          } catch (e) {
+            btn.setAttribute("aria-busy", "false");
+          }
+        });
+      });
+      var proposeSubmit = synEl.querySelector("[data-propose-submit]");
+      if (proposeSubmit) {
+        proposeSubmit.addEventListener("click", async function () {
+          var bodyEl = synEl.querySelector("[data-propose-body]");
+          var sourceEl = synEl.querySelector("[data-propose-source]");
+          var statusEl = synEl.querySelector("[data-propose-status]");
+          var text = (bodyEl && bodyEl.value ? bodyEl.value : "").trim();
+          if (text.length < 30) {
+            if (statusEl) statusEl.textContent = "Escreva ao menos 30 caracteres.";
+            return;
+          }
+          var sourceValue = sourceEl && sourceEl.value ? sourceEl.value.trim() : "";
+          if (!/^https:\/\//i.test(sourceValue)) {
+            if (statusEl) statusEl.textContent = "Proposta exige fonte oficial https://.";
+            if (sourceEl) sourceEl.focus();
+            return;
+          }
+          proposeSubmit.setAttribute("aria-busy", "true");
+          try {
+            var me = await mielinaMe();
+            if (!me.authenticated) { mielinaLogin(); return; }
+            var res = await fetch("/api/mielina/synthesis/propose", {
+              method: "POST",
+              headers: mielinaJsonHeaders(),
+              body: JSON.stringify({
+                questionId: questionId(),
+                body: text,
+                sourceUrl: sourceEl && sourceEl.value ? sourceEl.value.trim() : "",
+              }),
+            });
+            if (res.status === 403) {
+              if (statusEl) statusEl.textContent = "Nível 3+ necessário.";
+              return;
+            }
+            if (!res.ok) throw new Error("propose " + res.status);
+            if (statusEl) statusEl.textContent = "Proposta enviada.";
+          } catch (e) {
+            if (statusEl) statusEl.textContent = "Falha ao enviar.";
+          } finally {
+            proposeSubmit.setAttribute("aria-busy", "false");
+          }
+        });
+      }
+    }
+  }
 })();
 
 /* ---- Compositor guiado (ritual "Passei na prova!") ----
@@ -212,7 +405,7 @@
     if (status) status.textContent = msg || "";
   }
 
-  publish.addEventListener("click", function () {
+  publish.addEventListener("click", async function () {
     var text = (body.value || "").trim();
     if (text.length < 15) {
       say(composer.getAttribute("data-msg-missing") || "Escreva a explicação.");
@@ -299,11 +492,37 @@
       }
     }
 
+    // Publica via API de Mielina (autenticada); fallback para GitHub Discussions
+    // se a API ainda não estiver configurada/responder 503.
+    var apiOk = false;
+    try {
+      var me = await mielinaMe();
+      if (!me.authenticated) { mielinaLogin(); return; }
+      var res = await fetch("/api/mielina/comment", {
+        method: "POST",
+        headers: mielinaJsonHeaders(),
+        credentials: "same-origin",
+        body: JSON.stringify({ questionId: term, option: chosenOpt, selfDeclaredPassed: isPassed, body: text, sourceUrl: url }),
+      });
+      if (res.status === 401) { mielinaLogin(); return; }
+      apiOk = res.ok;
+      if (apiOk) {
+        var data = await res.json().catch(function () { return {}; });
+        say(composer.getAttribute("data-msg-ready") || "Publicado.");
+        if (data && data.subjectId) {
+          var cards = document.querySelectorAll(".mielina-card");
+          var last = cards[cards.length - 1];
+          if (last) last.setAttribute("data-subject-id", data.subjectId);
+        }
+      }
+    } catch (e) {
+      apiOk = false;
+    }
     say(composer.getAttribute("data-msg-ready") || "Abrindo…");
     body.value = "";
     if (source) source.value = "";
 
-    if (term && repo) {
+    if (!apiOk && term && repo) {
       var md =
         "**Alternativa que confundiu:** " + chosenOpt + "\n" +
         "**Status:** " + (isPassed ? "✦ Passei na prova!" : "Estudando agora") + "\n\n" +

@@ -19,3 +19,8 @@ node_modules/
 # ⚠ Só a raiz: as og-images de assets/ PRECISAM subir no push
 # (referenciadas pelas metas og:image das páginas).
 /*.png
+
+# Segredos locais (nunca commitar) — ver .env.example
+.env
+.env.local
+.env.*.local

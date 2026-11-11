@@ -1,0 +1,55 @@
+name: Curadoria da Síntese
+
+# Fase 4 da Camada de Mielina: gatilho protegido para publicar uma revisão da
+# Síntese Wiki. A API /api/mielina/synthesis/approve|revert apenas dispara
+# `repository_dispatch`; quem COMMITA em main é este workflow, que relê a
+# verdade de main e revalida TODOS os gates (permissões, proposer != approver,
+# baseVersion atual, contentHash exato e idempotência por originCommentId).
+on:
+  repository_dispatch:
+    types: [mielina-curadoria]
+
+# Roda a partir da branch padrão (main). Nunca faz checkout do branch de quem
+# disparou: o commit é criado via API com expectedHeadOid (concorrência
+# otimista) e fica assinado/atribuído pela GitHub.
+permissions:
+  contents: write
+  discussions: read
+
+concurrency:
+  group: curadoria-sintese-main
+  cancel-in-progress: false
+
+jobs:
+  aplicar:
+    name: Revalidar e publicar revisão
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout de main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # A policy única é a fonte das regras de reputação (Fase 1).
+      - name: Conferir dependências da curadoria
+        run: |
+          test -f build/lib/mielina-policy.mjs || {
+            echo "::error::build/lib/mielina-policy.mjs ausente em main — a Fase 1 precisa estar mergeada."
+            exit 1
+          }
+          node --check scripts/curadoria-sintese.mjs
+
+      - name: Validar gates e commitar revisão em main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          MIELINA_REPO: ${{ github.repository }}
+        run: node scripts/curadoria-sintese.mjs --apply

@@ -1,43 +1,42 @@
 {
   "RAN-DBDEA-00001": {
+    "discussionId": "D_kwDOVVHVoc4ArAq2",
+    "discussionNumber": 17,
+    "discussionUrl": "https://github.com/ironidesflj/noos-hub/discussions/17",
+    "legacyDiscussionIds": [],
+    "legacyDiscussionNumbers": [],
+    "syncedAt": "2026-11-11T13:09:30.215Z",
+    "approvedPassersCount": 0,
     "synthesis": {
       "summary": "O atalho mental que resolve em 10 segundos: o enunciado exige duas garantias simultâneas para um Lakeflow Job — compute dedicado que nasce e morre automaticamente com a execução, e bloqueio total de sessões interativas de analistas. Por que não é A ou D? All-purpose clusters e clusters compartilhados ficam ativos entre execuções e permitem anexar notebooks interativos. Por que não é C? Um SQL Warehouse é voltado a consultas SQL, não a transformações PySpark em jobs dedicados. Só o Job Cluster (B) é provisionado sob demanda pelo próprio Lakeflow Job e encerrado ao fim da tarefa.",
       "sourceUrl": "https://docs.databricks.com/aws/en/jobs/compute",
       "sourceTitle": "Compute for Lakeflow Jobs — Databricks Docs",
-      "authors": ["@vitor-cloud-9f", "@ironidesflj"],
+      "authors": [
+        "@vitor-cloud-9f",
+        "@ironidesflj"
+      ],
       "version": 3
     },
     "comments": [
       {
-        "handle": "@vitor-cloud-9f",
-        "tier": 4,
-        "passed": true,
-        "option": "A",
-        "body": "No simulado muita gente escorrega na A porque lê 'analysts' no enunciado. Mas repare na negativa: 'Analysts must NOT be able to attach to this compute'. Sempre que a prova pedir isolamento de execução + término automático ao fim do pipeline, a resposta é Job Cluster (B).",
-        "sourceUrl": "https://docs.databricks.com/aws/en/jobs/compute",
-        "accelerations": 34,
-        "accepted": true
-      },
-      {
-        "handle": "@helena-qa-2b",
-        "tier": 3,
-        "passed": true,
-        "option": "C",
-        "body": "Para não confundir B com C na hora da prova: Lakeflow Job rodando PySpark precisa de Job Cluster (B). Serverless SQL Warehouse (C) só entra quando a carga é puramente SQL / BI.",
-        "sourceUrl": "https://docs.databricks.com/aws/en/compute/",
-        "accelerations": 19,
-        "accepted": false
-      },
-      {
+        "subjectId": "DC_kwDOVVHVoc4BKfPd",
+        "subjectType": "DiscussionComment",
+        "discussionId": "D_kwDOVVHVoc4ArAq2",
+        "url": "https://github.com/ironidesflj/noos-hub/discussions/17#discussioncomment-19526621",
+        "parentSubjectId": null,
+        "authorId": "U_kgDOCouteg",
         "handle": "@ironidesflj",
         "tier": 4,
-        "passed": true,
-        "option": "B",
-        "body": "Além de impedir sessões interativas indevidas, o Job Cluster reduz drasticamente o custo em DBU comparado ao All-Purpose Cluster.",
-        "sourceUrl": "https://docs.databricks.com/aws/en/jobs/compute",
-        "accelerations": 12,
-        "accepted": false,
-        "createdAt": "2026-11-10T18:56:35Z"
+        "passedSelfDeclared": false,
+        "option": "",
+        "body": "teste comentario",
+        "sourceUrl": "",
+        "sourceOfficial": false,
+        "accelerations": 0,
+        "createdAt": "2026-11-10T18:56:35Z",
+        "updatedAt": "2026-11-10T18:56:35Z",
+        "isRoot": false,
+        "replyToSubjectId": null
       }
     ]
   }

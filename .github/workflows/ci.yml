@@ -66,6 +66,12 @@ jobs:
           print('OK — todas as referências locais existem.')
           PY
 
+      - name: Testes da Camada de Mielina (política, sync, API, curadoria)
+        run: |
+          node --test build/lib/mielina-policy.test.mjs
+          node --test scripts/sync-discussao.test.mjs
+          node --test tests/*.test.mjs
+
       - name: Gerar páginas de questões e sitemap
         run: |
           npm ci
