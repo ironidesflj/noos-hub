@@ -31,6 +31,32 @@ function mielinaJsonHeaders(extra) {
 function mielinaLogin() {
   window.location.href = "/api/mielina/auth/login?returnTo=" + encodeURIComponent(window.location.pathname + window.location.hash);
 }
+/* Chamadas do apoio com timeout real: se o GitHub pendurar, o AbortController
+   aborta e o catch do clique reconcilia via GET. Nada é somado localmente. */
+var MIELINA_SUPPORT_TIMEOUT_MS = 12000;
+async function mielinaFetchJson(url, options, timeoutMs) {
+  var controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+  var init = {};
+  var key;
+  if (options) {
+    for (key in options) {
+      if (Object.prototype.hasOwnProperty.call(options, key)) init[key] = options[key];
+    }
+  }
+  var timer = null;
+  if (controller) {
+    init.signal = controller.signal;
+    timer = setTimeout(function () { controller.abort(); }, timeoutMs || MIELINA_SUPPORT_TIMEOUT_MS);
+  }
+  try {
+    var res = await fetch(url, init);
+    var data = null;
+    try { data = await res.json(); } catch (e) { data = null; }
+    return { status: res.status, ok: res.ok, data: data };
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
   var root = document.querySelector(".q-col-mielina");
   if (!root) return;
 
@@ -234,22 +260,29 @@ function mielinaLogin() {
           return;
         }
         if (!me.authenticated) { mielinaLogin(); return; }
-        var res = await fetch("/api/mielina/support", {
-          method: "POST",
-          headers: mielinaJsonHeaders(),
-          body: JSON.stringify({ subjectId: subjectId, desiredState: desired, questionId: questionId() }),
-        });
+        var res = await mielinaFetchJson(
+          "/api/mielina/support",
+          {
+            method: "POST",
+            headers: mielinaJsonHeaders(),
+            body: JSON.stringify({ subjectId: subjectId, desiredState: desired, questionId: questionId() }),
+          },
+          MIELINA_SUPPORT_TIMEOUT_MS
+        );
         if (res.status === 401) { mielinaLogin(); return; }
         if (!res.ok) throw new Error("support " + res.status);
-        var data = await res.json();
-        setVoteUi(btn, Number(data.count), data.viewerSupported === true);
+        if (!res.data || typeof res.data.count !== "number") throw new Error("support sem contagem");
+        setVoteUi(btn, res.data.count, res.data.viewerSupported === true);
       } catch (e) {
-        // Reconciliação: nunca soma local fantasma.
+        // Timeout/erro: reconciliação autoritativa via GET; nunca soma local fantasma.
         try {
-          var r = await fetch("/api/mielina/support?subjectId=" + encodeURIComponent(subjectId));
-          if (r.ok) {
-            var d = await r.json();
-            setVoteUi(btn, Number(d.count), d.viewerSupported === true);
+          var r = await mielinaFetchJson(
+            "/api/mielina/support?subjectId=" + encodeURIComponent(subjectId),
+            { method: "GET" },
+            MIELINA_SUPPORT_TIMEOUT_MS
+          );
+          if (r.ok && r.data && typeof r.data.count === "number") {
+            setVoteUi(btn, r.data.count, r.data.viewerSupported === true);
           }
         } catch (e2) {
           /* sem rede: mantém estado anterior */

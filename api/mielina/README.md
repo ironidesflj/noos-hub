@@ -14,6 +14,12 @@ Nenhum token, segredo ou `client_secret` aparece em resposta, log ou URL.
 Todas as respostas usam `Cache-Control: private, no-store`. Erros seguem
 `{ ok: false, error: "<CODIGO>", message: "<texto>", errors?: [...] }`.
 
+Toda chamada ao GitHub tem timeout real (`AbortController` + `setTimeout`),
+ajustável por `MIELINA_GITHUB_TIMEOUT_MS` (inteiro positivo em ms, default
+`10000`, teto `60000`). Quando o GitHub não responde, a rota devolve
+`504 GITHUB_TIMEOUT` — mensagem fixa, sem token/URL/detalhe interno — e o
+cliente reconcilia o estado com um GET.
+
 ### `GET /api/mielina/me`
 
 Identidade leve para a UI (Fase 5). Lê a sessão do cookie e
@@ -51,7 +57,8 @@ Sem corpo. Exige sessão + Origin + `X-Mielina-CSRF`; limpa os cookies.
 
 ### `GET /api/mielina/support?subjectId=DC_…` (reconciliação)
 
-Exige sessão (sem CSRF; é leitura).
+Exige sessão (sem CSRF; é leitura). É a fonte autoritativa após um erro/timeout
+no POST: devolve o estado real do GitHub, sem somar nada no cliente.
 
 ```json
 { "ok": true, "subjectId": "DC_…", "questionId": "RAN-DBDEA-00001",
@@ -70,7 +77,9 @@ Corpo: `{ "subjectId": "DC_…", "desiredState": true|false,
   única `build/lib/mielina-policy.mjs`).
 - Resposta: `{ ok, subjectId, questionId, count, viewerSupported, observedAt }`.
 - Erros: `400 SUBJECT_QUESTION_MISMATCH`/`SUBJECT_FOREIGN_REPO`,
-  `401 UNAUTHENTICATED`, `403 CSRF_INVALID`, `429 RATE_LIMITED` (30/min).
+  `401 UNAUTHENTICATED`, `403 CSRF_INVALID`, `429 RATE_LIMITED` (30/min),
+  `504 GITHUB_TIMEOUT` (GitHub não respondeu a tempo; a mutação pode ter sido
+  aplicada — reconcilie via `GET /api/mielina/support`).
 
 ### `POST /api/mielina/comment`
 
@@ -140,6 +149,10 @@ await fetch("/api/mielina/support", {
   `403 CSRF_INVALID`. O valor vem de `GET /api/mielina/me.csrfToken`.
 - `GET /api/mielina/support?subjectId=…` não exige CSRF (é leitura), mas exige
   sessão.
+- O cliente envia o POST do apoio com `AbortController` (timeout de 12 s) e faz
+  a reconciliação por GET também com timeout; se o servidor demorar, o clique
+  nunca fica pendurado nem soma localmente. O servidor corta antes
+  (`MIELINA_GITHUB_TIMEOUT_MS`, default 10 s) e responde `504 GITHUB_TIMEOUT`.
 - O `Origin` é enviado automaticamente pelo navegador em POST same-origin.
 - Após `202` de approve/revert o conteúdo muda em `main`; a página estática só
   reflete depois do sync/build (recarregar/pollar, nunca somar localmente).

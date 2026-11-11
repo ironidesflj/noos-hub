@@ -33,10 +33,17 @@ Página `/q/{ID}/` dual-column (≥1024px), questão sticky à esquerda e discus
 - Synapse publica 431 questões de estudo; links de comunidade no app são responsabilidade do repositório do Synapse.
 - Axon `0.3.0` publicado (`retired`/`isRetired`); ver `library.version` em `noos.registry.json`.
 
-## Verificação (10/11/2026)
+## Verificação (11/11/2026)
 
-- `npm run qa` → **PASS** (68 asserções no gerador); `node --test` → **63/63**; `node --test` → **63/63** (política, sync, lib/API, curadoria) (fixture; inclui paridade PT/EN, cantoneiras, 4 níveis de avatar, diff, compositor e zero iframe do giscus).
+- `npm run qa` → **PASS** (68 asserções no gerador); `node --test build/lib/mielina-policy.test.mjs scripts/sync-discussao.test.mjs tests/*.test.mjs` → **74/74** (63 de base + 4 de paginação profunda/replies + 7 de timeout do apoio; fixture cobre paridade PT/EN, cantoneiras, 4 níveis de avatar, diff, compositor e zero iframe do giscus).
 - `npm run build` → **1.031 aceitas / 0 rejeitadas**, 2.062 páginas canônicas, 1.031 redirects, sitemap com 1.033 entradas.
+- **Sync real (`--dry`, 11/11/2026):** `[dry] 2 questões; 1 autores`, exit 0 — a `Q_DISCUSSIONS` nova (comments + `replies { totalCount }` + reactions inline) foi aceita pelo GitHub real.
+
+### Correções de 11/11/2026
+
+- **Replies silenciosamente descartadas:** `COMMENT_FIELDS` não pedia `replies`; `completeReplies()` recebia `undefined`, devolvia `[]` e TODO autor de resposta ficava fora da reputação/tiers. Agora `COMMENT_FIELDS` pede `replies { totalCount }` e `fetchAllReplies()` pagina `Q_REPLIES` do cursor nulo **só** para comentários com respostas (`tests/sync-pagination.test.mjs`).
+- **Limite de nós do GraphQL:** a 1ª tentativa de fix inlinava `replies(first:50)` sob `comments(first:50)`; o GitHub real rejeitou com `MAX_NODE_LIMIT_EXCEEDED` (50×50×50×100 = 12,5M nós > 500k). Custo atual: comments(50)×reactions(100) = 250k; replies(50)×reactions(100) = 5k por página. O fixture offline modela esse erro (`rejected`).
+- **Timeout real do apoio:** `GitHubClient.graphql()/rest()` usam `AbortController` + `setTimeout` (`MIELINA_GITHUB_TIMEOUT_MS`, default 10 s, teto 60 s) e devolvem `504 GITHUB_TIMEOUT`; o POST de apoio no cliente aborta em 12 s e reconcilia por `GET /support` (contador autoritativo, sem soma local) — `tests/mielina-timeout.test.mjs`.
 - Layout verificado em 320 px, 640 px (200% zoom em 1280) e 1920 px sem overflow horizontal; sticky com scroll interno.
 - **CSP enforce testado localmente** com servidor enviando o header: 0 violações em home, questão, redirect e 404; tema e filtros funcionando; scripts inline eliminados (`js/theme-boot.js`, `js/lang-redirect.js`, `js/redirect.js`).
 - **Pendências conhecidas:** configurar GitHub App/segredos na Vercel (`docs/configurar-mielina.md`) e validar o checklist (auth/API dependem de credenciais); curadoria editorial das sínteses (o schema de `revisions` está pronto, mas os dumps atuais ainda não têm histórico arquivado), promoção automática de “resposta aceita”, self-host das Google Fonts (hoje liberadas na CSP) e testes de CSP no preview. Cruzamento de reputação com upvote local segue em estudo (documentado no `plan.md`).

@@ -73,6 +73,11 @@ com os apps; o estado operacional fica em `current-state.md`.
 - Five phases implementadas e mergeadas (#22 `aa16394`, #23 `d7c2506`);
   produção 2.0.0; 63 testes Node + QA 68; CSP enforce.
 - Checkout local reconciliado em `d7c2506`; guia de credenciais criado.
+- Hotfixes pós-checklist (mesmo dia): replies do sync deixaram de ser
+  descartadas (`replies { totalCount }` + `fetchAllReplies`), custo GraphQL
+  ajustado ao limite de nós do GitHub real (validação `--dry` exit 0) e timeout
+  real nas chamadas ao GitHub (`504 GITHUB_TIMEOUT` + reconciliação do cliente).
+  74 testes Node verdes.
 
 ## Pendente
 
