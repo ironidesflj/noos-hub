@@ -60,7 +60,10 @@ Configure na Vercel (Production/Preview) — nomes exatos em `.env.example`:
 - `MIELINA_DISPATCH_TOKEN` (PAT fine-grained com `contents: write` para disparar
   `repository_dispatch`; alternativa: `MIELINA_GITHUB_TOKEN`)
 - opcionais: `MIELINA_ALLOWED_ORIGINS` (previews), `MIELINA_REPO`,
-  `MIELINA_DISCUSSION_CATEGORY_ID`, `MIELINA_RAW_BASE`
+  `MIELINA_DISCUSSION_CATEGORY_ID`, `MIELINA_RAW_BASE`,
+  `MIELINA_GITHUB_TIMEOUT_MS` (timeout por chamada ao GitHub; default `10000`,
+  teto `60000`; ao estourar a API responde `504 GITHUB_TIMEOUT` e o cliente
+  reconcilia o contador via GET)
 
 Sem essas variáveis as APIs respondem falha fechada (503/401) e a leitura
 estática continua funcionando. O workflow `curadoria-sintese.yml` usa o token

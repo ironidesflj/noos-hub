@@ -114,17 +114,24 @@ async function gql(token, query, variables = {}) {
 }
 
 const REACTION_FIELDS = `pageInfo{hasNextPage endCursor} nodes{content user{__typename login ... on User { id databaseId }}}`;
-const COMMENT_FIELDS = `
-  id url createdAt updatedAt isAnswer
-  author { __typename login ... on User { id databaseId } }
-  body
-  reactions(first:100){${REACTION_FIELDS}}
-`;
+// REPLY_FIELDS alimenta apenas Q_REPLIES: as respostas são paginadas fora do
+// documento de comentários para não estourar o limite de nós do GitHub.
 const REPLY_FIELDS = `
   id url createdAt updatedAt
   author { __typename login ... on User { id databaseId } }
   body
   reactions(first:100){${REACTION_FIELDS}}
+`;
+// `replies` entra só como totalCount: inlinar replies(first:50) dentro de
+// comments(first:50) de Q_DISCUSSIONS estoura MAX_NODE_LIMIT_EXCEEDED no GitHub
+// real (50×50×50×100 = 12,5M nós > 500k). A contagem manda buscar as respostas
+// por Q_REPLIES somente onde existem.
+const COMMENT_FIELDS = `
+  id url createdAt updatedAt isAnswer
+  author { __typename login ... on User { id databaseId } }
+  body
+  reactions(first:100){${REACTION_FIELDS}}
+  replies { totalCount }
 `;
 
 const Q_DISCUSSIONS = `
@@ -193,24 +200,20 @@ async function completeReactions(token, subjectId, firstConn) {
   }
 }
 
-async function completeReplies(token, commentId, firstConn) {
-  const nodes = [...((firstConn && firstConn.nodes) || [])];
-  if (firstConn && firstConn.pageInfo.hasNextPage) {
-    let cursor = firstConn.pageInfo.endCursor;
-    for (;;) {
-      const data = await gql(token, Q_REPLIES, { id: commentId, cursor });
-      const conn = data.node && data.node.replies;
-      if (!conn) throw new Error(`respostas ausentes para ${commentId}`);
-      nodes.push(...conn.nodes);
-      if (!conn.pageInfo.hasNextPage) break;
-      cursor = conn.pageInfo.endCursor;
-    }
+/**
+ * Busca TODAS as páginas de respostas de um comentário, do cursor nulo.
+ * Q_REPLIES já traz REPLY_FIELDS com reactions inline; reactions >100 são
+ * completadas por completeReactions. Custo por página: 50×100 = 5.000 nós.
+ */
+async function fetchAllReplies(token, commentId) {
+  const replies = await paginate(token, Q_REPLIES, { id: commentId }, (d) => d.node.replies);
+  for (const reply of replies) {
+    reply.reactions = { nodes: await completeReactions(token, reply.id, reply.reactions) };
   }
-  for (const reply of nodes) reply.reactions = { nodes: await completeReactions(token, reply.id, reply.reactions) };
-  return nodes;
+  return replies;
 }
 
-async function hydrateDiscussion(token, node) {
+export async function hydrateDiscussion(token, node) {
   const comments = [...node.comments.nodes];
   if (node.comments.pageInfo.hasNextPage) {
     // paginate() recomeça do cursor nulo para garantir a lista completa;
@@ -221,7 +224,9 @@ async function hydrateDiscussion(token, node) {
   }
   for (const comment of comments) {
     comment.reactions = { nodes: await completeReactions(token, comment.id, comment.reactions) };
-    comment.replies = { nodes: await completeReplies(token, comment.id, comment.replies) };
+    // totalCount evita N+1: Q_REPLIES só é chamada para comentários com respostas.
+    const replyCount = Number(comment.replies && comment.replies.totalCount) || 0;
+    comment.replies = { nodes: replyCount > 0 ? await fetchAllReplies(token, comment.id) : [] };
   }
   node.reactions = { nodes: await completeReactions(token, node.id, node.reactions) };
   node.comments = { nodes: comments };
@@ -385,7 +390,9 @@ export function buildAuthorMetrics(entries, preserved, curators) {
 
 // ---------- coleta ----------
 
-async function collectAll(token) {
+// Exportado para teste offline: percorre Q_DISCUSSIONS → Q_COMMENTS → Q_REPLIES
+// → Q_REACTIONS com fetch stubado (fixture fiel à seleção pedida em cada query).
+export async function collectAll(token) {
   const discussions = await paginate(
     token,
     Q_DISCUSSIONS,
