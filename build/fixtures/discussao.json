@@ -41,6 +41,18 @@
           ],
           "updatedAt": "2026-11-10"
         }
+      ],
+      "pendingProposals": [
+        {
+          "proposalId": "DC_fixture_proposal_1",
+          "baseVersion": 3,
+          "proposerId": "U_fixture_1",
+          "proposerHandle": "@vitor-cloud-9f",
+          "body": "Proposta de melhoria: explicitar que o alias eterno não é reciclado.",
+          "sourceUrl": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org",
+          "contentHash": "sha256:fixture",
+          "createdAt": "2026-11-11T12:30:00Z"
+        }
       ]
     },
     "comments": [
@@ -52,7 +64,17 @@
         "body": "O discriminante é a estabilidade: o ID canônico nunca muda, mesmo se o texto da questão for revisado. A alternativa C confunde porque parece mais curta, mas reciclar sequência quebra links já publicados.",
         "sourceUrl": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org",
         "accelerations": 27,
-        "accepted": true
+        "accepted": true,
+        "subjectId": "DC_fixture_1",
+        "authorId": "U_fixture_1",
+        "subjectType": "DiscussionComment",
+        "discussionId": "D_fixture",
+        "url": "https://github.com/ironidesflj/noos-hub/discussions/1#discussioncomment-1",
+        "passedSelfDeclared": true,
+        "sourceOfficial": true,
+        "createdAt": "2026-11-10T18:00:00Z",
+        "updatedAt": "2026-11-10T18:00:00Z",
+        "isRoot": false
       },
       {
         "handle": "@cintia-v8f",
@@ -62,7 +84,17 @@
         "body": "Eu errei marcando C no simulado. O gabarito mostra que o ID antigo continua como alias — a página nova não invalida a URL que já circulou.",
         "sourceUrl": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org",
         "accelerations": 18,
-        "accepted": false
+        "accepted": false,
+        "subjectId": "DC_fixture_2",
+        "authorId": "U_fixture_2",
+        "subjectType": "DiscussionComment",
+        "discussionId": "D_fixture",
+        "url": "https://github.com/ironidesflj/noos-hub/discussions/1#discussioncomment-2",
+        "passedSelfDeclared": true,
+        "sourceOfficial": true,
+        "createdAt": "2026-11-10T18:00:00Z",
+        "updatedAt": "2026-11-10T18:00:00Z",
+        "isRoot": false
       },
       {
         "handle": "@anon-7q",
@@ -71,8 +103,19 @@
         "option": "A",
         "body": "Achei que a letra A era a correta porque o exemplo mostra só o prefixo, mas a explicação da síntese resolveu.",
         "accelerations": 2,
-        "accepted": false
+        "accepted": false,
+        "subjectId": "DC_fixture_3",
+        "authorId": "U_fixture_3",
+        "subjectType": "DiscussionComment",
+        "discussionId": "D_fixture",
+        "url": "https://github.com/ironidesflj/noos-hub/discussions/1#discussioncomment-3",
+        "passedSelfDeclared": false,
+        "sourceOfficial": false,
+        "createdAt": "2026-11-10T18:00:00Z",
+        "updatedAt": "2026-11-10T18:00:00Z",
+        "isRoot": false
       }
-    ]
+    ],
+    "syncedAt": "2026-11-11T13:00:00Z"
   }
 }

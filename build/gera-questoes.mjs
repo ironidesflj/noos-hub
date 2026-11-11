@@ -361,6 +361,17 @@ const isSafeUrl = (u) => {
 
 const optionLetter = (i) => 'ABCD'[i] ?? '?';
 
+/* Compatibilidade: dumps novos usam passedSelfDeclared; fixtures antigas usam passed. */
+const isPassedComment = (c) => c?.passed === true || c?.passedSelfDeclared === true;
+
+/** Snapshot date in UTC: "11/11 13:09 UTC" (from entry.syncedAt). */
+const fmtSnapshot = (iso) => {
+  const d = iso ? new Date(iso) : null;
+  if (!d || Number.isNaN(d.getTime())) return '';
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+};
+
 const shortWords = (s, max = 28) => {
   const clean = String(s ?? '').replace(/\s+/g, ' ').trim();
   return clean.length <= max ? clean : `${clean.slice(0, max - 1).trimEnd()}…`;
@@ -430,7 +441,7 @@ function renderTiersDrawer(lang) {
                     ${renderNoosAvatarSvg('@helena-qa-2b', 3)}
                     <div>
                       <div class="mielina-handle">@helena-qa-2b</div>
-                      <span class="badge-role" style="margin-top:3px">⚡ ${isPt ? 'Mielina Ativa · Edita Wiki' : 'Active Myelin · Wiki Editor'}</span>
+                      <span class="badge-role" style="margin-top:3px">⚡ ${isPt ? 'Mielina Ativa · Propõe revisão da Síntese Wiki' : 'Active Myelin · Proposes Wiki synthesis'}</span>
                     </div>
                   </div>
                   <p class="tier-card-desc">${isPt ? 'Duas elipses coaxiais (±35°) abraçam o avatar com dois nós laterais.' : 'Two coaxial ellipses (±35°) wrap the avatar with two lateral nodes.'}</p>
@@ -453,7 +464,7 @@ function renderTiersDrawer(lang) {
                   </div>
                   <p class="tier-card-desc" style="color:var(--fg)"><strong>${isPt ? 'O Abraço da Esfera:' : 'The Sphere Embrace:'}</strong> ${isPt ? 'O capuz da Esfera Noos envolve o topo do Identicon e apoia dois nós luminosos nos ombros do perfil.' : 'The Noos Sphere hood wraps the top of the Identicon and rests two luminous nodes on its shoulders.'}</p>
                 </div>
-                <div class="tier-card-unlock" style="color:var(--signal)">🔓 ${isPt ? 'Poder: Aprovar/Reverter Diffs Wiki + Selo Co-autor.' : 'Unlocks: Approve/Revert Wiki Diffs + Co-author Badge.'}</div>
+                <div class="tier-card-unlock" style="color:var(--signal)">🔓 ${isPt ? 'Poder: Aprovar revisões de terceiros e restaurar versões + Selo Co-autor.' : 'Unlocks: Approve third-party revisions and restore versions + Co-author Badge.'}</div>
               </div>
             </div>
           </section>`;
@@ -462,7 +473,8 @@ function renderTiersDrawer(lang) {
 function renderDiscussionHead(q, entry, lang) {
   const t = mielinaT(lang);
   const comments = Array.isArray(entry?.comments) ? entry.comments : [];
-  const approved = comments.filter((c) => c && c.passed === true).length;
+  const approved = comments.filter((c) => c && isPassedComment(c)).length;
+  const observed = fmtSnapshot(entry?.syncedAt);
   return `<div class="mielina-box">
             <header class="mielina-head-top">
               <div style="flex:1;min-width:220px">
@@ -479,6 +491,7 @@ function renderDiscussionHead(q, entry, lang) {
                   <span class="mielina-score-label">${escapeHtml(t.approved)}</span>
                 </div>
                 <p class="mielina-score-sub">${escapeHtml(t.approvedSub)}</p>
+                ${observed ? `<span class="mono mielina-observed" title="${escapeHtml(lang === 'pt' ? 'Data de apuração do snapshot' : 'Snapshot capture time')}">${escapeHtml(lang === 'pt' ? 'Snapshot apurado em' : 'Snapshot captured at')} ${escapeHtml(observed)}</span>` : ''}
               </div>
             </header>
             ${renderMatrixInner(q, entry, lang)}
@@ -585,17 +598,21 @@ function renderSynthesis(q, entry, lang) {
           </section>`;
   }
 
-  const summary = String(syn.summary ?? '').trim();
+  const summary = String(syn.body ?? syn.summary ?? '').trim();
   const source = isSafeUrl(syn.sourceUrl) ? syn.sourceUrl : refUrl;
   const sourceLabel = String(syn.sourceTitle ?? refTitle ?? source).trim();
-  const authors = Array.isArray(syn.authors) ? syn.authors.filter(Boolean).map(String) : [];
+  const authors = (Array.isArray(syn.contributors) ? syn.contributors : [])
+    .map((c) => (typeof c === 'string' ? c : c?.handle))
+    .filter(Boolean);
+  const legacyAuthors = Array.isArray(syn.authors) ? syn.authors.filter(Boolean).map(String) : [];
+  const coauthors = (authors.length ? authors : legacyAuthors);
   const ver = Math.max(1, Number(syn.version) || 1);
   /* Histórico REAL de revisões (schema: syn.revisions[] com version+summary+fonte).
      Só renderiza Diff quando existem pelo menos duas revisões arquivadas —
      nunca inventa "revisão anterior". Dumps antigos sem revisions mostram o
      estado honesto "histórico a partir da próxima curadoria". */
   const revisions = (Array.isArray(syn.revisions) ? syn.revisions : [])
-    .filter((r) => r && typeof r === 'object' && typeof r.summary === 'string' && r.summary.trim())
+    .filter((r) => r && typeof r === 'object' && String(r.body ?? r.summary ?? '').trim())
     .slice()
     .sort((a, b) => (Number(a.version) || 0) - (Number(b.version) || 0));
   const prevRev = revisions.length >= 2 ? revisions[revisions.length - 2] : null;
@@ -609,12 +626,50 @@ function renderSynthesis(q, entry, lang) {
                 <span style="color:var(--fg)">${lang === 'pt' ? `COMPARANDO REVISÃO #${prevVer} → #${ver} (ATUAL)` : `COMPARING REVISION #${prevVer} → #${ver} (CURRENT)`}</span>
                 <span style="color:var(--accent)">${lang === 'pt' ? 'Gate Nível 03 (25+ acelerações)' : 'Tier 03 Gate (25+ accelerations)'}</span>
               </div>
-              <p class="diff-del">- ${escapeHtml(String(prevRev.summary))}</p>
+              <p class="diff-del">- ${escapeHtml(String(prevRev.body ?? prevRev.summary))}</p>
               <p class="diff-add">+ ${escapeHtml(summary)}</p>
               ${isSafeUrl(prevRev.sourceUrl) ? `<p class="mielina-official"><span class="mono">${escapeHtml(t.source)} (rev. #${prevVer})</span> <a class="mielina-source" href="${escapeHtml(prevRev.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(String(prevRev.sourceTitle || prevRev.sourceUrl))}</a></p>` : ''}
             </div>`
     : '';
-  return `<section class="mielina-box pinned" id="sintese-wiki" aria-labelledby="sintese-title">
+  const pending = (Array.isArray(syn.pendingProposals) ? syn.pendingProposals : []).filter(
+    (x) => x && typeof x === 'object' && x.body
+  );
+  const pendingBlock = pending.length
+    ? `<div class="mielina-proposals" data-proposals-list hidden>
+        <p class="mielina-kicker">${escapeHtml(lang === 'pt' ? 'Propostas pendentes' : 'Pending proposals')}</p>
+        ${pending
+          .map(
+            (pr) => `<article class="mielina-proposal" data-proposal-id="${escapeHtml(String(pr.proposalId || pr.id || ''))}">
+              <p>${escapeHtml(String(pr.body))}</p>
+              <span class="mono">v${escapeHtml(String(pr.baseVersion ?? ''))} · ${escapeHtml(String(pr.proposerHandle ?? ''))}</span>
+              <button type="button" class="mielina-chip" data-approve-proposal="${escapeHtml(String(pr.proposalId || pr.id || ''))}"
+                data-base-version="${escapeHtml(String(pr.baseVersion ?? ''))}" data-content-hash="${escapeHtml(String(pr.contentHash || ''))}" hidden>
+                ✓ ${escapeHtml(lang === 'pt' ? 'Aprovar e publicar' : 'Approve and publish')}
+              </button>
+            </article>`
+          )
+          .join('')}
+      </div>`
+    : '';
+  const revisionRestore = revisions.length >= 2
+    ? `<div class="mielina-revision-list" data-revision-list hidden>
+        <span class="mono">${escapeHtml(lang === 'pt' ? 'Restaurar versão:' : 'Restore version:')}</span>
+        ${revisions
+          .map(
+            (r) => `<button type="button" class="mielina-chip" data-revision-restore="${escapeHtml(String(r.version))}"
+              data-base-version="${escapeHtml(String(ver))}">↺ v${escapeHtml(String(r.version))}</button>`
+          )
+          .join('')}
+      </div>`
+    : '';
+  const proposePanel = `<div class="mielina-propose" data-propose-panel hidden>
+      <p class="mielina-kicker">${escapeHtml(lang === 'pt' ? 'Propor revisão (Nível 3+)' : 'Propose revision (Tier 3+)')}</p>
+      <textarea data-propose-body rows="3" maxlength="2000" placeholder="${escapeHtml(lang === 'pt' ? 'Nova síntese consolidada…' : 'New consolidated synthesis…')}"></textarea>
+      <input data-propose-source type="url" inputmode="url" placeholder="https://" />
+      <button type="button" class="mielina-chip" data-propose-submit>${escapeHtml(lang === 'pt' ? 'Enviar proposta' : 'Submit proposal')}</button>
+      <span class="mono" data-propose-status role="status" aria-live="polite"></span>
+    </div>`;
+  return `<section class="mielina-box pinned" id="sintese-wiki" aria-labelledby="sintese-title" data-question-id="${escapeHtml(q.record.id)}">
             ${corners}
             <div class="mielina-wiki-top">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -622,6 +677,7 @@ function renderSynthesis(q, entry, lang) {
                 <span class="mono" style="text-transform:none;letter-spacing:0">rev. #${escapeHtml(String(ver))} · CC BY-SA 4.0</span>
               </div>
               ${historyChip}
+              <button class="mielina-chip" type="button" data-curation-open title="${escapeHtml(lang === 'pt' ? 'Curadoria da síntese (Nível 3+ propõe; Nível 4 aprova)' : 'Synthesis curation (Tier 3+ proposes; Tier 4 approves)')}">✦ ${escapeHtml(lang === 'pt' ? 'Curadoria' : 'Curation')}</button>
             </div>
             <div data-wiki-read>
               <p class="mielina-summary">${escapeHtml(summary)}</p>
@@ -634,10 +690,13 @@ function renderSynthesis(q, entry, lang) {
                       : `<span>${escapeHtml(sourceLabel)}</span>`
                   }</span>
                 </div>
-                <span class="mono" style="text-transform:none;letter-spacing:0">${escapeHtml(t.coauthors)}: ${authors.map(escapeHtml).join(', ') || '—'}</span>
+                <span class="mono" style="text-transform:none;letter-spacing:0">${escapeHtml(t.coauthors)}: ${coauthors.map(escapeHtml).join(', ') || '—'}</span>
               </div>
             </div>
             ${diffBlock}
+            ${pendingBlock}
+            ${revisionRestore}
+            ${proposePanel}
           </section>`;
 }
 
@@ -658,7 +717,7 @@ function renderRitual(lang) {
 function renderFilters(entry, lang) {
   const t = mielinaT(lang);
   const comments = Array.isArray(entry?.comments) ? entry.comments : [];
-  const passedCount = comments.filter((c) => c && c.passed === true).length;
+  const passedCount = comments.filter((c) => c && isPassedComment(c)).length;
   const chips = [
     { key: 'all', label: `${t.all} (${comments.length})`, pressed: true },
     { key: 'passed', label: `✦ ${t.passed} (${passedCount})`, pressed: false },
@@ -701,10 +760,10 @@ function renderThread(q, entry, lang) {
       const opt = String(c.option ?? '').toUpperCase();
       const source = isSafeUrl(c.sourceUrl) ? c.sourceUrl : null;
       const accel = Number(c.accelerations) || 0;
-      const approved = c.passed === true;
+      const approved = isPassedComment(c);
       const roleIcon = tier === 4 ? '🛡️ ' : tier === 3 ? '⚡ ' : '';
       const badges = [
-        approved ? `<span class="badge-passed">✦ ${escapeHtml(lang === 'pt' ? `Passei na prova · ${q.record.exam}` : `Passed · ${q.record.exam}`)}</span>` : '',
+        approved ? `<span class="badge-passed" title="${escapeHtml(lang === 'pt' ? 'Autodeclarado no ritual' : 'Self-declared in the ritual')}">✦ ${escapeHtml(lang === 'pt' ? `Passei na prova (autodeclarado) · ${q.record.exam}` : `Passed (self-declared) · ${q.record.exam}`)}</span>` : '',
         `<span class="badge-role">${roleIcon}${escapeHtml(tierNames[lang][tier] ?? '')}</span>`,
         c.accepted === true ? `<span class="badge-role">✓ ${escapeHtml(t.accepted)}</span>` : '',
         opt ? `<span class="badge-trap">${escapeHtml(lang === 'pt' ? 'Alternativa' : 'Option')} ${escapeHtml(opt)}</span>` : '',
@@ -736,10 +795,18 @@ function renderThread(q, entry, lang) {
               <footer class="mielina-card-foot">
                 <span>${
                   source
-                    ? `${escapeHtml(t.source)} <a class="mielina-source" href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source)}</a>`
-                    : escapeHtml(lang === 'pt' ? 'Contribuição verificada sob CC BY-SA 4.0' : 'Verified contribution under CC BY-SA 4.0')
+                    ? `${escapeHtml(
+                        c.sourceOfficial
+                          ? lang === 'pt'
+                            ? 'Fonte oficial citada'
+                            : 'Official source cited'
+                          : lang === 'pt'
+                            ? 'Fonte citada'
+                            : 'Source cited'
+                      )}: <a class="mielina-source" href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source)}</a>`
+                    : escapeHtml(lang === 'pt' ? 'Contribuição da comunidade · CC BY-SA 4.0' : 'Community contribution · CC BY-SA 4.0')
                 }</span>
-                <button type="button" class="mielina-upvote-btn" data-upvote="${escapeHtml(q.record.id)}-${idx}">
+                <button type="button" class="mielina-upvote-btn" data-upvote="1" data-subject-id="${escapeHtml(String(c.subjectId || ''))}" data-count="${accel}" data-voted="${c.viewerSupported === true ? 'true' : 'false'}" aria-busy="false">
                   <span>▲</span>
                   <span data-vote-num>${accel}</span>
                   <span>· ${escapeHtml(t.accelerateBtn)}</span>
@@ -1108,6 +1175,11 @@ if (QA) {
   expect(ptHtml.includes('class="q-gravity"'), 'barra de gravidade cross-app presente');
   expect(ptHtml.includes('data-wiki-diff'), 'bloco de diff inline da síntese wiki presente');
   expect(ptHtml.includes('data-upvote='), 'botão interativo de aceleração presente');
+  expect(ptHtml.includes('data-subject-id="DC_fixture_1"'), 'voto vinculado ao subjectId permanente do GitHub');
+  expect(ptHtml.includes('Snapshot apurado em 11/11 13:00 UTC'), 'data de apuração do snapshot visível');
+  expect(ptHtml.includes('data-propose-panel'), 'painel de proposta de revisão presente');
+  expect(ptHtml.includes('data-revision-restore='), 'restauração de versão presente no histórico');
+  expect(ptHtml.includes('data-approve-proposal="DC_fixture_proposal_1"'), 'botão de aprovação da proposta pendente presente');
   expect(ptHtml.includes('Passei na prova'), 'flair de aprovado presente');
   expect(ptHtml.includes('data-filter-opt="B"'), 'âncora de discussão por alternativa');
   expect(ptHtml.includes('data-wiki-diff'), 'diff de histórico real presente quando há revisões arquivadas');

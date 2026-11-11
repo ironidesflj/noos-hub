@@ -149,3 +149,47 @@ dumps existentes; fluxo de reversão auditável (Gate Nível 4); promoção
 automática de “resposta aceita”. A CSP das páginas está em **enforce** desde a
 1.6.0 (scripts inline externalizados; Google Fonts liberado até o self-host).
 
+
+
+---
+
+## 7. Arquitetura definitiva v3 (2026-11-11) — contrato consolidado
+
+A versão 2.0.0 implementa o handoff `handoff-arquitetura-definitiva-mielina.md`.
+Regras vinculantes:
+
+- **Leitura 100% estática:** a página publica o snapshot com data de apuração
+  (`syncedAt`/`observedAt` em UTC) e **não chama `/api/mielina/*` no load**;
+  APIs só são acionadas por ação participativa ou sessão autenticada.
+- **Sessão:** GitHub App com OAuth (state + PKCE), cookie cifrado
+  AES-256-GCM (`MIELINA_SESSION_SECRET`), `HttpOnly; Secure; SameSite=Lax`,
+  `Cache-Control: private, no-store`; **nada em localStorage**.
+- **Identidade de dados:** `subjectId` = node ID GraphQL (`D_…`/`DC_…`),
+  `authorId` = ID da conta; índices posicionais nunca identificam voto.
+- **Apoio (`▲ Acelerar`):** 1 conta humana = 1 apoio; união de `ROCKET`,
+  `THUMBS_UP`, `HEART`, sem bots e sem auto-apoio. O cliente envia o desejo e
+  substitui o número pelo `count` confirmado pela API; em timeout reconcilia
+  via GET, sem soma local fantasma. O voto legado em localStorage é limpo.
+- **Fonte oficial:** allowlist por prefixo em `discussao/official-sources.json`
+  (só `https:`, domínio/subdomínio oficial) → selo **“Fonte oficial citada”**.
+  “Fonte verificada” fica reservado à síntese aprovada.
+- **Tiers (E estrito):** 1 = participação autenticada; 2 = aprovação
+  autodeclarada; 3 = ≥25 apoios **E** ≥3 contribuições com fonte oficial;
+  4 = ≥100 apoios **E** ≥3 sínteses distintas aprovadas (ou curador explícito).
+- **Curadoria:** Nível 3 **propõe** revisão; Nível 4/curador **aprova** ou
+  **restaura**, sempre com `contentHash` + `baseVersion`, sem autoaprovação
+  (`approverId ≠ proposerId`) e com revisões **append-only** (`revisions[]`
+  nunca é reescrito; restaurar cria `v(N+1)`).
+- **Execução:** aprovações disparam `repository_dispatch` para o workflow
+  `curadoria-sintese.yml`, que revalida permissões, hash, versão e idempotência
+  antes de commitar em `main`.
+- **Sync:** paginação completa de discussions/comments/replies/reactions,
+  all-or-nothing (falha = nenhum arquivo alterado), dedupe por título (mais
+  antiga canônica), registros sem procedência só existem no fixture de QA.
+  Roda a cada hora (workflow) e nunca dentro do build.
+- **APIs (Vercel Functions):** `/api/mielina/auth/login|callback`,
+  `/api/mielina/me`, `/api/mielina/support`, `/api/mielina/comment`,
+  `/api/mielina/synthesis/propose|approve|revert`.
+
+O checklist de aceite vive em `noos-orquestra/relatorios/mielina-checklist.md`
+(fora do repositório) e é reproduzido em cada release.

@@ -1,0 +1,6 @@
+{
+  "_comentario": "Allowlist de fontes oficiais por prefixo. Usada pelo sync e pela API para o selo 'Fonte oficial citada'. Só https; domínio exato ou subdomínio.",
+  "RAN": ["learn.microsoft.com", "azure.microsoft.com", "docs.databricks.com", "aws.amazon.com", "docs.aws.amazon.com", "cloud.google.com"],
+  "SYN": ["istqb.org", "bstqb.org.br", "iso.org", "ieee.org"],
+  "GLOBAL": ["ietf.org", "w3.org", "nist.gov", "owasp.org"]
+}

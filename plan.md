@@ -48,7 +48,25 @@ com os apps; o estado operacional fica em `current-state.md`.
   `redirect`); testado localmente com 0 violações em home/questão/redirect/404.
 - **Histórico real de síntese:** `synthesis.revisions[]` com diff `#n-1 → #n`
   usando o texto anterior real; dumps sem histórico mostram estado honesto.
-- **QA 61 asserções** mantido; build 1.031/2.062/1.031; versão **1.6.0**.
+- **QA 68 asserções** (fixture); build 1.031/2.062/1.031; versão **1.6.0** (base; a arquitetura v3 sobe para **2.0.0**).
+
+## Em execução — 2026-11-11 · Arquitetura definitiva da Mielina (v3)
+
+- **Fase 1:** política única (`build/lib/mielina-policy.mjs`) com apoiadores
+  únicos, allowlist de fonte oficial e tiers E-estrito + testes unitários.
+- **Fase 2:** sync reescrito com paginação completa (discussions/comments/
+  replies/reactions), all-or-nothing, dedupe de discussões, IDs permanentes,
+  higiene de procedência, `reputation.json` e preservação de `synthesis`.
+  Workflow horário.
+- **Fase 3/4:** APIs `/api/mielina/*` + workflow `curadoria-sintese.yml`
+  (GitHub App OAuth/PKCE, cookie cifrado, gates/hashes/idempotência).
+- **Fase 5:** UI com snapshot datado, voto via API (sem localStorage),
+  propostas/aprovação/restauração inline, rótulos de fonte/tier.
+- **Versão 2.0.0**; checklist de aceite em
+  `noos-orquestra/relatorios/mielina-checklist.md`.
+- **Bloqueio externo:** configurar GitHub App + segredos (`GITHUB_APP_ID`,
+  `GITHUB_APP_PRIVATE_KEY`, `GITHUB_APP_CLIENT_ID`, `GITHUB_APP_CLIENT_SECRET`,
+  `MIELINA_SESSION_SECRET`) na Vercel para validar auth/API em produção.
 
 ## Pendente
 

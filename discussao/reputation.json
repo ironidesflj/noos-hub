@@ -1,0 +1,26 @@
+{
+  "syncedAt": "2026-11-11T13:09:30.215Z",
+  "curators": [
+    {
+      "authorId": "U_kgDOCouteg",
+      "handle": "@ironidesflj",
+      "role": "maintainer-curator"
+    }
+  ],
+  "authors": {
+    "U_kgDOCouteg": {
+      "handle": "@ironidesflj",
+      "tier": 4,
+      "selfDeclaredPassed": false,
+      "metrics": {
+        "authenticatedParticipations": 2,
+        "eligibleSupports": 0,
+        "officialCitedPosts": 0,
+        "selfDeclaredPassed": false,
+        "distinctApprovedSyntheses": 0
+      },
+      "lastContributionAt": "2026-11-10T18:56:35Z"
+    }
+  },
+  "verifiedOfficialUrls": []
+}

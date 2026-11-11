@@ -5,11 +5,11 @@
 
 ## Estado verificado (10/11/2026)
 
-- Sistema **v1.6.0** (`package.json`, `noos.registry.json`, rodapés PT/EN).
+- Sistema **v2.0.0** (`package.json`, `noos.registry.json`, rodapés PT/EN).
 - **1.031 questões publicadas:** `RAN.jsonl` 600 (DBDEA 300 + AZ-900 300) + `SYN.jsonl` 431. Build → 1.031 aceitas, 0 rejeitadas, **2.062 páginas canônicas** e **1.031 redirects**; `sitemap.xml` com **1.033 entradas** (2 base + 1.031 PT).
 - `npm run qa` → **61/61 PASS** (fixture; não acende páginas no ar).
 - Axon `@ironidesflj/axon@0.3.0` como devDependency com pin exato; nada do pacote no output servido.
-- **Camada de Mielina v2 (F2.1+F2.2, Opção A):** dual-column, matriz de dissecção, síntese baseline/curada + diff inline, reputação/identicon 1–4, filtros, ritual `?ritual=passed`, compositor guiado com card otimista. **Sem iframe do giscus**; GitHub Discussions é o back-end via compositor + sync diário (`sync-discussao.yml`, 06:23 UTC), que gera `discussao/{PREFIX}.json`, calcula tiers, preserva `synthesis` e abre PR. O build **nunca** faz fetch.
+- **Camada de Mielina v2 (F2.1+F2.2, Opção A):** dual-column, matriz de dissecção, síntese baseline/curada + diff inline, reputação/identicon 1–4, filtros, ritual `?ritual=passed`, compositor guiado com card otimista. **Sem iframe do giscus**; GitHub Discussions é o back-end via compositor + sync horário (`sync-discussao.yml`, 23 * * * *), que gera `discussao/{PREFIX}.json`, calcula tiers, preserva `synthesis` e abre PR. O build **nunca** faz fetch.
 - **Ingestão F2:** `ingest-manifest.yml` baixa manifesto do app, confere SHA-256 e abre PR; monitor a cada 15 min.
 - **Epitáfio:** Axon 0.3.0; questão retirada mantém página com aviso, sem gabarito, no sitemap.
 
@@ -30,12 +30,13 @@ Este checkout **não está sincronizado**: `HEAD` local = `c418b7b` (33 commits 
 - **Promoção automática de “resposta aceita”** e gates completos de reputação (tier já derivado no sync).
 - **Self-host das Google Fonts** (CSP enforce libera os domínios do Google até lá); workflow agendado pode ser desativado pelo GitHub após ~60 dias sem atividade.
 - **Reputação/upvote:** `▲ Acelerar` é local e não entra no tier (que deriva de reações do GitHub); decisão de produto pendente — proposta de manter a UI e separar os contadores (não desfazer a Mielina v2).
+- **Arquitetura Mielina v3 (11/11, 2.0.0):** política única de reputação/fontes; sync paginado all-or-nothing com IDs permanentes; APIs `/api/mielina/*` (GitHub App OAuth/PKCE, cookie cifrado); curadoria Nível 3 propõe/Nível 4 aprova com `contentHash`+`baseVersion`; UI com snapshot datado e voto via API (sem localStorage); checklist em `noos-orquestra/relatorios/mielina-checklist.md`. **Falta configurar o GitHub App/secrets na Vercel** para validar auth/API em produção.
 - **Hardening/histórico (10/11, 1.6.0):** CSP enforce com scripts inline externalizados; `synthesis.revisions[]` renderiza diff real quando há ≥2 revisões; QA 61; documentação atualizada.
 - **Specs reconciliadas (10/11):** `spec-pagina-de-questao.md` atualizada para a v10.2/v12 + item 6 (Mielina) e `spec-discussao-questao.md` marcada como implementada (Opção A); rotas antigas (`api/q.js`, 301/308 de função) agora têm nota de superação explícita.
 
 ## Próximo passo
 
-1. Reconciliar com `origin/main` (ver nota operacional) e publicar a versão 1.5.0.
+1. Reconciliar com `origin/main` (ver nota operacional) e publicar a versão 2.0.0.
 2. Rodar `npm ci && npm run build && npm run qa` (cache: `npm_config_cache="$PWD/.npm-cache"`).
 3. Curadoria: transformar contribuições reais em `synthesis` versionada e inaugurar a Camada de Mielina nas questões-âncora.
 4. Qualquer bump: `package.json` × `noos.registry.json` × rodapé PT/EN iguais.
