@@ -2,8 +2,6 @@
 
 Revisão documental: **11/11/2026** · versão do sistema: **2.0.0** (arquitetura definitiva da Mielina).
 
-> **Nota operacional (10/11/2026):** este checkout está **33 commits atrás de `origin/main`** e recebeu a implementação da Camada de Mielina v2 como mudanças não commitadas. Antes de publicar: reconciliar com `origin/main`, rodar `npm ci && npm run build && npm run qa` e só então commit/push (ver `memory.md`).
-
 ## Publicado no Hub
 
 - `noos.study` é o endereço principal. `www.noos.study` redireciona para ele; `noos-hub.vercel.app` é outra URL do mesmo projeto Vercel.
@@ -25,7 +23,7 @@ Página `/q/{ID}/` dual-column (≥1024px), questão sticky à esquerda e discus
 - **Síntese consolidada:** versão curada quando existe dump; caso contrário **baseline v1 automática** com o gabarito e a fonte oficial do manifesto. O dump aceita `synthesis.revisions[]`; quando há ≥2 revisões arquivadas, o botão **Diff** mostra o **histórico real** (`#n-1 → #n`) com o texto anterior e a fonte da revisão; sem histórico arquivado, a página informa “histórico a partir da próxima curadoria” (nunca inventa revisão).
 - **Reputação/“Abraço da Esfera”:** identicon determinístico 5×5 + 4 níveis SVG; **tier derivado no sync** (reações, fontes, aprovação, respostas aceitas) com overrides em `discussao/authors.json`; botão **▲ Acelerar** com persistência local.
 - **Ritual “Passei na prova!”:** `?ritual=passed&trap=C`, flair e compositor guiado; **publicação otimista** do card + abertura da Discussion pré-preenchida no GitHub.
-- **Sem iframe do giscus (Opção A):** toda a UI é nativa. O **GitHub Discussions** (`ironidesflj/noos-hub`, categoria Q&A) é o back-end: o compositor publica com título = ID e corpo estruturado; o **sync horário** (`sync-discussao.yml`, 23 * * * *) lê post raiz + comentários, calcula tiers, **preserva `synthesis`** e abre PR com `discussao/{PREFIX}.json`.
+- **Sem iframe do giscus (Opção A):** toda a UI é nativa. O **GitHub Discussions** (`ironidesflj/noos-hub`, categoria Q&A) é o back-end: o compositor publica com título = ID e corpo estruturado; o **sync horário** (`sync-discussao.yml`, `23 * * * *`) lê post raiz + comentários, calcula tiers, **preserva `synthesis`** e abre PR com `discussao/{PREFIX}.json`.
 - **Degradação graciosa:** sem JS, questão, gabarito, síntese e contribuições seguem legíveis; sem dump, estado orientador (nada é inventado).
 
 ## Coordenação com apps
@@ -37,11 +35,11 @@ Página `/q/{ID}/` dual-column (≥1024px), questão sticky à esquerda e discus
 
 ## Verificação (10/11/2026)
 
-- `npm run qa` → **PASS** (68 asserções no gerador); `node --test` → **63/63** (política, sync, lib/API, curadoria) (fixture; inclui paridade PT/EN, cantoneiras, 4 níveis de avatar, diff, compositor e zero iframe do giscus).
+- `npm run qa` → **PASS** (68 asserções no gerador); `node --test` → **63/63**; `node --test` → **63/63** (política, sync, lib/API, curadoria) (fixture; inclui paridade PT/EN, cantoneiras, 4 níveis de avatar, diff, compositor e zero iframe do giscus).
 - `npm run build` → **1.031 aceitas / 0 rejeitadas**, 2.062 páginas canônicas, 1.031 redirects, sitemap com 1.033 entradas.
 - Layout verificado em 320 px, 640 px (200% zoom em 1280) e 1920 px sem overflow horizontal; sticky com scroll interno.
 - **CSP enforce testado localmente** com servidor enviando o header: 0 violações em home, questão, redirect e 404; tema e filtros funcionando; scripts inline eliminados (`js/theme-boot.js`, `js/lang-redirect.js`, `js/redirect.js`).
-- **Pendências conhecidas:** configurar o GitHub App/segredos na Vercel e validar o checklist de aceite (auth/API dependem de credenciais); curadoria editorial das sínteses (o schema de `revisions` está pronto, mas os dumps atuais ainda não têm histórico arquivado), promoção automática de “resposta aceita”, self-host das Google Fonts (hoje liberadas na CSP) e testes de CSP no preview. Cruzamento de reputação com upvote local segue em estudo (documentado no `plan.md`).
+- **Pendências conhecidas:** configurar GitHub App/segredos na Vercel (`docs/configurar-mielina.md`) e validar o checklist (auth/API dependem de credenciais); curadoria editorial das sínteses (o schema de `revisions` está pronto, mas os dumps atuais ainda não têm histórico arquivado), promoção automática de “resposta aceita”, self-host das Google Fonts (hoje liberadas na CSP) e testes de CSP no preview. Cruzamento de reputação com upvote local segue em estudo (documentado no `plan.md`).
 
 ## Limites
 

@@ -30,11 +30,11 @@ com os apps; o estado operacional fica em `current-state.md`.
 - **Opção A:** iframe do giscus **removido**; UI 100% nativa. GitHub
   Discussions (categoria Q&A) é o back-end; o compositor publica e o sync
   periódico gera `discussao/{PREFIX}.json`.
-- **Sync (`scripts/sync-discussao.mjs` + workflow diário 06:23 UTC):** lê post
+- **Sync (`scripts/sync-discussao.mjs` + workflow horário (`23 * * * *`)):** lê post
   raiz e comentários, parseia alternativa/status/fonte, calcula tier 1–4,
   preserva `synthesis` e abre PR com os dumps. Fora do build (zero fetch no
   gerador).
-- **QA ampliado:** **61 asserções** (paridade PT/EN, cantoneiras, matriz,
+- **QA ampliado:** **68 asserções** (paridade PT/EN, cantoneiras, matriz,
   síntese, avatares, diff, compositor, zero giscus).
 - **Números do último build local:** 1.031 aceitas (RAN 600 + SYN 431),
   2.062 páginas canônicas, 1.031 redirects, sitemap 1.033.
@@ -68,11 +68,16 @@ com os apps; o estado operacional fica em `current-state.md`.
   `GITHUB_APP_PRIVATE_KEY`, `GITHUB_APP_CLIENT_ID`, `GITHUB_APP_CLIENT_SECRET`,
   `MIELINA_SESSION_SECRET`) na Vercel para validar auth/API em produção.
 
+## Feito — 2026-11-11 · Arquitetura Mielina v3 (2.0.0)
+
+- Five phases implementadas e mergeadas (#22 `aa16394`, #23 `d7c2506`);
+  produção 2.0.0; 63 testes Node + QA 68; CSP enforce.
+- Checkout local reconciliado em `d7c2506`; guia de credenciais criado.
+
 ## Pendente
 
-- **Reconciliar o checkout local** com `origin/main` (o working tree estava 33
-  commits atrás) antes de publicar; rodar `npm ci && npm run build && npm run qa`
-  e commit na `main`.
+- **Configuração externa:** GitHub App + `MIELINA_*` na Vercel + redeploy, e
+  validação de OAuth/dispatch (`docs/configurar-mielina.md`).
 - **Curadoria da síntese:** fluxo editorial para transformar contribuições
   aprovadas em versão consolidada (hoje o dump permite síntese manual, e o
   baseline v1 cobre o resto).
