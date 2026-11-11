@@ -324,106 +324,103 @@ async function mielinaFetchJson(url, options, timeoutMs) {
     }
     if (curationBtn) curationBtn.addEventListener("click", loadCuration);
 
-    var proposalList = synEl.querySelector("[data-proposals-list]");
-    if (proposalList) {
-      var approveBtns = synEl.querySelectorAll("[data-approve-proposal]");
-      approveBtns.forEach(function (btn) {
-        btn.addEventListener("click", async function () {
-          btn.setAttribute("aria-busy", "true");
-          try {
-            var me = await mielinaMe();
-            if (!me.authenticated) { mielinaLogin(); return; }
-            var res = await fetch("/api/mielina/synthesis/approve", {
-              method: "POST",
-              headers: mielinaJsonHeaders(),
-              body: JSON.stringify({
-                questionId: questionId(),
-                proposalId: btn.getAttribute("data-approve-proposal"),
-                baseVersion: Number(btn.getAttribute("data-base-version")),
-                contentHash: btn.getAttribute("data-content-hash"),
-              }),
-            });
-            if (res.status === 403) throw new Error("forbidden");
-            if (!res.ok) throw new Error("approve " + res.status);
-            window.location.reload();
-          } catch (e) {
-            btn.setAttribute("aria-busy", "false");
-          }
-        });
+    var approveBtns = synEl.querySelectorAll("[data-approve-proposal]");
+    approveBtns.forEach(function (btn) {
+      btn.addEventListener("click", async function () {
+        btn.setAttribute("aria-busy", "true");
+        try {
+          var me = await mielinaMe();
+          if (!me.authenticated) { mielinaLogin(); return; }
+          var res = await fetch("/api/mielina/synthesis/approve", {
+            method: "POST",
+            headers: mielinaJsonHeaders(),
+            body: JSON.stringify({
+              questionId: questionId(),
+              proposalId: btn.getAttribute("data-approve-proposal"),
+              baseVersion: Number(btn.getAttribute("data-base-version")),
+              contentHash: btn.getAttribute("data-content-hash"),
+            }),
+          });
+          if (res.status === 403) throw new Error("forbidden");
+          if (!res.ok) throw new Error("approve " + res.status);
+          window.location.reload();
+        } catch (e) {
+          btn.setAttribute("aria-busy", "false");
+        }
       });
-      var restoreBtns = synEl.querySelectorAll("[data-revision-restore]");
-      restoreBtns.forEach(function (btn) {
-        btn.addEventListener("click", async function () {
-          var reason = window.prompt(
-            (document.documentElement.lang || "pt").indexOf("pt") === 0
-              ? "Motivo da restauração (auditável):"
-              : "Restore reason (auditable):"
-          );
-          if (!reason || reason.trim().length < 10) return;
-          btn.setAttribute("aria-busy", "true");
-          try {
-            var me = await mielinaMe();
-            if (!me.authenticated) { mielinaLogin(); return; }
-            var res = await fetch("/api/mielina/synthesis/revert", {
-              method: "POST",
-              headers: mielinaJsonHeaders(),
-              body: JSON.stringify({
-                questionId: questionId(),
-                baseVersion: Number(btn.getAttribute("data-base-version")),
-                targetVersion: Number(btn.getAttribute("data-revision-restore")),
-                reason: reason,
-              }),
-            });
-            if (!res.ok) throw new Error("revert " + res.status);
-            window.location.reload();
-          } catch (e) {
-            btn.setAttribute("aria-busy", "false");
-          }
-        });
+    });
+    var restoreBtns = synEl.querySelectorAll("[data-revision-restore]");
+    restoreBtns.forEach(function (btn) {
+      btn.addEventListener("click", async function () {
+        var reason = window.prompt(
+          (document.documentElement.lang || "pt").indexOf("pt") === 0
+            ? "Motivo da restauração (auditável):"
+            : "Restore reason (auditable):"
+        );
+        if (!reason || reason.trim().length < 10) return;
+        btn.setAttribute("aria-busy", "true");
+        try {
+          var me = await mielinaMe();
+          if (!me.authenticated) { mielinaLogin(); return; }
+          var res = await fetch("/api/mielina/synthesis/revert", {
+            method: "POST",
+            headers: mielinaJsonHeaders(),
+            body: JSON.stringify({
+              questionId: questionId(),
+              baseVersion: Number(btn.getAttribute("data-base-version")),
+              targetVersion: Number(btn.getAttribute("data-revision-restore")),
+              reason: reason,
+            }),
+          });
+          if (!res.ok) throw new Error("revert " + res.status);
+          window.location.reload();
+        } catch (e) {
+          btn.setAttribute("aria-busy", "false");
+        }
       });
-      var proposeSubmit = synEl.querySelector("[data-propose-submit]");
-      if (proposeSubmit) {
-        proposeSubmit.addEventListener("click", async function () {
-          var bodyEl = synEl.querySelector("[data-propose-body]");
-          var sourceEl = synEl.querySelector("[data-propose-source]");
-          var statusEl = synEl.querySelector("[data-propose-status]");
-          var text = (bodyEl && bodyEl.value ? bodyEl.value : "").trim();
-          if (text.length < 30) {
-            if (statusEl) statusEl.textContent = "Escreva ao menos 30 caracteres.";
+    });
+    var proposeSubmit = synEl.querySelector("[data-propose-submit]");
+    if (proposeSubmit) {
+      proposeSubmit.addEventListener("click", async function () {
+        var bodyEl = synEl.querySelector("[data-propose-body]");
+        var sourceEl = synEl.querySelector("[data-propose-source]");
+        var statusEl = synEl.querySelector("[data-propose-status]");
+        var text = (bodyEl && bodyEl.value ? bodyEl.value : "").trim();
+        if (text.length < 30) {
+          if (statusEl) statusEl.textContent = "Escreva ao menos 30 caracteres.";
+          return;
+        }
+        var sourceValue = sourceEl && sourceEl.value ? sourceEl.value.trim() : "";
+        if (!/^https:\/\//i.test(sourceValue)) {
+          if (statusEl) statusEl.textContent = "Proposta exige fonte oficial https://.";
+          if (sourceEl) sourceEl.focus();
+          return;
+        }
+        proposeSubmit.setAttribute("aria-busy", "true");
+        try {
+          var me = await mielinaMe();
+          if (!me.authenticated) { mielinaLogin(); return; }
+          var res = await fetch("/api/mielina/synthesis/propose", {
+            method: "POST",
+            headers: mielinaJsonHeaders(),
+            body: JSON.stringify({
+              questionId: questionId(),
+              body: text,
+              sourceUrl: sourceEl && sourceEl.value ? sourceEl.value.trim() : "",
+            }),
+          });
+          if (res.status === 403) {
+            if (statusEl) statusEl.textContent = "Nível 3+ necessário.";
             return;
           }
-          var sourceValue = sourceEl && sourceEl.value ? sourceEl.value.trim() : "";
-          if (!/^https:\/\//i.test(sourceValue)) {
-            if (statusEl) statusEl.textContent = "Proposta exige fonte oficial https://.";
-            if (sourceEl) sourceEl.focus();
-            return;
-          }
-          proposeSubmit.setAttribute("aria-busy", "true");
-          try {
-            var me = await mielinaMe();
-            if (!me.authenticated) { mielinaLogin(); return; }
-            var res = await fetch("/api/mielina/synthesis/propose", {
-              method: "POST",
-              headers: mielinaJsonHeaders(),
-              body: JSON.stringify({
-                questionId: questionId(),
-                body: text,
-                sourceUrl: sourceEl && sourceEl.value ? sourceEl.value.trim() : "",
-              }),
-            });
-            if (res.status === 403) {
-              if (statusEl) statusEl.textContent = "Nível 3+ necessário.";
-              return;
-            }
-            if (!res.ok) throw new Error("propose " + res.status);
-            if (statusEl) statusEl.textContent = "Proposta enviada.";
-          } catch (e) {
-            if (statusEl) statusEl.textContent = "Falha ao enviar.";
-          } finally {
-            proposeSubmit.setAttribute("aria-busy", "false");
-          }
-        });
-      }
+          if (!res.ok) throw new Error("propose " + res.status);
+          if (statusEl) statusEl.textContent = "Proposta enviada.";
+        } catch (e) {
+          if (statusEl) statusEl.textContent = "Falha ao enviar.";
+        } finally {
+          proposeSubmit.setAttribute("aria-busy", "false");
+        }
+      });
     }
   }
 })();
