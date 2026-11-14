@@ -5,7 +5,7 @@
     "discussionUrl": "https://github.com/ironidesflj/noos-hub/discussions/17",
     "legacyDiscussionIds": [],
     "legacyDiscussionNumbers": [],
-    "syncedAt": "2026-11-11T13:09:30.215Z",
+    "syncedAt": "2026-11-14T18:19:48.621Z",
     "approvedPassersCount": 0,
     "synthesis": {
       "summary": "O atalho mental que resolve em 10 segundos: o enunciado exige duas garantias simultâneas para um Lakeflow Job — compute dedicado que nasce e morre automaticamente com a execução, e bloqueio total de sessões interativas de analistas. Por que não é A ou D? All-purpose clusters e clusters compartilhados ficam ativos entre execuções e permitem anexar notebooks interativos. Por que não é C? Um SQL Warehouse é voltado a consultas SQL, não a transformações PySpark em jobs dedicados. Só o Job Cluster (B) é provisionado sob demanda pelo próprio Lakeflow Job e encerrado ao fim da tarefa.",
@@ -15,7 +15,19 @@
         "@vitor-cloud-9f",
         "@ironidesflj"
       ],
-      "version": 3
+      "version": 3,
+      "pendingProposals": [
+        {
+          "proposalId": "DC_kwDOVVHVoc4BKkqf",
+          "baseVersion": 3,
+          "proposerId": "U_kgDOCouteg",
+          "proposerHandle": "@ironidesflj",
+          "body": "O atalho mental que resolve em 10 segundos: o enunciado exige duas garantias simultâneas para um Lakeflow Job — compute dedicado que nasce e morre automaticamente com a execução, e bloqueio total de sessões interativas de analistas. Por que não é A ou D? All-purpose clusters e clusters compartilhados ficam ativos entre execuções e permitem anexar notebooks interativos. Por que não é C? Um SQL Warehouse é voltado a consultas SQL, não a transformações PySpark em jobs dedicados. Só o Job Cluster (B) é provisionado sob demanda pelo próprio Lakeflow Job e encerrado ao fim da tarefa.",
+          "sourceUrl": "https://docs.databricks.com/aws/en/jobs/compute",
+          "contentHash": "sha256:5ac259b84dc363300cbe1046506305117637e742891b8c4cc0614b9677e11e23",
+          "createdAt": "2026-11-11T18:47:39Z"
+        }
+      ]
     },
     "comments": [
       {
